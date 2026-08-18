@@ -244,7 +244,10 @@ const load = async () => {
       r.onsuccess = () => resolve(r.result);
       r.onerror = () => reject(r.error);
     });
-    if (raw?.sessions) store = migrateWorkspace(raw);
+    if (raw?.sessions) {
+      store = migrateWorkspace(raw);
+      savedState = "Saved locally";
+    }
     else await persist();
   } catch (error) {
     savedState = `Storage unavailable: ${storageMessage(error)}`;
@@ -308,7 +311,7 @@ const attachmentFor = (id: string) =>
 
 function render() {
   document.querySelector<HTMLDivElement>("#app")!.innerHTML =
-    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard">⌂ Dashboard</button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings">${icon("settings")} Settings</button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${view === "dashboard" ? dashboard() : view === "settings" ? settings() : workspace()}</main></div>`;
+    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${view === "dashboard" ? dashboard() : view === "settings" ? settings() : workspace()}</main></div>`;
   bind();
 }
 function sessionCard(s: Session) {
