@@ -35,7 +35,7 @@ assert.equal(
   true,
 );
 assert.equal(
-  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v3"),
+  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v4"),
   true,
 );
 console.log("SolveStack static-shell smoke test passed");

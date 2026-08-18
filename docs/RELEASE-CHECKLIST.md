@@ -1,5 +1,14 @@
 # SolveStack release checklist
 
+## First production deployment
+
+- Record the final Cloudflare Pages or custom-domain origin.
+- Add an absolute self-referencing canonical URL to `index.html` using that origin.
+- Add `og:url` using the same canonical URL.
+- Add `public/sitemap.xml` containing the canonical homepage URL.
+- Add the sitemap URL to `public/robots.txt`.
+- Submit the production property and sitemap in Google Search Console.
+
 - Run `bun run build`.
 - Run `bun run test`.
 - Confirm `dist/index.html`, `dist/manifest.webmanifest`, `dist/service-worker.js`, and `dist/icon.svg` exist.

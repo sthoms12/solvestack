@@ -1,12 +1,61 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#101313" />
-    <meta name="description" content="A local-first troubleshooting workspace for IT professionals." />
+    <meta name="description" content="Capture troubleshooting notes, evidence, hypotheses, and resolutions locally, then export reusable Markdown, HTML, JSON, and ZIP knowledge packages." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="application-name" content="SolveStack" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:title" content="SolveStack — Local-first IT troubleshooting workspace" />
+    <meta property="og:description" content="Capture the reasoning and evidence behind technical investigations, then export durable troubleshooting knowledge." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SolveStack — Never lose track of your troubleshooting again." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SolveStack — Local-first IT troubleshooting workspace" />
+    <meta name="twitter:description" content="Capture technical investigations and export durable troubleshooting knowledge." />
+    <meta name="twitter:image" content="/og-image.png" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <title>SolveStack — Never lose track of your troubleshooting again.</title>
+    <title>Local-First IT Troubleshooting Workspace | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "SolveStack",
+        "applicationCategory": "BusinessApplication",
+        "applicationSubCategory": "IT troubleshooting workspace",
+        "operatingSystem": "Any modern web browser",
+        "description": "A local-first troubleshooting workspace for IT professionals that captures reasoning and evidence and exports portable technical knowledge.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Local browser storage",
+          "Structured troubleshooting timeline",
+          "Evidence and attachment capture",
+          "Hypothesis tracking",
+          "Deterministic RCA generation",
+          "Markdown, HTML, JSON, and ZIP export",
+          "Offline progressive web application"
+        ]
+      }
+    </script>
   </head>
-  <body><div id="app"></div><script type="module" src="/src/main.ts"></script></body>
+  <body>
+    <div id="app">
+      <main>
+        <h1>SolveStack: local-first IT troubleshooting workspace</h1>
+        <p>Capture observations, commands, evidence, hypotheses, dead ends, decisions, and resolutions while you troubleshoot.</p>
+        <p>Your investigations stay in this browser and export as portable Markdown, standalone HTML, JSON, and ZIP knowledge packages.</p>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

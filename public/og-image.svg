@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#101313"/>
+  <path d="M0 0h16v630H0z" fill="#c9f269"/>
+  <g transform="translate(72 72)">
+    <rect width="88" height="88" rx="20" fill="#c9f269"/>
+    <text x="44" y="67" fill="#152012" font-family="Arial, Helvetica, sans-serif" font-size="63" font-weight="700" text-anchor="middle">S</text>
+  </g>
+  <text x="72" y="235" fill="#c9f269" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="4">LOCAL-FIRST IT TROUBLESHOOTING</text>
+  <text x="72" y="330" fill="#f4f7f1" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700">Never lose the thread.</text>
+  <text x="72" y="398" fill="#aeb8ad" font-family="Arial, Helvetica, sans-serif" font-size="31">Capture reasoning and evidence. Export durable knowledge.</text>
+  <line x1="72" y1="486" x2="1128" y2="486" stroke="#2f3937" stroke-width="2"/>
+  <text x="72" y="550" fill="#f4f7f1" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700">SolveStack</text>
+  <text x="1128" y="550" fill="#7f8c86" font-family="Arial, Helvetica, sans-serif" font-size="20" text-anchor="end">NO ACCOUNT · NO CLOUD DATABASE · NO AI REQUIRED</text>
+</svg>

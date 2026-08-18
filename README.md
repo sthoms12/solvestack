@@ -23,6 +23,8 @@ Connect the `sthoms12/solvestack` GitHub repository and use:
 
 No environment variables, server functions, database, or runtime compatibility flags are required.
 
+The source includes indexable fallback content, robots directives, SoftwareApplication structured data, Open Graph and Twitter metadata, a 1200×630 social image, and Cloudflare cache/security headers. After Cloudflare assigns the final production URL, add the absolute canonical URL and sitemap by following `docs/RELEASE-CHECKLIST.md`.
+
 ## Boundaries
 
 No account, backend, cloud database, AI, or network service is required. The MVP stores sessions and evidence in IndexedDB and provides deterministic Markdown, standalone HTML, JSON, backup, and ZIP knowledge-package export. The service worker caches the application shell for offline use after the first load.
