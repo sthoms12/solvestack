@@ -1,12 +1,11 @@
 # SolveStack release checklist
 
-## First production deployment
+## Production SEO
 
-- Record the final Cloudflare Pages or custom-domain origin.
-- Add an absolute self-referencing canonical URL to `index.html` using that origin.
-- Add `og:url` using the same canonical URL.
-- Add `public/sitemap.xml` containing the canonical homepage URL.
-- Add the sitemap URL to `public/robots.txt`.
+- Confirm `https://solvestack-ai.app/` remains the intended canonical origin.
+- Confirm the apex domain redirects HTTP to HTTPS without a redirect chain.
+- If `www.solvestack-ai.app` is attached, redirect it to `https://solvestack-ai.app/`.
+- Confirm `/robots.txt`, `/sitemap.xml`, and `/og-image.png` return HTTP 200.
 - Submit the production property and sitemap in Google Search Console.
 
 - Run `bun run build`.

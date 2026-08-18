@@ -22,7 +22,10 @@ console.log("SolveStack data-model smoke test passed");
 const buildFiles = [
   "dist/index.html",
   "dist/manifest.webmanifest",
+  "dist/og-image.png",
+  "dist/robots.txt",
   "dist/service-worker.js",
+  "dist/sitemap.xml",
 ];
 for (const file of buildFiles)
   assert.equal(
@@ -36,6 +39,25 @@ assert.equal(
 );
 assert.equal(
   (await Bun.file("public/service-worker.js").text()).includes("solvestack-v4"),
+  true,
+);
+const productionOrigin = "https://solvestack-ai.app/";
+assert.equal(
+  (await Bun.file("index.html").text()).includes(
+    `<link rel="canonical" href="${productionOrigin}" />`,
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/sitemap.xml").text()).includes(
+    `<loc>${productionOrigin}</loc>`,
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/robots.txt").text()).includes(
+    `${productionOrigin}sitemap.xml`,
+  ),
   true,
 );
 console.log("SolveStack static-shell smoke test passed");

@@ -23,7 +23,7 @@ Connect the `sthoms12/solvestack` GitHub repository and use:
 
 No environment variables, server functions, database, or runtime compatibility flags are required.
 
-The source includes indexable fallback content, robots directives, SoftwareApplication structured data, Open Graph and Twitter metadata, a 1200×630 social image, and Cloudflare cache/security headers. After Cloudflare assigns the final production URL, add the absolute canonical URL and sitemap by following `docs/RELEASE-CHECKLIST.md`.
+The source includes indexable fallback content, a canonical URL for `https://solvestack-ai.app/`, robots and sitemap directives, SoftwareApplication structured data, Open Graph and Twitter metadata, a 1200×630 social image, and Cloudflare cache/security headers.
 
 ## Boundaries
 
