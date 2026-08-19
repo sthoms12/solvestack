@@ -1,4 +1,4 @@
-const CACHE = "solvestack-v6";
+const CACHE = "solvestack-v7";
 self.addEventListener("install", (event) =>
   event.waitUntil(
     caches
@@ -10,6 +10,8 @@ self.addEventListener("install", (event) =>
           "/manifest.webmanifest",
           "/icon.svg",
           "/og-image.png",
+          "/use-your-data/",
+          "/use-your-data/guide.css",
         ]),
       ),
   ),

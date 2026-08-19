@@ -35,6 +35,8 @@ The persistence boundary and migration policy are documented in `docs/DATA-MODEL
 
 First-time users receive a dismissible workflow introduction, and the persistent field guide explains the Capture → Structure → Investigate → Resolve → Document → Reuse model with a realistic IT example. Settings includes durable audience, product-boundary, local-privacy, backup, and knowledge-repository guidance.
 
+The in-app **Use your data** guide explains what each export format is for and how completed investigations can become searchable knowledge, runbooks, AI-assisted reviews, readable handoffs, and durable archives. A public vendor-neutral guide is available at `https://solvestack-ai.app/use-your-data/`, with privacy guardrails and reusable prompts for organization-approved AI tools. SolveStack itself never uploads or analyzes exported data.
+
 ## Verification
 
 The current verification suite covers the static build and PWA shell, versioned data contracts, backup merge and corruption rejection, required export sections, ZIP signatures and evidence paths, attachment limits, quota-specific storage failure messaging, transaction-abort handling, accessible live status/labels on core controls, and registered domain tests for search ranking, related-session explanations, redaction, and backup merging.

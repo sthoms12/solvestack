@@ -313,7 +313,7 @@ const attachmentFor = (id: string) =>
 
 function render() {
   document.querySelector<HTMLDivElement>("#app")!.innerHTML =
-    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button><button class="nav-item" id="open-guide" aria-label="How SolveStack works"><span aria-hidden="true">?</span><b>How it works</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${view === "dashboard" ? dashboard() : view === "settings" ? settings() : workspace()}</main></div>${guideDialog()}`;
+    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button><button class="nav-item" id="open-guide" aria-label="How SolveStack works"><span aria-hidden="true">?</span><b>How it works</b></button><button class="nav-item" id="open-data-guide" aria-label="Ways to use exported troubleshooting data"><span aria-hidden="true">↗</span><b>Use your data</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${view === "dashboard" ? dashboard() : view === "settings" ? settings() : workspace()}</main></div>${guideDialog()}${useDataDialog()}`;
   bind();
 }
 function sessionCard(s: Session) {
@@ -328,7 +328,11 @@ function welcomePanel() {
   return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Keep the investigation understandable while you solve it.</h2><p>Capture what you observe, try, rule out, and resolve. SolveStack keeps the working record on this device, then turns it into portable troubleshooting knowledge.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
 }
 function guideDialog() {
-  return `<dialog id="guide-dialog" class="guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / 01–06</span><h2>How SolveStack works</h2><p>Use it when a technical problem involves multiple tests, possible causes, evidence, or decisions worth preserving.</p></div><button class="guide-close" value="close" aria-label="Close guide">×</button></header><ol class="guide-steps"><li><b>Capture</b><span>Start a session as troubleshooting begins. Record observations, commands, errors, screenshots, and references as they happen.</span></li><li><b>Structure</b><span>Label entries by reasoning type so another engineer can follow what you knew and when you knew it.</span></li><li><b>Investigate</b><span>Track hypotheses, next steps, evidence, and the current focus without turning the work into a ticket form.</span></li><li><b>Rule out</b><span>Keep failed theories and explain why they were eliminated. Dead ends are valuable troubleshooting knowledge.</span></li><li><b>Resolve</b><span>Record the root cause, fix, validation, and prevention while the details are still fresh.</span></li><li><b>Reuse</b><span>Export Markdown, HTML, JSON, or a ZIP package. Store the result in SharePoint, OneDrive, GitHub, or your existing knowledge system.</span></li></ol><section class="guide-example"><span class="section-kicker">EXAMPLE INVESTIGATION</span><strong>Exchange Online outbound mail delay</strong><p>Capture affected users, service-health checks, message traces, connector tests, the gateway hypothesis, why other causes were ruled out, and how delivery was validated after the fix.</p></section><footer><p><strong>Built for:</strong> IT engineers, administrators, support specialists, consultants, and technical problem-solvers.</p><p><strong>Not designed as:</strong> a ticketing system, incident-management platform, cloud knowledge base, or AI assistant.</p><button class="primary" value="close">Got it</button></footer></form></dialog>`;
+  return `<dialog id="guide-dialog" class="guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / 01–06</span><h2>How SolveStack works</h2><p>Use it when a technical problem involves multiple tests, possible causes, evidence, or decisions worth preserving.</p></div><button class="guide-close" value="close" aria-label="Close guide">×</button></header><ol class="guide-steps"><li><b>Capture</b><span>Start a session as troubleshooting begins. Record observations, commands, errors, screenshots, and references as they happen.</span></li><li><b>Structure</b><span>Label entries by reasoning type so another engineer can follow what you knew and when you knew it.</span></li><li><b>Investigate</b><span>Track hypotheses, next steps, evidence, and the current focus without turning the work into a ticket form.</span></li><li><b>Rule out</b><span>Keep failed theories and explain why they were eliminated. Dead ends are valuable troubleshooting knowledge.</span></li><li><b>Resolve</b><span>Record the root cause, fix, validation, and prevention while the details are still fresh.</span></li><li><b>Reuse</b><span>Export Markdown, HTML, JSON, or a ZIP package. Store the result in your existing knowledge system.</span></li></ol><section class="guide-example"><span class="section-kicker">EXAMPLE INVESTIGATION</span><strong>Exchange Online outbound mail delay</strong><p>Capture affected users, service-health checks, message traces, connector tests, the gateway hypothesis, why other causes were ruled out, and how delivery was validated after the fix.</p></section><footer><p><strong>Built for:</strong> IT engineers, administrators, support specialists, consultants, and technical problem-solvers.</p><p><strong>Not designed as:</strong> a ticketing system, incident-management platform, cloud knowledge base, or AI assistant.</p><button class="secondary" id="guide-to-data" value="close">See what exports can become</button><button class="primary" value="close">Got it</button></footer></form></dialog>`;
+}
+
+function useDataDialog() {
+  return `<dialog id="data-guide-dialog" class="guide-dialog data-guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / PORTABLE KNOWLEDGE</span><h2>What can your exports become?</h2><p>Move completed investigations into the systems your organization already trusts.</p></div><button class="guide-close" value="close" aria-label="Close use your data guide">×</button></header><div class="data-format-grid"><article><b>Markdown</b><span>Searchable knowledge, documentation, version control, and approved AI review.</span></article><article><b>HTML</b><span>A readable, standalone handoff for another engineer or stakeholder.</span></article><article><b>JSON</b><span>A lossless SolveStack record for re-import, backup, or custom processing.</span></article><article><b>ZIP</b><span>The complete report and original evidence in one durable archive.</span></article></div><section class="data-possibilities"><span class="section-kicker">POSSIBILITIES</span><ul><li>Build a searchable troubleshooting library.</li><li>Create knowledge articles, runbooks, and training material.</li><li>Compare resolved cases for recurring symptoms and root causes.</li><li>Ask an organization-approved AI tool to review one or more Markdown exports.</li></ul></section><section class="guide-guardrail"><strong>Move knowledge deliberately.</strong><p>SolveStack does not upload or analyze exports. Redact credentials, personal data, tenant details, and confidential evidence before sharing. External storage and AI tools have their own privacy and retention policies.</p></section><footer><a class="secondary guide-page-link" href="/use-your-data/">Open the complete possibilities guide</a><button class="primary" value="close">Done</button></footer></form></dialog>`;
 }
 function searchResults() {
   const found = searchSessions(store.sessions, search).slice(0, 8);
@@ -614,7 +618,17 @@ function redact(value: string) {
 function bind() {
   const openGuide = () =>
     document.querySelector<HTMLDialogElement>("#guide-dialog")?.showModal();
+  const openDataGuide = () =>
+    document
+      .querySelector<HTMLDialogElement>("#data-guide-dialog")
+      ?.showModal();
   document.querySelector("#open-guide")?.addEventListener("click", openGuide);
+  document
+    .querySelector("#open-data-guide")
+    ?.addEventListener("click", openDataGuide);
+  document.querySelector("#guide-to-data")?.addEventListener("click", () =>
+    setTimeout(openDataGuide, 0),
+  );
   document.querySelector("#welcome-guide")?.addEventListener("click", openGuide);
   document.querySelector("#settings-guide")?.addEventListener("click", openGuide);
   document.querySelector("#welcome-start")?.addEventListener("click", () =>
@@ -940,10 +954,12 @@ function bind() {
   document.querySelector("#export-md")?.addEventListener("click", () => {
     const s = active()!;
     download(`${s.id}-knowledge.md`, knowledgeMarkdown(s), "text/markdown");
+    setTimeout(openDataGuide, 150);
   });
   document.querySelector("#export-rca")?.addEventListener("click", () => {
     const s = active()!;
     download(`${s.id}-rca.md`, rcaMarkdown(s), "text/markdown");
+    setTimeout(openDataGuide, 150);
   });
   document.querySelector("#export-json")?.addEventListener("click", () => {
     const s = active()!;
@@ -960,14 +976,19 @@ function bind() {
       ),
       "application/json",
     );
+    setTimeout(openDataGuide, 150);
   });
   document.querySelector("#export-html")?.addEventListener("click", () => {
     const s = active()!;
     download(`${s.id}.html`, standaloneHtml(s), "text/html");
+    setTimeout(openDataGuide, 150);
   });
   document
     .querySelector("#export-package")
-    ?.addEventListener("click", () => makeZip(active()!));
+    ?.addEventListener("click", () => {
+      makeZip(active()!);
+      setTimeout(openDataGuide, 150);
+    });
   document.querySelector("#resolve")?.addEventListener("click", async () => {
     const s = active()!;
     const values = await collectFields("Resolve session", [

@@ -26,6 +26,8 @@ const buildFiles = [
   "dist/robots.txt",
   "dist/service-worker.js",
   "dist/sitemap.xml",
+  "dist/use-your-data/index.html",
+  "dist/use-your-data/guide.css",
 ];
 for (const file of buildFiles)
   assert.equal(
@@ -38,7 +40,7 @@ assert.equal(
   true,
 );
 assert.equal(
-  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v6"),
+  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v7"),
   true,
 );
 const productionOrigin = "https://solvestack-ai.app/";
@@ -51,6 +53,12 @@ assert.equal(
 assert.equal(
   (await Bun.file("public/sitemap.xml").text()).includes(
     `<loc>${productionOrigin}</loc>`,
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/sitemap.xml").text()).includes(
+    `<loc>${productionOrigin}use-your-data/</loc>`,
   ),
   true,
 );
