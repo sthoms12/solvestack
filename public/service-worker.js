@@ -1,4 +1,4 @@
-const CACHE = "solvestack-v5";
+const CACHE = "solvestack-v6";
 self.addEventListener("install", (event) =>
   event.waitUntil(
     caches

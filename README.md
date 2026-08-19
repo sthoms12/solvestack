@@ -33,6 +33,8 @@ The data format is versioned (`schemaVersion: 2`) with an executable version-1 m
 
 The persistence boundary and migration policy are documented in `docs/DATA-MODEL.md`. Use `docs/RELEASE-CHECKLIST.md` for repeatable static releases.
 
+First-time users receive a dismissible workflow introduction, and the persistent field guide explains the Capture → Structure → Investigate → Resolve → Document → Reuse model with a realistic IT example. Settings includes durable audience, product-boundary, local-privacy, backup, and knowledge-repository guidance.
+
 ## Verification
 
 The current verification suite covers the static build and PWA shell, versioned data contracts, backup merge and corruption rejection, required export sections, ZIP signatures and evidence paths, attachment limits, quota-specific storage failure messaging, transaction-abort handling, accessible live status/labels on core controls, and registered domain tests for search ranking, related-session explanations, redaction, and backup merging.

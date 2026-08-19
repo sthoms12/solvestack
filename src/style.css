@@ -202,6 +202,73 @@ h2 em {
 .primary:hover {
   background: #dcff8c;
 }
+.welcome-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 760px) auto;
+  gap: 24px;
+  align-items: start;
+  margin: -22px 0 46px;
+  padding: 25px 28px;
+  overflow: hidden;
+  border: 1px solid #4b5e42;
+  border-radius: 10px;
+  background:
+    linear-gradient(110deg, #202a20 0%, #171d1a 72%), var(--panel);
+  box-shadow: inset 3px 0 0 var(--accent), var(--shadow);
+}
+.welcome-panel::after {
+  content: "";
+  position: absolute;
+  right: -50px;
+  bottom: -92px;
+  width: 230px;
+  height: 230px;
+  border: 1px solid #c9f26918;
+  border-radius: 50%;
+}
+.welcome-index {
+  font: 500 38px "DM Mono", monospace;
+  color: var(--accent);
+  line-height: 1;
+}
+.welcome-panel h2 {
+  max-width: 660px;
+  margin: 7px 0 8px;
+  font-size: 24px;
+}
+.welcome-panel p {
+  max-width: 720px;
+  margin-bottom: 17px;
+  color: #b3bcb6;
+  line-height: 1.6;
+}
+.welcome-panel small {
+  display: block;
+  margin-top: 14px;
+  color: var(--muted);
+  font: 10px "DM Mono", monospace;
+}
+.welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.welcome-dismiss,
+.guide-close {
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 22px;
+}
+.welcome-dismiss:hover,
+.guide-close:hover {
+  color: var(--text);
+}
 .secondary {
   background: transparent;
   border-color: var(--line);
@@ -374,6 +441,125 @@ h2 em {
   letter-spacing: -0.04em;
   margin: 20px 0 10px;
   color: var(--accent);
+}
+.guide-dialog {
+  width: min(860px, calc(100vw - 32px));
+  max-height: min(850px, calc(100vh - 32px));
+  padding: 0;
+  overflow: auto;
+  border: 1px solid #526348;
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 30px 100px #000b;
+}
+.guide-dialog::backdrop {
+  background: #070909d9;
+  backdrop-filter: blur(4px);
+}
+.guide-dialog form {
+  padding: 30px;
+}
+.guide-dialog header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+.guide-dialog header h2 {
+  margin: 7px 0 8px;
+  font-size: 30px;
+}
+.guide-dialog header p,
+.guide-dialog footer p,
+.guide-example p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.guide-close {
+  flex: 0 0 40px;
+}
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 10px 0;
+  list-style: none;
+  counter-reset: field-step;
+}
+.guide-steps li {
+  counter-increment: field-step;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  padding: 20px 20px 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.guide-steps li::before {
+  content: "0" counter(field-step);
+  color: var(--accent);
+  font: 500 11px "DM Mono", monospace;
+}
+.guide-steps b,
+.guide-steps span {
+  grid-column: 2;
+}
+.guide-steps b {
+  margin-top: -27px;
+  font-size: 15px;
+}
+.guide-steps span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.guide-example {
+  margin: 18px 0 24px;
+  padding: 20px;
+  border-left: 3px solid var(--warm);
+  background: var(--panel2);
+}
+.guide-example strong {
+  display: block;
+  margin: 8px 0 4px;
+}
+.guide-example p {
+  margin-bottom: 0;
+  font-size: 12px;
+}
+.guide-dialog footer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 24px;
+  align-items: end;
+}
+.guide-dialog footer p {
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+.guide-dialog footer .primary {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+.settings-about {
+  grid-column: 1 / -1;
+}
+.settings-about ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+.settings-about li {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 .empty {
   text-align: center;
@@ -836,6 +1022,57 @@ h2 em {
   .main {
     padding: 28px 16px;
     min-width: 0;
+  }
+  .welcome-panel {
+    display: block;
+    margin: -10px 0 32px;
+    padding: 22px 20px;
+  }
+  .welcome-index {
+    margin-bottom: 15px;
+    font-size: 27px;
+  }
+  .welcome-panel h2 {
+    padding-right: 24px;
+    font-size: 21px;
+  }
+  .welcome-dismiss {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+  }
+  .welcome-actions .primary,
+  .welcome-actions .secondary {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+  .guide-dialog form {
+    padding: 22px 18px;
+  }
+  .guide-dialog header h2 {
+    font-size: 25px;
+  }
+  .guide-steps {
+    display: block;
+  }
+  .guide-steps li {
+    padding-right: 0;
+  }
+  .guide-dialog footer {
+    display: block;
+  }
+  .guide-dialog footer .primary {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .settings-about ul {
+    display: block;
+  }
+  .settings-about li {
+    margin-bottom: 8px;
   }
   .topbar,
   .workspace-header {
