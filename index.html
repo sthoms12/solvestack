@@ -27,6 +27,7 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
+        "@graph": [{
         "@type": "SoftwareApplication",
         "name": "SolveStack",
         "url": "https://solvestack-ai.app/",
@@ -39,6 +40,7 @@
           "price": "0",
           "priceCurrency": "USD"
         },
+        "creator": { "@id": "https://solvestack-ai.app/#creator" },
         "featureList": [
           "Local browser storage",
           "Structured troubleshooting timeline",
@@ -48,6 +50,7 @@
           "Markdown, HTML, JSON, and ZIP export",
           "Offline progressive web application"
         ]
+        }, { "@type": "Person", "@id": "https://solvestack-ai.app/#creator", "name": "Steve Thoms", "url": "https://www.linkedin.com/in/steve-thoms-81381990", "sameAs": ["https://www.linkedin.com/in/steve-thoms-81381990", "https://x.com/thomstech12"] }]
       }
     </script>
   </head>
@@ -58,6 +61,7 @@
         <p>Capture observations, commands, evidence, hypotheses, dead ends, decisions, and resolutions while you troubleshoot.</p>
         <p>Your investigations stay in this browser and export as portable Markdown, standalone HTML, JSON, and ZIP knowledge packages.</p>
         <p><a href="/use-your-data/">Learn how exported troubleshooting data can become searchable knowledge, runbooks, AI-assisted reviews, and durable archives.</a></p>
+        <p>Created by <a href="https://www.linkedin.com/in/steve-thoms-81381990" rel="me">Steve Thoms</a>.</p>
       </main>
     </div>
     <script type="module" src="/src/main.ts"></script>
