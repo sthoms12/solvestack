@@ -25,6 +25,8 @@ No environment variables, server functions, database, or runtime compatibility f
 
 The source includes indexable fallback content, a canonical URL for `https://solvestack-ai.app/`, robots and sitemap directives, SoftwareApplication structured data, Open Graph and Twitter metadata, a 1200×630 social image, and Cloudflare cache/security headers.
 
+The Worker asset runtime is defined in `wrangler.jsonc`. It uses `not_found_handling: "404-page"` so unknown URLs return the custom `404.html` with an HTTP 404 response instead of the application shell. A narrowly scoped Worker handler also returns that response for the stale indexed `/key.php` path.
+
 ## Boundaries
 
 No account, backend, cloud database, AI, or network service is required. The MVP stores sessions and evidence in IndexedDB and provides deterministic Markdown, standalone HTML, JSON, backup, and ZIP knowledge-package export. The service worker caches the application shell for offline use after the first load.

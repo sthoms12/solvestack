@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "solvestack",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-28",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/key.php"]
+  },
+  "observability": {
+    "enabled": true
+  }
+}

@@ -25,7 +25,6 @@ const buildFiles = [
   "dist/og-image.png",
   "dist/robots.txt",
   "dist/404.html",
-  "dist/_redirects",
   "dist/service-worker.js",
   "dist/sitemap.xml",
   "dist/use-your-data/index.html",
