@@ -24,6 +24,7 @@ const buildFiles = [
   "dist/manifest.webmanifest",
   "dist/og-image.png",
   "dist/robots.txt",
+  "dist/404.html",
   "dist/service-worker.js",
   "dist/sitemap.xml",
   "dist/use-your-data/index.html",
