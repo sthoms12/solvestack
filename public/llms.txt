@@ -1,0 +1,15 @@
+# SolveStack
+
+SolveStack is a free, local-first IT troubleshooting workspace. It helps practitioners capture symptoms, observations, commands, evidence, hypotheses, dead ends, root causes, fixes, and validation while an investigation is in progress.
+
+## Canonical pages
+
+- https://solvestack-ai.app/ — product and workflow overview
+- https://solvestack-ai.app/use-your-data/ — guide to turning exports into durable troubleshooting knowledge
+
+## Product boundaries
+
+- Core data stays in IndexedDB in the current browser profile.
+- SolveStack has no account, cloud database, or built-in AI service.
+- Users choose when to export Markdown, HTML, JSON, backups, or ZIP knowledge packages.
+- Exported records should be redacted before they are shared with external tools.
