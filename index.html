@@ -38,7 +38,7 @@
         "description": "A local-first troubleshooting workspace for IT professionals that captures reasoning and evidence and exports portable technical knowledge.",
         "offers": {
           "@type": "Offer",
-          "price": "0",
+          "price": 0,
           "priceCurrency": "USD"
         },
         "creator": { "@id": "https://solvestack-ai.app/#creator" },
@@ -60,20 +60,21 @@
       <main>
         <h1>SolveStack: local-first IT troubleshooting workspace</h1>
         <p>Capture observations, commands, evidence, hypotheses, dead ends, decisions, and resolutions while you troubleshoot.</p>
-        <p>Your investigations stay in this browser and export as portable Markdown, standalone HTML, JSON, and ZIP knowledge packages.</p>
+        <p>Your investigations stay in this browser and <a href="/use-your-data/">export as portable Markdown, standalone HTML, JSON, and ZIP knowledge packages</a>.</p>
         <h2>Keep the reasoning behind the fix</h2>
         <p>SolveStack gives an IT investigation a durable structure while the work is still happening. Record the original symptom, commands and observations, evidence, competing hypotheses, causes ruled out, the confirmed root cause, and the validation that proved the resolution worked. The result is more useful than a ticket that records only the final command.</p>
         <p>Study how real incidents were diagnosed: <a href="https://rootcausecasebook.com/">Root Cause Casebook</a> publishes evidence-grounded IT incident case studies.</p>
         <h2>Local by default, portable when you choose</h2>
-        <p>Core investigation data stays in IndexedDB in the current browser. SolveStack has no account, cloud database, or built-in AI service. Export Markdown for a knowledge repository, standalone HTML for a readable handoff, JSON for lossless backup or migration, or a ZIP package that keeps the record and supporting evidence together.</p>
+        <p>Core investigation data stays in IndexedDB in the current browser. SolveStack has no account, cloud database, or built-in AI service. Export Markdown for a <a href="/use-your-data/">knowledge repository</a>, standalone HTML for a readable handoff, JSON for lossless backup or migration, or a ZIP package that keeps the record and supporting evidence together.</p>
         <p><a href="/use-your-data/">See practical ways to turn exported troubleshooting data into searchable knowledge, runbooks, approved AI-assisted reviews, and durable archives.</a></p>
         <h2>SolveStack questions</h2>
         <h3>Where does SolveStack store troubleshooting data?</h3><p>Core investigation data stays in IndexedDB in the current browser profile. SolveStack has no account or cloud database.</p>
         <h3>What can SolveStack export?</h3><p>Export Markdown, standalone HTML, JSON, complete backups, or ZIP knowledge packages that keep the record and supporting evidence together.</p>
         <h3>Does SolveStack use AI?</h3><p>No. SolveStack does not include an AI service. You can review an export in an organization-approved tool after removing credentials, personal data, and confidential evidence.</p>
-        <p>Created by <a href="https://www.linkedin.com/in/steve-thoms-81381990" rel="me">Steve Thoms</a>. <a href="mailto:sthoms105@gmail.com">Contact the creator</a>.</p>
+        <p>Created by <a href="https://www.linkedin.com/in/steve-thoms-81381990" rel="me">Steve Thoms</a>. <span class="js-email" data-u="sthoms105" data-d="gmail.com" role="link" tabindex="0" style="cursor:pointer;text-decoration:underline">Contact the creator</span>.</p>
       </main>
     </div>
     <script type="module" src="/src/main.ts"></script>
+    <script>document.querySelectorAll('.js-email').forEach(function(el){function go(){window.location.href='mailto:'+el.dataset.u+'@'+el.dataset.d;}el.addEventListener('click',go);el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});});</script>
   </body>
 </html>
