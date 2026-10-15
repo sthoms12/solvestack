@@ -69,4 +69,41 @@ assert.equal(
   ),
   true,
 );
+const home = await Bun.file("index.html").text();
+const title = home.match(/<title>([^<]+)<\/title>/)?.[1] ?? "";
+const heading = home.match(/<h1>([^<]+)<\/h1>/)?.[1] ?? "";
+assert.equal(title.startsWith("SolveStack"), true, title);
+assert.equal(heading.startsWith("SolveStack"), true, heading);
+const jsonLd = JSON.parse(
+  home.match(
+    /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+  )?.[1] ?? "{}",
+) as { "@graph": Array<Record<string, unknown>> };
+const entity = (type: string) =>
+  jsonLd["@graph"].find((node) => node["@type"] === type);
+const organization = entity("Organization");
+const website = entity("WebSite");
+assert.equal(organization?.name, "SolveStack");
+assert.equal(organization?.url, productionOrigin);
+assert.equal(
+  (organization?.logo as { url?: string } | undefined)?.url,
+  `${productionOrigin}icon.svg`,
+);
+assert.equal(website?.name, "SolveStack");
+assert.equal(website?.url, productionOrigin);
+const knownProfiles = new Set([
+  "https://www.linkedin.com/in/steve-thoms-81381990",
+  "https://x.com/thomstech12",
+]);
+for (const node of jsonLd["@graph"]) {
+  const sameAs = node.sameAs;
+  if (!Array.isArray(sameAs)) continue;
+  for (const profile of sameAs) {
+    assert.equal(knownProfiles.has(String(profile)), true, String(profile));
+  }
+}
+assert.equal(
+  (await Bun.file("src/main.ts").text()).includes("<h1>SolveStack</h1>"),
+  true,
+);
 console.log("SolveStack static-shell smoke test passed");
