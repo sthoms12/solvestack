@@ -24,34 +24,93 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <script defer src="https://zoanalytics-thomstech.zocomputer.io/zowa.js" data-site="cloudflare-solvestack" data-query="exclude"></script>
-    <title>Local-First IT Troubleshooting Workspace | SolveStack</title>
+    <title>SolveStack | Local-First IT Troubleshooting Workspace</title>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@graph": [{
-        "@type": "SoftwareApplication",
-        "name": "SolveStack",
-        "url": "https://solvestack-ai.app/",
-        "applicationCategory": "BusinessApplication",
-        "applicationSubCategory": "IT troubleshooting workspace",
-        "operatingSystem": "Any modern web browser",
-        "description": "A local-first troubleshooting workspace for IT professionals that captures reasoning and evidence and exports portable technical knowledge.",
-        "offers": {
-          "@type": "Offer",
-          "price": 0,
-          "priceCurrency": "USD"
-        },
-        "creator": { "@id": "https://solvestack-ai.app/#creator" },
-        "featureList": [
-          "Local browser storage",
-          "Structured troubleshooting timeline",
-          "Evidence and attachment capture",
-          "Hypothesis tracking",
-          "Deterministic RCA generation",
-          "Markdown, HTML, JSON, and ZIP export",
-          "Offline progressive web application"
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "SolveStack",
+            "url": "https://solvestack-ai.app/",
+            "applicationCategory": "BusinessApplication",
+            "applicationSubCategory": "IT troubleshooting workspace",
+            "operatingSystem": "Any modern web browser",
+            "description": "A local-first troubleshooting workspace for IT professionals that captures reasoning and evidence and exports portable technical knowledge.",
+            "offers": {
+              "@type": "Offer",
+              "price": 0,
+              "priceCurrency": "USD"
+            },
+            "creator": { "@id": "https://solvestack-ai.app/#creator" },
+            "featureList": [
+              "Local browser storage",
+              "Structured troubleshooting timeline",
+              "Evidence and attachment capture",
+              "Hypothesis tracking",
+              "Deterministic RCA generation",
+              "Markdown, HTML, JSON, and ZIP export",
+              "Offline progressive web application"
+            ]
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://solvestack-ai.app/#organization",
+            "name": "SolveStack",
+            "url": "https://solvestack-ai.app/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://solvestack-ai.app/icon.svg"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://solvestack-ai.app/#website",
+            "name": "SolveStack",
+            "url": "https://solvestack-ai.app/",
+            "publisher": { "@id": "https://solvestack-ai.app/#organization" },
+            "creator": { "@id": "https://solvestack-ai.app/#creator" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Where does SolveStack store troubleshooting data?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SolveStack stores core investigation data in IndexedDB in the current browser profile. It has no account or cloud database."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What can SolveStack export?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "SolveStack exports Markdown, standalone HTML, JSON, complete backups, and ZIP knowledge packages with supporting evidence."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does SolveStack use AI?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. SolveStack does not include an AI service. Exported records can be reviewed in an organization-approved tool after sensitive data is removed."
+                }
+              }
+            ]
+          },
+          {
+            "@type": "Person",
+            "@id": "https://solvestack-ai.app/#creator",
+            "name": "Steve Thoms",
+            "url": "https://www.linkedin.com/in/steve-thoms-81381990",
+            "sameAs": [
+              "https://www.linkedin.com/in/steve-thoms-81381990",
+              "https://x.com/thomstech12"
+            ]
+          }
         ]
-        }, { "@type": "WebSite", "name": "SolveStack", "url": "https://solvestack-ai.app/", "creator": { "@id": "https://solvestack-ai.app/#creator" } }, { "@type": "FAQPage", "mainEntity": [{ "@type": "Question", "name": "Where does SolveStack store troubleshooting data?", "acceptedAnswer": { "@type": "Answer", "text": "SolveStack stores core investigation data in IndexedDB in the current browser profile. It has no account or cloud database." } }, { "@type": "Question", "name": "What can SolveStack export?", "acceptedAnswer": { "@type": "Answer", "text": "SolveStack exports Markdown, standalone HTML, JSON, complete backups, and ZIP knowledge packages with supporting evidence." } }, { "@type": "Question", "name": "Does SolveStack use AI?", "acceptedAnswer": { "@type": "Answer", "text": "No. SolveStack does not include an AI service. Exported records can be reviewed in an organization-approved tool after sensitive data is removed." } }] }, { "@type": "Person", "@id": "https://solvestack-ai.app/#creator", "name": "Steve Thoms", "url": "https://www.linkedin.com/in/steve-thoms-81381990", "sameAs": ["https://www.linkedin.com/in/steve-thoms-81381990", "https://x.com/thomstech12"] }]
       }
     </script>
   </head>
