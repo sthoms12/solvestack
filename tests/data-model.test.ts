@@ -29,6 +29,10 @@ const buildFiles = [
   "dist/sitemap.xml",
   "dist/use-your-data/index.html",
   "dist/use-your-data/guide.css",
+  "dist/rca-template/index.html",
+  "dist/rca-template/template.css",
+  "dist/5-whys-template/index.html",
+  "dist/5-whys-template/template.css",
 ];
 for (const file of buildFiles)
   assert.equal(
@@ -60,6 +64,18 @@ assert.equal(
 assert.equal(
   (await Bun.file("public/sitemap.xml").text()).includes(
     `<loc>${productionOrigin}use-your-data/</loc>`,
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/sitemap.xml").text()).includes(
+    `<loc>${productionOrigin}rca-template/</loc>`,
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/sitemap.xml").text()).includes(
+    `<loc>${productionOrigin}5-whys-template/</loc>`,
   ),
   true,
 );

@@ -14,7 +14,13 @@
   </url>
   <url>
     <loc>https://solvestack-ai.app/rca-template/</loc>
-    <lastmod>2026-10-05</lastmod>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://solvestack-ai.app/5-whys-template/</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

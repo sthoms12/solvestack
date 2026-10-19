@@ -5,27 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#101313" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="description" content="Free root cause analysis template for IT incidents: problem statement, timeline, 5 whys, and corrective actions. Document it privately in SolveStack and export as Markdown or ZIP — no account, no cloud." />
+    <meta name="description" content="Root cause analysis template for IT incidents: problem statement, timeline, 5 whys, contributing factors, actions, and follow-ups. Free to copy." />
     <link rel="canonical" href="https://solvestack-ai.app/rca-template/" />
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="SolveStack" />
     <meta property="og:url" content="https://solvestack-ai.app/rca-template/" />
-    <meta property="og:title" content="Free RCA Template — Root Cause Analysis for IT Incidents" />
-    <meta property="og:description" content="A genuinely usable root cause analysis template for IT incidents: problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups. Free, no account." />
+    <meta property="og:title" content="Root Cause Analysis Template for IT Incidents" />
+    <meta property="og:description" content="A root cause analysis template you can copy: problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups." />
     <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Free RCA Template — Root Cause Analysis for IT Incidents" />
-    <meta name="twitter:description" content="Problem statement, timeline, 5 whys, corrective actions. Free template, local-first documentation, no account." />
+    <meta name="twitter:title" content="Root Cause Analysis Template for IT Incidents" />
+    <meta name="twitter:description" content="Problem statement, timeline, 5 whys, corrective actions, and follow-ups. Free template, no account." />
     <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
     <link rel="stylesheet" href="/rca-template/template.css" />
-    <title>Free RCA Template — Root Cause Analysis for IT Incidents | SolveStack</title>
+    <title>Root Cause Analysis Template for IT Incidents | SolveStack</title>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "TechArticle",
-        "headline": "Free RCA Template — Root Cause Analysis for IT Incidents",
-        "description": "A free, usable root cause analysis template for IT incidents, with the 5 whys method, corrective actions, and a local-first documentation workflow.",
+        "headline": "Root Cause Analysis Template for IT Incidents",
+        "description": "A root cause analysis template for IT incidents, with a problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups.",
         "url": "https://solvestack-ai.app/rca-template/",
         "publisher": { "@type": "Organization", "name": "SolveStack" },
         "about": ["root cause analysis", "incident response", "5 whys", "IT troubleshooting", "postmortem"]
@@ -38,28 +38,33 @@
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "What is an RCA template?",
-            "acceptedAnswer": { "@type": "Answer", "text": "A structured document that walks an incident from symptom to confirmed cause. Standard sections: problem statement, timeline, 5 whys analysis, contributing factors, corrective actions, and follow-ups. It keeps the analysis evidence-based instead of a blame exercise." }
+            "name": "What is a root cause analysis template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A root cause analysis template is a structured document that walks an incident from the symptom to a confirmed cause. This one has six sections: problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups. Filling it in keeps the analysis tied to evidence instead of turning it into a blame exercise." }
           },
           {
             "@type": "Question",
             "name": "What are the 5 whys?",
-            "acceptedAnswer": { "@type": "Answer", "text": "A root-cause technique where you ask \u201cwhy\u201d repeatedly \u2014 typically five times \u2014 with each answer becoming the next question. It moves the analysis past surface symptoms (\u201cthe server crashed\u201d) to the underlying cause (\u201cno alerting on disk growth\u201d)." }
+            "acceptedAnswer": { "@type": "Answer", "text": "A technique where you ask why repeatedly, usually about five times, and each answer becomes the next question. It moves the analysis past a surface symptom, such as the server crashed, to a cause you can change, such as no alert on disk growth. The 5 whys template is a shorter worksheet for that chain alone." }
           },
           {
             "@type": "Question",
             "name": "How do I write a root cause analysis for an IT outage?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Start with a precise problem statement and a timestamped timeline. Apply the 5 whys to the timeline, separate contributing factors from the single root cause, record corrective actions with owners and dates, then validate that the fix worked." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Start with a precise problem statement and a timestamped timeline. Apply the 5 whys to the timeline, separate contributing factors from the root cause, record corrective actions with owners and dates, then check that the fix worked." }
           },
           {
             "@type": "Question",
-            "name": "What is the difference between RCA and a postmortem?",
-            "acceptedAnswer": { "@type": "Answer", "text": "RCA is the analysis that identifies why an incident happened. A postmortem (or post-incident review) is the broader review document \u2014 timeline, impact, the RCA itself, and action items. Teams often combine them into one record." }
+            "name": "What is the difference between a root cause analysis and a postmortem?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A root cause analysis is the work that identifies why an incident happened. A postmortem, or post-incident review, is the broader document: timeline, impact, the analysis itself, and action items. Teams often keep both in one record." }
+          },
+          {
+            "@type": "Question",
+            "name": "How is a 5 whys template different from a root cause analysis template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A 5 whys template records only the cause chain. A root cause analysis template also records the problem statement, the timeline, contributing factors, owners, and whether the actions worked. Use the shorter worksheet for the chain, and this page for the full incident record." }
           },
           {
             "@type": "Question",
             "name": "Can I use this template offline?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The template is plain text you can copy into any document. If you document the investigation in SolveStack, it also works fully offline: data stays in your browser\u2019s IndexedDB with no account or cloud connection." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The template is plain text you can copy into any document. SolveStack, the app linked from this page, also works offline: investigation data stays in IndexedDB in your browser, with no account and no cloud service." }
           }
         ]
       }
@@ -68,14 +73,14 @@
   <body>
     <header class="site-header">
       <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
-      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="#faqs">FAQs</a><a class="launch" href="/">Open SolveStack</a></nav>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/5-whys-template/">5 Whys</a><a href="#faqs">FAQs</a><a class="launch" href="/">Open SolveStack</a></nav>
     </header>
     <main>
       <section class="hero">
         <div class="chapter">FIELD GUIDE / ROOT CAUSE ANALYSIS</div>
         <p class="overline">DOCUMENT → ANALYZE → PREVENT</p>
-        <h1>Root Cause Analysis <em>(RCA)</em> Template</h1>
-        <p class="intro">A free, genuinely usable RCA template for IT incidents: problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups. Copy it into any document — or run the whole investigation privately in SolveStack and export it as Markdown or ZIP.</p>
+        <h1>Root Cause Analysis <em>Template</em></h1>
+        <p class="intro">A root cause analysis template is a structured record of an incident: what failed, the evidence, the cause, and the actions that stop a repeat. This one is written for IT incidents and has six sections — problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups. Copy the plain-text version below, or capture the same investigation in SolveStack and export it as Markdown or ZIP.</p>
         <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/">Open SolveStack</a></div>
         <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
       </section>
@@ -83,46 +88,61 @@
       <section class="template" id="template" aria-labelledby="template-title">
         <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Six sections. No fluff.</h2></div></div>
         <div class="step-list">
-          <article><span class="number">SECTION 01</span><div><h3>Problem statement</h3><p>One paragraph: what happened, what was affected, and when it was detected. Write it so someone who was not on call can understand the incident in thirty seconds. Include the blast radius — users, systems, revenue — with numbers, not adjectives.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Payment API returned HTTP 500 for ~12% of checkout requests, 14:02–14:47 UTC. 340 failed orders. Detected by checkout-error alert, not by a customer report.</span></div></article>
-          <article><span class="number">SECTION 02</span><div><h3>Incident timeline</h3><p>A timestamped sequence from first symptom to confirmed resolution. Record what was observed and what was done at each step — including the dead ends. The timeline is the evidence the rest of the analysis stands on; an RCA without one is a guess.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>14:02 — alert fires. 14:09 — on-call confirms 500s on /pay/confirm. 14:18 — database primary disk at 100% found. 14:31 — disk expanded, errors stop. 14:47 — error rate back to baseline, incident closed.</span></div></article>
-          <article><span class="number">SECTION 03</span><div><h3>The 5 whys</h3><p>Ask "why" repeatedly — typically five times — with each answer becoming the next question. This is what moves the analysis past the surface symptom to the cause you can actually fix. Write each why down; the chain is the deliverable, not just the final answer.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Why did checkout fail? The database rejected writes. Why? Its disk was full. Why? Log retention had no cap. Why? The retention policy was never configured after the migration. Why? Migration runbook had no storage-verification step.</span></div></article>
-          <article><span class="number">SECTION 04</span><div><h3>Contributing factors</h3><p>Causes that made the incident worse or more likely, but are not the root cause. Keep this list separate from the root cause — mixing them is the most common RCA failure. Contributing factors still deserve action, just not the headline.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Alert threshold was set at 95% disk, leaving ~9 minutes of headroom. Staging environment has 10× the disk headroom of production, so load tests never caught it. The runbook's rollback step assumed a healthy database.</span></div></article>
-          <article><span class="number">SECTION 05</span><div><h3>Corrective actions</h3><p>Every action gets an owner and a date — an action without both is a wish. Separate immediate fixes (stop the bleeding) from systemic fixes (stop the recurrence). If an action cannot be scheduled, say so explicitly rather than letting it drift.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Immediate: cap log retention at 30 days (Priya, this week). Systemic: add storage-verification step to the migration runbook (Marcus, next sprint). Systemic: disk-usage alert at 80% with paging at 90% (Priya, next sprint).</span></div></article>
-          <article><span class="number">SECTION 06</span><div><h3>Follow-ups</h3><p>Close the loop: did the corrective actions actually happen, and did they work? Record the validation — the test, metric, or review that proved the fix. An RCA whose actions were never verified is an unfinished document.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Retention cap deployed 10-09; disk growth flat for 14 days. Runbook updated and reviewed in the 10-16 ops review. Alert thresholds live; paged once on a legitimate growth spike.</span></div></article>
+          <article><span class="number">SECTION 01</span><div><h3>Problem statement</h3><p>One paragraph: what happened, what was affected, and when it was detected. Write it so someone who was not on call can understand the incident in thirty seconds. Include the blast radius — users, systems, or business process — with the measurements you actually have, not adjectives.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Payment API returned HTTP 500 for a slice of checkout requests, 14:02–14:47 UTC. Failed orders were counted from the checkout log. Detected by the checkout-error alert, not by a customer report.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Incident timeline</h3><p>A timestamped sequence from first symptom to confirmed resolution. Record what was observed and what was done at each step — including the dead ends. The timeline is the evidence the rest of the analysis stands on. An RCA without one is a guess.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>14:02 — alert fires. 14:09 — on-call confirms 500s on /pay/confirm. 14:18 — database primary disk at 100% found. 14:31 — disk expanded, errors stop. 14:47 — error rate back to baseline, incident closed.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>The 5 whys</h3><p>Ask "why" repeatedly — typically five times — with each answer becoming the next question. Write each why down. The chain is the deliverable, not just the final answer. Stop on a cause you can change, and keep a note of the evidence for each step. For the chain on its own, use the <a href="/5-whys-template/">5 whys template</a>.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Why did checkout fail? The database rejected writes. Why? Its disk was full. Why? Log retention had no cap. Why? The retention policy was never configured after the migration. Why? The migration runbook had no storage-verification step.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Contributing factors</h3><p>Conditions that made the incident worse or more likely, but are not the cause the chain ends on. Keep them in this list so they are not mistaken for the root cause. A contributing factor can still deserve an action.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The disk alert fired late enough that there was little time to act. Staging had more disk headroom than production, so load tests never reached a full disk. The rollback step in the runbook assumed a healthy database.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Corrective actions</h3><p>Every action gets an owner and a date. An action without both is a wish. Separate immediate fixes (stop the current impact) from systemic fixes (stop the recurrence). If an action cannot be scheduled, say so explicitly rather than letting it drift.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Immediate: cap log retention (Priya, this week). Systemic: add a storage-verification step to the migration runbook (Marcus, next sprint). Systemic: page on disk growth earlier (Priya, next sprint).</span></div></article>
+          <article><span class="number">SECTION 06</span><div><h3>Follow-ups</h3><p>Close the loop: did the corrective actions happen, and did they work? Record the check — the test, metric, or review that showed the fix held. An RCA whose actions were never checked is unfinished.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Retention cap deployed; disk growth stayed flat over the following two weeks. Runbook updated and reviewed in the next ops review. The earlier disk alert fired once on a real growth spike.</span></div></article>
         </div>
         <div class="copyblock">
           <p>COPY-PASTE VERSION — PLAIN TEXT</p>
           <pre>ROOT CAUSE ANALYSIS
 ===================
 Incident:
-Date:
+Date (start–end, with timezone):
 Severity:
 Incident commander:
+Systems affected:
 
 1. PROBLEM STATEMENT
-   What happened, what was affected, when detected (numbers, not adjectives):
+   What failed, what it affected, and when it was detected.
+   Measurements you actually have (counts, durations, error rates):
 
 2. INCIDENT TIMELINE
-   [timestamp] — observation or action:
-   [timestamp] — observation or action:
-   [timestamp] — resolution confirmed:
+   HH:MM TZ — what was observed or done
+   HH:MM TZ —
+   HH:MM TZ — resolution confirmed
 
 3. THE 5 WHYS
-   Why? 
-   Why? 
-   Why? 
-   Why? 
-   Why? 
-   Root cause:
+   Problem:
+   1. Why?
+      Answer:
+      Evidence:
+   2. Why?
+      Answer:
+      Evidence:
+   3. Why?
+      Answer:
+      Evidence:
+   4. Why?
+      Answer:
+      Evidence:
+   5. Why?
+      Answer:
+      Evidence:
+   Root cause (a cause you can change):
+   Add another chain if a second cause does not depend on this one.
 
 4. CONTRIBUTING FACTORS
-   - (made it worse / more likely, but not the root cause)
+   - Factor — how it made the incident worse or more likely, and why it is not the root cause
 
 5. CORRECTIVE ACTIONS
-   - [ ] Action — owner — due date (immediate vs systemic)
+   - [ ] Immediate: action — owner — due date
+   - [ ] Systemic: action — owner — due date
 
 6. FOLLOW-UPS
-   - Validation that each action happened and worked:</pre>
+   - Action — date checked — what showed it worked</pre>
         </div>
       </section>
 
@@ -144,17 +164,19 @@ Incident commander:
       <section class="faq" id="faqs" aria-labelledby="faqs-title">
         <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">RCA, answered briefly.</h2></div></div>
         <div class="faq-list">
-          <article><h3>What is an RCA template?</h3><p>A structured document that walks an incident from symptom to confirmed cause. Standard sections: problem statement, timeline, 5 whys analysis, contributing factors, corrective actions, and follow-ups. It keeps the analysis evidence-based instead of a blame exercise.</p></article>
-          <article><h3>What are the 5 whys?</h3><p>A root-cause technique where you ask "why" repeatedly — typically five times — with each answer becoming the next question. It moves the analysis past surface symptoms ("the server crashed") to the underlying cause ("no alerting on disk growth").</p></article>
-          <article><h3>How do I write a root cause analysis for an IT outage?</h3><p>Start with a precise problem statement and a timestamped timeline. Apply the 5 whys to the timeline, separate contributing factors from the single root cause, record corrective actions with owners and dates, then validate that the fix worked.</p></article>
-          <article><h3>What is the difference between RCA and a postmortem?</h3><p>RCA is the analysis that identifies why an incident happened. A postmortem (or post-incident review) is the broader review document — timeline, impact, the RCA itself, and action items. Teams often combine them into one record.</p></article>
-          <article><h3>Can I use this template offline?</h3><p>Yes. The template is plain text you can copy into any document. If you document the investigation in SolveStack, it also works fully offline: data stays in your browser's IndexedDB with no account or cloud connection.</p></article>
+          <article><h3>What is a root cause analysis template?</h3><p>A root cause analysis template is a structured document that walks an incident from the symptom to a confirmed cause. This one has six sections: problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups. Filling it in keeps the analysis tied to evidence instead of turning it into a blame exercise.</p></article>
+          <article><h3>What are the 5 whys?</h3><p>A technique where you ask why repeatedly, usually about five times, and each answer becomes the next question. It moves the analysis past a surface symptom, such as the server crashed, to a cause you can change, such as no alert on disk growth. The <a href="/5-whys-template/">5 whys template</a> is a shorter worksheet for that chain alone.</p></article>
+          <article><h3>How do I write a root cause analysis for an IT outage?</h3><p>Start with a precise problem statement and a timestamped timeline. Apply the 5 whys to the timeline, separate contributing factors from the root cause, record corrective actions with owners and dates, then check that the fix worked.</p></article>
+          <article><h3>What is the difference between a root cause analysis and a postmortem?</h3><p>A root cause analysis is the work that identifies why an incident happened. A postmortem, or post-incident review, is the broader document: timeline, impact, the analysis itself, and action items. Teams often keep both in one record.</p></article>
+          <article><h3>How is a 5 whys template different from a root cause analysis template?</h3><p>A <a href="/5-whys-template/">5 whys template</a> records only the cause chain. A root cause analysis template also records the problem statement, the timeline, contributing factors, owners, and whether the actions worked. Use the shorter worksheet for the chain, and this page for the full incident record.</p></article>
+          <article><h3>Can I use this template offline?</h3><p>Yes. The template is plain text you can copy into any document. SolveStack, the app linked from this page, also works offline: investigation data stays in IndexedDB in your browser, with no account and no cloud service.</p></article>
         </div>
       </section>
 
       <section class="related" aria-labelledby="related-title">
         <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
         <div class="related-cards">
+          <a href="/5-whys-template/"><b>5 WHYS</b><span>5 whys template</span><p>A shorter worksheet for one cause chain, with a worked IT example and a copyable template.</p></a>
           <a href="/"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished RCA as Markdown, HTML, JSON, or ZIP.</p></a>
           <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
         </div>
