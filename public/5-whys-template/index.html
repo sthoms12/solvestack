@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="5 whys template for IT incidents: how the questions work, a worked example, and a copyable worksheet with room for evidence. Free. No account." />
+    <link rel="canonical" href="https://solvestack-ai.app/5-whys-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/5-whys-template/" />
+    <meta property="og:title" content="5 Whys Template for IT Incidents" />
+    <meta property="og:description" content="A 5 whys template with a short explanation, a worked IT example, and a copyable cause chain. Pair it with the root cause analysis template." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="5 Whys Template for IT Incidents" />
+    <meta name="twitter:description" content="Explanation, worked IT example, and a copyable 5 whys worksheet. Free, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/5-whys-template/template.css" />
+    <title>5 Whys Template for IT Incidents | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "5 Whys Template for IT Incidents",
+        "description": "A 5 whys template for IT incidents, with a short explanation, a worked example, and a copyable worksheet.",
+        "url": "https://solvestack-ai.app/5-whys-template/",
+        "publisher": { "@type": "Organization", "name": "SolveStack" },
+        "about": ["5 whys", "root cause analysis", "incident response", "IT troubleshooting"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a 5 whys template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A 5 whys template is a short worksheet for one cause chain: the problem, a series of why questions where each answer becomes the next question, the evidence for each step, and the action you will take. Five is the usual length, not a requirement. Stop sooner when you reach a cause you can change, and continue if the answer is still a symptom." }
+          },
+          {
+            "@type": "Question",
+            "name": "How many whys should I ask?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Ask until the answer is a cause your team can change and each step is backed by evidence. Five is how the technique is usually taught, not proof that the fifth answer is the real cause. If the chain ends on a person's name, ask why the system allowed that mistake." }
+          },
+          {
+            "@type": "Question",
+            "name": "How is a 5 whys template different from a root cause analysis template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A 5 whys template covers the cause chain only. A root cause analysis template also records the problem statement, the timeline, contributing factors that are not the root cause, owners, and how the fix was checked. Use this page for the chain and the root cause analysis template for the whole incident record." }
+          },
+          {
+            "@type": "Question",
+            "name": "When does a 5 whys chain go wrong?",
+            "acceptedAnswer": { "@type": "Answer", "text": "It goes wrong when a step is a guess with no evidence, when two independent causes are forced into one chain, or when the team stops at human error. Write the evidence next to each why. If the incident has more than one independent cause, write a separate chain for each. The chain stays a hypothesis until the corrective action is checked." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use this template offline?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The template is plain text. Paste it into any document. The SolveStack app linked from this page stores investigation notes in your browser and exports Markdown, HTML, JSON, and ZIP with no account and no cloud service." }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#how">Method</a><a href="#example">Example</a><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / 5 WHYS</div>
+        <p class="overline">SYMPTOM → WHY → CAUSE YOU CAN CHANGE</p>
+        <h1>5 Whys <em>Template</em></h1>
+        <p class="intro">A 5 whys template is a short worksheet for one cause chain. State what you observed, ask why it happened, and let each answer become the next question until you reach a cause your team can change. Five is the usual length, not a quota. Copy the template below, or use the chain as one section of a <a href="/rca-template/">root cause analysis template</a>.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Copy the template</a><a class="secondary" href="/">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="how" aria-labelledby="how-title">
+        <div class="section-label"><span>01</span><div><p>THE METHOD</p><h2 id="how-title">One chain, each step evidenced.</h2></div></div>
+        <div class="step-list">
+          <article><span class="number">STEP 01</span><div><h3>Start from an observation</h3><p>The 5 whys is a questioning technique associated with the Toyota Production System. IT incident reviews use the same move. Write the problem as something observed — an error, a failed user action, a metric that moved — not as the cause you already suspect.</p></div></article>
+          <article><span class="number">STEP 02</span><div><h3>Answer from evidence</h3><p>Ask why that observation is true. The answer should point at a log line, a config value, a timeline entry, or a change record. If you cannot point at anything, mark the step unverified instead of guessing. That answer is the next question.</p></div></article>
+          <article><span class="number">STEP 03</span><div><h3>Stop on a cause you can change</h3><p>Stop when the cause is something your team can change and another why would only restate it. Do not stop on a person's name if a system condition still explains how the mistake was possible. Five steps is a teaching convention, not proof that the fifth answer is the cause.</p></div></article>
+          <article><span class="number">STEP 04</span><div><h3>Split independent causes</h3><p>One chain follows one path. If the incident has two causes that do not depend on each other, write two chains. Forcing them into a single list hides one of them. The chain stays a hypothesis until the corrective action is in place and the original symptom stays gone.</p></div></article>
+        </div>
+      </section>
+
+      <section class="tool" id="example" aria-labelledby="example-title">
+        <div class="section-label"><span>02</span><div><p>WORKED EXAMPLE</p><h2 id="example-title">An invented IT incident, read end to end.</h2></div></div>
+        <div class="step-list">
+          <article><span class="number">NOTE</span><div><h3>Not a real incident</h3><p>The host, times, and settings below are made up so the chain can be followed from symptom to action. They are not measurements from a real outage, and they are not results from a study.</p></div></article>
+          <article><span class="number">PROBLEM</span><div><h3>New VPN sessions failed</h3><p>At 09:14, new VPN connections were refused. Sessions that were already connected stayed up.</p></div></article>
+          <article><span class="number">WHY 01</span><div><h3>Why did new connections fail?</h3><p>The concentrator refused them. Its log at 09:14 said the license seat count was exhausted.</p><span class="example"><b>EVIDENCE</b>Concentrator log: license limit reached, 09:14.</span></div></article>
+          <article><span class="number">WHY 02</span><div><h3>Why was the seat count exhausted?</h3><p>A backup host still held idle sessions open from the 02:10 backup window. The session table showed those sessions sourced from that host and idle since then.</p><span class="example"><b>EVIDENCE</b>Session table: idle sessions owned by the backup host, idle since 02:10.</span></div></article>
+          <article><span class="number">WHY 03</span><div><h3>Why were those sessions still open at 09:14?</h3><p>The idle timeout on the concentrator is 24 hours, and the backup job runs every night. The previous night's sessions were still inside the timeout when the workday started.</p><span class="example"><b>EVIDENCE</b>Device config: idle timeout 86400 seconds. Backup schedule: nightly.</span></div></article>
+          <article><span class="number">WHY 04</span><div><h3>Why is the idle timeout 24 hours for every session?</h3><p>During an earlier incident the global timeout was raised so long-running admin sessions would not drop. The change was never limited to that admin group.</p><span class="example"><b>EVIDENCE</b>The change record set the global timeout. No group-specific override exists.</span></div></article>
+          <article><span class="number">WHY 05</span><div><h3>Why did a global timeout change stay in place?</h3><p>The change checklist only asked whether connectivity was restored. It did not ask which sessions the new setting applied to. That is a cause the team can change, so the chain stops here.</p><span class="example"><b>EVIDENCE</b>Runbook checklist: a "service restored" line, and no line for the scope of the setting.</span></div></article>
+          <article><span class="number">ACTION</span><div><h3>What would get checked</h3><p>Clear the idle backup sessions and set a shorter idle timeout on the backup group the same day. Add a line to the checklist: which sessions does this setting apply to? The check is the next backup window — those sessions should not still be idle the following morning, and new user connections should succeed. If a second, unrelated failure had also been in the log, it would be a second chain, not another why on this one.</p></div></article>
+        </div>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>03</span><div><p>COPY IT</p><h2 id="template-title">A worksheet you can paste anywhere.</h2></div></div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>5 WHYS
+======
+Problem (what was observed, when, what it affected):
+
+1. Why?
+   Answer:
+   Evidence (log, config, timeline, or change record):
+
+2. Why is that answer true?
+   Answer:
+   Evidence:
+
+3. Why?
+   Answer:
+   Evidence:
+
+4. Why?
+   Answer:
+   Evidence:
+
+5. Why?
+   Answer:
+   Evidence:
+
+Stop when the cause is one you can change. Add or remove steps if the chain needs it.
+If the answer is still a symptom, ask why again.
+If the chain names a person, ask why the system allowed the mistake.
+
+Root cause:
+Is this a cause we can change, or still a symptom?
+
+Second independent cause (start another chain, or write "none"):
+
+Corrective action — owner — due date:
+How we will know it worked:</pre>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>04</span><div><p>QUESTIONS</p><h2 id="faqs-title">5 whys, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What is a 5 whys template?</h3><p>A 5 whys template is a short worksheet for one cause chain: the problem, a series of why questions where each answer becomes the next question, the evidence for each step, and the action you will take. Five is the usual length, not a requirement. Stop sooner when you reach a cause you can change, and continue if the answer is still a symptom.</p></article>
+          <article><h3>How many whys should I ask?</h3><p>Ask until the answer is a cause your team can change and each step is backed by evidence. Five is how the technique is usually taught, not proof that the fifth answer is the real cause. If the chain ends on a person's name, ask why the system allowed that mistake.</p></article>
+          <article><h3>How is a 5 whys template different from a root cause analysis template?</h3><p>A 5 whys template covers the cause chain only. A <a href="/rca-template/">root cause analysis template</a> also records the problem statement, the timeline, contributing factors that are not the root cause, owners, and how the fix was checked. Use this page for the chain and the root cause analysis template for the whole incident record.</p></article>
+          <article><h3>When does a 5 whys chain go wrong?</h3><p>It goes wrong when a step is a guess with no evidence, when two independent causes are forced into one chain, or when the team stops at human error. Write the evidence next to each why. If the incident has more than one independent cause, write a separate chain for each. The chain stays a hypothesis until the corrective action is checked.</p></article>
+          <article><h3>Can I use this template offline?</h3><p>Yes. The template is plain text. Paste it into any document. The SolveStack app linked from this page stores investigation notes in your browser and exports Markdown, HTML, JSON, and ZIP with no account and no cloud service.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>05</span><div><p>KEEP GOING</p><h2 id="related-title">The chain is one part of the record.</h2></div></div>
+        <div class="related-cards">
+          <a href="/rca-template/"><b>FULL RECORD</b><span>Root cause analysis template</span><p>Problem statement, timeline, 5 whys, contributing factors, corrective actions, and follow-ups — the incident record around this chain.</p></a>
+          <a href="/"><b>SOLVESTACK WORKSPACE</b><span>Open the app</span><p>Capture the symptom, evidence, hypotheses, and resolution in your browser. Export Markdown, HTML, JSON, or ZIP. No account and no cloud service.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
