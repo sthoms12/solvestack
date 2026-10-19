@@ -76,6 +76,9 @@ function assertStaticTemplatePage(
 
 const rca = await Bun.file("public/rca-template/index.html").text();
 const fiveWhys = await Bun.file("public/5-whys-template/index.html").text();
+const incidentReport = await Bun.file(
+  "public/incident-report-template/index.html",
+).text();
 const sitemap = await Bun.file("public/sitemap.xml").text();
 
 assertStaticTemplatePage(rca, {
@@ -101,10 +104,34 @@ assert.match(fiveWhys, /Not a real incident/);
 assert.equal(fiveWhys.includes("2.9k") || fiveWhys.includes("$6.38"), false);
 assert.equal(fiveWhys.includes("$4.61") || rca.includes("$6.38"), false);
 
-for (const path of ["rca-template/", "5-whys-template/"]) {
+assertStaticTemplatePage(incidentReport, {
+  path: "/incident-report-template/",
+  title: "IT Incident Report Template",
+  heading: "IT Incident Report Template",
+  descriptionPhrase: "incident report template",
+  templateMarker: "INCIDENT REPORT",
+});
+assert.equal(incidentReport.includes('href="/rca-template/"'), true);
+assert.equal(incidentReport.includes('href="/use-your-data/"'), true);
+assert.equal(incidentReport.includes('href="/"'), true);
+assert.match(incidentReport, /Not a real incident/);
+assert.equal(
+  incidentReport.includes("2.9k") ||
+    incidentReport.includes("$6.38") ||
+    incidentReport.includes("$4.61"),
+  false,
+);
+
+for (const path of ["rca-template/", "5-whys-template/", "incident-report-template/"]) {
   assert.equal(sitemap.includes(`<loc>${productionOrigin}${path}</loc>`), true);
   const built = await Bun.file(`dist/${path}index.html`).text();
-  assert.equal(built, path === "rca-template/" ? rca : fiveWhys);
+  const expected =
+    path === "rca-template/"
+      ? rca
+      : path === "5-whys-template/"
+        ? fiveWhys
+        : incidentReport;
+  assert.equal(built, expected);
 }
 
 console.log("SolveStack template page contract passed");

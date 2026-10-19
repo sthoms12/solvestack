@@ -8,6 +8,7 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 - https://solvestack-ai.app/use-your-data/ — guide to turning exports into durable troubleshooting knowledge
 - https://solvestack-ai.app/rca-template/ — root cause analysis template for IT incidents
 - https://solvestack-ai.app/5-whys-template/ — 5 whys template with a worked IT example
+- https://solvestack-ai.app/incident-report-template/ — IT incident report template with a worked example
 
 ## Product boundaries
 

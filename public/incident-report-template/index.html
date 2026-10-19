@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free IT incident report template: incident ID, severity, timeline, impact, root cause, remediation, and action items. Document outages privately in SolveStack — no account, no cloud." />
+    <link rel="canonical" href="https://solvestack-ai.app/incident-report-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/incident-report-template/" />
+    <meta property="og:title" content="IT Incident Report Template" />
+    <meta property="og:description" content="An IT incident report template you can copy: incident ID, severity, timeline, impact, root cause, remediation, and action items." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="IT Incident Report Template" />
+    <meta name="twitter:description" content="Incident ID, severity, timeline, impact, root cause, remediation, and action items. Free template, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/incident-report-template/template.css" />
+    <title>IT Incident Report Template — Document Outages &amp; Downtime | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "IT Incident Report Template",
+        "description": "An IT incident report template for outages and downtime, with incident identification, severity, timeline, impact, root cause, remediation, and action items.",
+        "url": "https://solvestack-ai.app/incident-report-template/",
+        "publisher": { "@type": "Organization", "name": "SolveStack" },
+        "about": ["incident report", "incident response", "IT troubleshooting", "postmortem", "on-call"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What should an IT incident report template include?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Incident ID, severity, a timestamped timeline, measured impact, the root cause, remediation steps, and action items with owners and dates. This template covers all seven, plus a worked example. Keep each section short — the report is a record for the next on-call engineer, not a narrative." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between an incident report and a postmortem?",
+            "acceptedAnswer": { "@type": "Answer", "text": "An incident report records what happened: timeline, impact, and what was done. A postmortem, or root cause analysis, goes deeper into why it happened and how to prevent a repeat. Write the report during the incident; do the analysis after. For the deeper analysis, the RCA template covers the problem statement, timeline, 5 whys, and corrective actions." }
+          },
+          {
+            "@type": "Question",
+            "name": "How detailed should the incident timeline be?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Timestamp every observed symptom and every action taken, including the dead ends. A timeline with five precise entries beats twenty vague ones — it is the evidence the rest of the report stands on. If you cannot reconstruct it after the fact, the report was started too late." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I write the impact section?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Use measurements you actually have: error counts, durations, affected users or systems. Avoid adjectives like severe or major — the severity field already carries that. If the numbers are estimates, say so and note the source." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is the worked example a real incident?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I write the report in SolveStack instead of copying the template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Capture the symptom, observations, evidence, and hypotheses in SolveStack while the incident is happening — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP." }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT REPORTING</div>
+        <p class="overline">DETECT → RECORD → REVIEW</p>
+        <h1>IT Incident <em>Report</em> Template</h1>
+        <p class="intro">An IT incident report is the record of what happened while the pressure was on: what broke, the timeline, the measured impact, and what was done about it. This template keeps it to seven sections so the next on-call engineer can reconstruct the incident in minutes. Copy the plain-text version below, or capture the same investigation in SolveStack and export it as Markdown or ZIP.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Seven sections. No fluff.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Incident identification</h3><p>The facts that file the report: a unique incident ID, the date and time window with timezone, who commanded the response, and which systems were affected. Someone reading this a year later should be able to find every related artifact from this block alone.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>INC-2026-118. Search API elevated p99 latency, detected 09:15 UTC. Commander: Riley. Systems: search-api (us-east), query cache tier. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Severity</h3><p>One level, assigned once, not debated in the report. S1 means customers cannot use the service; S2 means major degradation with a workaround; S3 means limited impact; S4 means no customer impact. The severity field carries the weight, so the prose does not have to.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>S2 — major degradation with a workaround. Search results were slow but available; cached results served most traffic. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Incident timeline</h3><p>A timestamped sequence from first symptom to confirmed resolution. Record what was observed and what was done at each step — including the dead ends. The timeline is the evidence the rest of the report stands on. A report without one is a press release.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>09:15 — p99 latency alert fires on /search. 09:22 — on-call confirms cache hit rate dropped to 31%. 09:40 — cache node restart attempted, no effect. 10:05 — faulty config push identified and rolled back. 10:40 — latency back to baseline, incident closed. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Impact</h3><p>What the incident cost, in measurements you actually have: error counts, durations, affected users or systems. If the numbers are estimates, say so and note the source. Impact written from the dashboard survives; impact written from memory does not.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>p99 latency above 2s for 85 minutes; ~12% of search queries affected; no failed checkouts (search is read-only). Counts from the search-api dashboard. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Root cause</h3><p>What the investigation concluded, stated as a cause you can change — or marked as still under investigation with a date. If the analysis deserves its own document, point to it: the incident report is the record, the root cause analysis is the deep work. For the deeper analysis, use the <a href="/rca-template/">RCA template</a>.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>A cache-configuration push at 08:58 UTC changed the eviction policy without a canary step; hot keys were evicted and the origin absorbed the load. Full chain documented separately. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 06</span><div><h3>Remediation</h3><p>What was done to stop the current impact — the rollback, the restart, the failover — in the order it happened. Remediation is what made the incident end, distinct from the actions that stop the next one.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>10:05 — configuration rolled back to the previous version. 10:12 — cache tier warmed from the last snapshot. 10:40 — latency at baseline for three consecutive checks; incident closed. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 07</span><div><h3>Action items</h3><p>Every action gets an owner and a date. An action without both is a wish. Separate the immediate follow-ups (verify the fix held) from systemic fixes (stop the recurrence). If an action cannot be scheduled, say so explicitly rather than letting it drift.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Immediate: verify cache hit rate holds above 90% for 48 hours (Riley, this week). Systemic: require canary deploys for cache-config changes (Sam, next sprint). Systemic: add a cache-hit-rate page threshold (Riley, next sprint). Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>INCIDENT REPORT
+===============
+Incident ID:
+Date (start–end, with timezone):
+Severity (S1–S4):
+Incident commander:
+Systems affected:
+
+1. INCIDENT IDENTIFICATION
+   Unique ID, detection time, commander, affected systems.
+
+2. SEVERITY
+   S1 = customers cannot use the service. S2 = major degradation,
+   workaround exists. S3 = limited impact. S4 = no customer impact.
+
+3. INCIDENT TIMELINE
+   HH:MM TZ — what was observed or done
+   HH:MM TZ —
+   HH:MM TZ — resolution confirmed
+
+4. IMPACT
+   Measured cost: counts, durations, affected users or systems.
+   Mark estimates as estimates, with the source.
+
+5. ROOT CAUSE
+   The confirmed cause (a cause you can change), or "under
+   investigation" with a date. For the deep analysis, see the
+   RCA template.
+
+6. REMEDIATION
+   What stopped the current impact, in order:
+   - HH:MM TZ — action taken
+
+7. ACTION ITEMS
+   - [ ] Immediate: action — owner — due date
+   - [ ] Systemic: action — owner — due date</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Document the incident where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>An incident report is only as good as the notes taken during the incident. SolveStack gives an IT investigation a durable 7-part structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the 5 whys converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Incident reports, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should an IT incident report template include?</h3><p>Incident ID, severity, a timestamped timeline, measured impact, the root cause, remediation steps, and action items with owners and dates. This template covers all seven, plus a worked example. Keep each section short — the report is a record for the next on-call engineer, not a narrative.</p></article>
+          <article><h3>What is the difference between an incident report and a postmortem?</h3><p>An incident report records what happened: timeline, impact, and what was done. A postmortem, or root cause analysis, goes deeper into why it happened and how to prevent a repeat. Write the report during the incident; do the analysis after. For the deeper analysis, the <a href="/rca-template/">RCA template</a> covers the problem statement, timeline, 5 whys, and corrective actions.</p></article>
+          <article><h3>How detailed should the incident timeline be?</h3><p>Timestamp every observed symptom and every action taken, including the dead ends. A timeline with five precise entries beats twenty vague ones — it is the evidence the rest of the report stands on. If you cannot reconstruct it after the fact, the report was started too late.</p></article>
+          <article><h3>How do I write the impact section?</h3><p>Use measurements you actually have: error counts, durations, affected users or systems. Avoid adjectives like severe or major — the severity field already carries that. If the numbers are estimates, say so and note the source.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I write the report in SolveStack instead of copying the template?</h3><p>Yes. Capture the symptom, observations, evidence, and hypotheses in SolveStack while the incident is happening — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished report as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
