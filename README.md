@@ -31,6 +31,8 @@ The Worker asset runtime is defined in `wrangler.jsonc`. It uses `not_found_hand
 
 No account, backend, cloud database, AI, or network service is required. The MVP stores sessions and evidence in IndexedDB and provides deterministic Markdown, standalone HTML, JSON, backup, and ZIP knowledge-package export. The service worker caches the application shell for offline use after the first load.
 
+The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.
+
 The data format is versioned (`schemaVersion: 2`) with an executable version-1 migration. JSON import accepts individual session exports and full backups, reports ID conflicts, and preserves existing investigations.
 
 The persistence boundary and migration policy are documented in `docs/DATA-MODEL.md`. Use `docs/RELEASE-CHECKLIST.md` for repeatable static releases.
