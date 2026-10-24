@@ -43,9 +43,19 @@ assert.match(
   /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(\)/,
 );
 assert.equal(policyLine.length <= 2000, true, "Workers _headers lines are limited to 2000 characters");
+const workerPolicy =
+  headers
+    .split("\n")
+    .filter((line) => line.includes("Content-Security-Policy:"))[1]
+    ?.split("Content-Security-Policy:")[1]
+    ?.trim() ?? "";
+assert.equal(
+  workerPolicy,
+  "default-src 'none'; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://static.cloudflareinsights.com https://cloudflareinsights.com",
+);
 assert.match(
   headers,
-  /\/service-worker\.js\n {2}Cache-Control: no-cache\n {2}! Content-Security-Policy/,
+  /\/service-worker\.js\n {2}Cache-Control: no-cache\n {2}! Content-Security-Policy\n {2}Content-Security-Policy:/,
 );
 
 const readme = await Bun.file("README.md").text();

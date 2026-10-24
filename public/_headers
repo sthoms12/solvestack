@@ -7,9 +7,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# The service worker proxies styles, fonts, and analytics. A document CSP on
-# this script would block those fetches inside the worker.
+# Replace the document policy. This script fetches fonts and the analytics
+# beacon, and default-src 'none' blocks everything else.
 /service-worker.js
   Cache-Control: no-cache
   ! Content-Security-Policy
+  Content-Security-Policy: default-src 'none'; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://static.cloudflareinsights.com https://cloudflareinsights.com
 
