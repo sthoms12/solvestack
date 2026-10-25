@@ -45,7 +45,7 @@ assert.equal(
   true,
 );
 assert.equal(
-  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v7"),
+  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v8"),
   true,
 );
 const productionOrigin = "https://solvestack-ai.app/";
