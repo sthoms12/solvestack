@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="OneNote vs SolveStack for IT troubleshooting notes: an honest comparison of sharing, structure, storage, and export, with a sample SolveStack export to download." />
+    <link rel="canonical" href="https://solvestack-ai.app/onenote-vs-solvestack/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/onenote-vs-solvestack/" />
+    <meta property="og:title" content="OneNote vs SolveStack for IT Troubleshooting Notes" />
+    <meta property="og:description" content="Where OneNote fits, where SolveStack fits, and a sample troubleshooting export." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="OneNote vs SolveStack for IT Troubleshooting Notes" />
+    <meta name="twitter:description" content="Where OneNote fits, where SolveStack fits, and a sample troubleshooting export." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/onenote-vs-solvestack/template.css" />
+    <title>OneNote vs SolveStack for IT Troubleshooting Notes | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "OneNote vs SolveStack for IT troubleshooting notes",
+        "description": "An honest comparison of OneNote and SolveStack for IT troubleshooting notes, with a sample export.",
+        "url": "https://solvestack-ai.app/onenote-vs-solvestack/",
+        "dateModified": "2026-10-30",
+        "publisher": {
+          "@type": "Organization",
+          "name": "SolveStack"
+        },
+        "about": [
+          "OneNote",
+          "IT troubleshooting",
+          "troubleshooting notes",
+          "knowledge management"
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is SolveStack a OneNote replacement?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. OneNote is a general notebook for teams and devices. SolveStack is a single-person workspace for one technical investigation at a time. Many IT teams can use both: SolveStack while the problem is open, and a shared notebook or knowledge base for the finished write-up."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When is OneNote the better choice for troubleshooting notes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When several people need to edit the same notes at the same time, when you need the notes on several devices, or when your team already keeps runbooks in shared notebooks. OneNote supports shared notebooks stored in OneDrive or SharePoint, with edit or view permissions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When is SolveStack the better choice?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When one engineer wants a structured record of a single problem: timestamped entries by type, hypotheses marked as ruled out with the reason, and a root cause, fix, validation, and prevention, exported as Markdown, HTML, JSON, or ZIP. The data stays in that browser and no account is needed."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can SolveStack share or sync notes between people?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. SolveStack stores data in IndexedDB in one browser profile. To move or share a record, you export it as a file. Clearing browser data can remove it, so export backups."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I move SolveStack exports into OneNote?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SolveStack exports Markdown and standalone HTML files. You can store those files wherever your team keeps documentation. This page does not claim any specific OneNote import path."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is the sample export a real incident?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. It is an invented example, created to show what a SolveStack export contains. The Markdown file was produced by SolveStack's own Knowledge MD export from the sample JSON."
+            }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Page navigation"><a href="#compare">Compare</a><a href="#sample">Sample export</a><a href="#faqs">FAQs</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">COMPARISON / TROUBLESHOOTING NOTES</div>
+        <p class="overline">ONENOTE · SOLVESTACK</p>
+        <h1>OneNote vs SolveStack for IT <em>troubleshooting</em> notes</h1>
+        <p class="intro"><strong>Short answer:</strong> use OneNote when a team needs shared notes on many devices. Use SolveStack when one engineer wants a structured, private record of a single investigation that exports as Markdown, HTML, JSON, or ZIP. They solve different problems, and many teams can use both.</p>
+        <div class="hero-actions"><a class="primary" href="#sample">See a sample export</a><a class="secondary" href="/">Open SolveStack</a></div>
+        <aside><strong>About this page</strong><span>OneNote facts link to Microsoft support pages checked on October 30, 2026. SolveStack facts describe what the app does today. SolveStack is not affiliated with Microsoft.</span></aside>
+      </section>
+
+      <section class="template" id="compare" aria-labelledby="compare-title">
+        <div class="section-label"><span>01</span><div><p>SIDE BY SIDE</p><h2 id="compare-title">How they differ.</h2></div></div>
+        <div class="compare-wrap">
+          <table>
+            <caption>OneNote details from Microsoft support pages, checked October 30, 2026. Features can vary by OneNote version and platform.</caption>
+            <thead><tr><th scope="col">Topic</th><th scope="col">OneNote</th><th scope="col">SolveStack</th></tr></thead>
+            <tbody><tr><th scope="row">Best for</th><td>Notebooks that a group fills in together, such as a brainstorming session or a group project. (<a href="https://support.microsoft.com/en-us/office/work-together-on-office-documents">source</a>)</td><td>One session per technical investigation, kept by the person working it.</td></tr><tr><th scope="row">Working with others</th><td>Share a whole notebook with edit or view access. People can work in it at the same time, see who did what, and revert a page to an earlier version. (<a href="https://support.microsoft.com/en-us/office/work-together-on-office-documents">source</a>, <a href="https://support.microsoft.com/en-us/onenote/onenote-help-and-learning/how-to-share-a-onenote-notebook">source</a>)</td><td>No sharing or sync. One browser profile holds the data. You share by exporting a file.</td></tr><tr><th scope="row">Where data lives</th><td>To share a notebook it must be saved in OneDrive or a SharePoint site. Local notebooks are listed for OneNote on Windows only. (<a href="https://support.microsoft.com/en-us/onenote/onenote-help-and-learning/how-to-share-a-onenote-notebook">source</a>, <a href="https://support.microsoft.com/en-us/onenote/onenote-platform-data-protection-recovery">source</a>)</td><td>IndexedDB in the current browser profile. No account and no SolveStack server for core data.</td></tr><tr><th scope="row">Devices</th><td>Desktop, web, and mobile apps can work on the same shared notebook. (<a href="https://support.microsoft.com/en-us/office/work-together-on-office-documents">source</a>)</td><td>Any modern browser. Works offline after the first load as a progressive web app. Data does not move between devices unless you export and import it.</td></tr><tr><th scope="row">Structure</th><td>Notebooks made of sections and pages. (<a href="https://support.microsoft.com/en-us/onenote/onenote-platform-data-protection-recovery">source</a>)</td><td>Fixed record: timestamped entries by type (note, observation, action, evidence, hypothesis, result, decision, resolution), hypotheses with a status and reasoning, tasks, current focus, scratchpad, and root cause, fix, validation, and prevention fields. Hypotheses can be marked Ruled Out with a reason, and exports list them in their own Ruled Out section.</td></tr><tr><th scope="row">Export</th><td>OneNote for Windows exports a page, section, or notebook to formats including PDF, Word, and OneNote section files. OneNote for the web exports pages to PDF; whole-notebook export from the web works only for notebooks on personal OneDrive accounts, not work or school OneDrive or SharePoint. (<a href="https://support.microsoft.com/en-us/onenote/onenote-platform-data-protection-recovery">source</a>, <a href="https://support.microsoft.com/en-us/onenote/export-and-import-onenote-notebooks">source</a>)</td><td>Knowledge Markdown, RCA Markdown, JSON, standalone HTML, and a ZIP package per session, plus a full JSON backup and JSON import.</td></tr><tr><th scope="row">Recovery</th><td>OneNote for Windows keeps automatic backups (daily by default, kept 2 weeks) and a recycle bin that keeps deleted notes for 60 days. (<a href="https://support.microsoft.com/en-us/onenote/onenote-platform-data-protection-recovery">source</a>)</td><td>Your exported backups. Clearing browser site data can remove the local workspace.</td></tr><tr><th scope="row">Cost</th><td>Microsoft lists OneNote among the apps in its Microsoft 365 Business Standard and Business Premium with Copilot plans. (<a href="https://www.microsoft.com/en-us/microsoft-365/copilot/pricing">Microsoft 365 plans</a>)</td><td>Free. No account.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="template" id="fit" aria-labelledby="fit-title">
+        <div class="section-label"><span>02</span><div><p>PICK THE RIGHT ONE</p><h2 id="fit-title">Where each one fits.</h2></div></div>
+        <div class="fit-grid">
+          <article><h3>OneNote is the better fit when</h3><ul><li>Several people need to edit the same notes at the same time.</li><li>You need the notes on desktop, web, and mobile.</li><li>Your team already keeps runbooks and handover notes in shared notebooks.</li><li>You want built-in page history and a recycle bin.</li></ul></article>
+          <article><h3>SolveStack is the better fit when</h3><ul><li>One person is working a problem that spans many tests, causes, and pieces of evidence.</li><li>You want ruled-out causes kept with the reason.</li><li>You want root cause, fix, validation, and prevention captured before the ticket closes.</li><li>You do not want an account or a cloud copy of raw notes.</li><li>You want a Markdown or HTML file to drop into your existing knowledge base.</li></ul></article>
+          <article><h3>Know the limits</h3><ul><li>SolveStack has no sharing, sync, or co-authoring.</li><li>Its data lives in one browser profile. Clearing site data can remove it, so export backups.</li><li>Attachments are limited to 10 MB each.</li><li>It is not a ticketing system, an incident-management platform, a cloud knowledge base, or an AI assistant.</li></ul></article>
+        </div>
+      </section>
+
+      <section class="template" id="sample" aria-labelledby="sample-title">
+        <div class="section-label"><span>03</span><div><p>SAMPLE EXPORT</p><h2 id="sample-title">What a SolveStack export looks like.</h2></div></div>
+        <p class="worked-note">The sample is invented, not a real incident. The Markdown file was produced by SolveStack's own Knowledge MD export from the sample session JSON. You can import the JSON in SolveStack under Settings, Import JSON.</p>
+        <div class="hero-actions"><a class="primary" href="/onenote-vs-solvestack/sample-knowledge.md" download>Download sample Markdown</a><a class="secondary" href="/onenote-vs-solvestack/sample-session.json" download>Download sample session JSON</a></div>
+        <div class="copyblock">
+          <p>EXCERPT FROM SAMPLE-KNOWLEDGE.MD</p>
+          <pre>## Root Cause
+The branch VPN tunnel used a 1500 byte MTU, so larger DNS replies were fragmented and the branch firewall dropped the fragments.
+
+## Resolution
+Set the branch VPN interface MTU to 1400.
+
+## Validation
+50 of 50 test lookups succeeded after the change, and no timeouts were reported the next day.
+
+## Prevention
+Add the MTU value to the branch VPN build checklist and review other branches.</pre>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>04</span><div><p>QUESTIONS</p><h2 id="faqs-title">OneNote vs SolveStack, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>Is SolveStack a OneNote replacement?</h3><p>No. OneNote is a general notebook for teams and devices. SolveStack is a single-person workspace for one technical investigation at a time. Many IT teams can use both: SolveStack while the problem is open, and a shared notebook or knowledge base for the finished write-up.</p></article><article><h3>When is OneNote the better choice for troubleshooting notes?</h3><p>When several people need to edit the same notes at the same time, when you need the notes on several devices, or when your team already keeps runbooks in shared notebooks. OneNote supports shared notebooks stored in OneDrive or SharePoint, with edit or view permissions.</p></article><article><h3>When is SolveStack the better choice?</h3><p>When one engineer wants a structured record of a single problem: timestamped entries by type, hypotheses marked as ruled out with the reason, and a root cause, fix, validation, and prevention, exported as Markdown, HTML, JSON, or ZIP. The data stays in that browser and no account is needed.</p></article><article><h3>Can SolveStack share or sync notes between people?</h3><p>No. SolveStack stores data in IndexedDB in one browser profile. To move or share a record, you export it as a file. Clearing browser data can remove it, so export backups.</p></article><article><h3>Can I move SolveStack exports into OneNote?</h3><p>SolveStack exports Markdown and standalone HTML files. You can store those files wherever your team keeps documentation. This page does not claim any specific OneNote import path.</p></article><article><h3>Is the sample export a real incident?</h3><p>No. It is an invented example, created to show what a SolveStack export contains. The Markdown file was produced by SolveStack&#x27;s own Knowledge MD export from the sample JSON.</p></article>
+        </div>
+        <div class="sources"><p>Sources, checked October 30, 2026:</p><ul>
+          <li><a href="https://support.microsoft.com/en-us/onenote/onenote-help-and-learning/how-to-share-a-onenote-notebook">How to share a OneNote notebook</a> (Microsoft Support)</li>
+          <li><a href="https://support.microsoft.com/en-us/office/work-together-on-office-documents">Work together on Office documents</a> (Microsoft Support)</li>
+          <li><a href="https://support.microsoft.com/en-us/onenote/onenote-platform-data-protection-recovery">OneNote platform data protection and recovery</a> (Microsoft Support)</li>
+          <li><a href="https://support.microsoft.com/en-us/onenote/export-and-import-onenote-notebooks">Export OneNote notebooks</a> (Microsoft Support)</li>
+          <li><a href="https://www.microsoft.com/en-us/microsoft-365/copilot/pricing">Microsoft Copilot plans and pricing</a> (Microsoft, lists apps included in Microsoft 365 business plans)</li>
+        </ul></div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>05</span><div><p>KEEP GOING</p><h2 id="related-title">Related guides.</h2></div></div>
+        <div class="related-cards">
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>What each export format is for and how finished investigations become searchable knowledge.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>Problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/incident-report-template/"><b>INCIDENT</b><span>IT incident report template</span><p>Incident ID, severity, timeline, impact, root cause, remediation, and action items.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
