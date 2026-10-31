@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 2,
+  "session": {
+    "schemaVersion": 2,
+    "id": "SS-SAMPLE-001",
+    "title": "Sample: intermittent DNS timeouts at a branch office",
+    "problem": "Users at one branch office see intermittent DNS lookup timeouts over the site-to-site VPN. This is an invented sample, not a real incident.",
+    "system": "Branch VPN and internal DNS",
+    "tags": [
+      "dns",
+      "vpn",
+      "sample"
+    ],
+    "status": "resolved",
+    "createdAt": "2026-10-20T14:00:00.000Z",
+    "updatedAt": "2026-10-20T15:30:00.000Z",
+    "resolvedAt": "2026-10-20T15:30:00.000Z",
+    "currentFocus": "Confirm the fix holds for a full business day.",
+    "scratchpad": "",
+    "entries": [
+      {
+        "id": "entry-s0000001",
+        "type": "Observation",
+        "technicalType": "",
+        "content": "Branch office users report web pages that fail to load for 5 to 10 seconds, then work on retry. Head office users are not affected.",
+        "timestamp": "2026-10-20T14:02:00.000Z",
+        "starred": true,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T14:02:00.000Z",
+        "updatedAt": "2026-10-20T14:02:00.000Z"
+      },
+      {
+        "id": "entry-s0000002",
+        "type": "Action",
+        "technicalType": "Command",
+        "content": "nslookup intranet.example.internal 10.20.0.53",
+        "timestamp": "2026-10-20T14:09:00.000Z",
+        "starred": false,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T14:09:00.000Z",
+        "updatedAt": "2026-10-20T14:09:00.000Z"
+      },
+      {
+        "id": "entry-s0000003",
+        "type": "Result",
+        "technicalType": "Command output",
+        "content": ";; connection timed out; no servers could be reached (2 of 5 attempts)",
+        "timestamp": "2026-10-20T14:10:00.000Z",
+        "starred": true,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T14:10:00.000Z",
+        "updatedAt": "2026-10-20T14:10:00.000Z"
+      },
+      {
+        "id": "entry-s0000004",
+        "type": "Evidence",
+        "technicalType": "Log",
+        "content": "Branch firewall log shows UDP 53 replies from 10.20.0.53 dropped as fragmented packets over the VPN tunnel.",
+        "timestamp": "2026-10-20T14:31:00.000Z",
+        "starred": true,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T14:31:00.000Z",
+        "updatedAt": "2026-10-20T14:31:00.000Z"
+      },
+      {
+        "id": "entry-s0000005",
+        "type": "Action",
+        "technicalType": "",
+        "content": "Lowered the tunnel MTU on the branch VPN interface from 1500 to 1400 in a change window.",
+        "timestamp": "2026-10-20T15:05:00.000Z",
+        "starred": false,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T15:05:00.000Z",
+        "updatedAt": "2026-10-20T15:05:00.000Z"
+      },
+      {
+        "id": "entry-s0000006",
+        "type": "Result",
+        "technicalType": "",
+        "content": "50 of 50 test lookups from the branch succeeded after the MTU change.",
+        "timestamp": "2026-10-20T15:20:00.000Z",
+        "starred": true,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T15:20:00.000Z",
+        "updatedAt": "2026-10-20T15:20:00.000Z"
+      },
+      {
+        "id": "entry-s0000007",
+        "type": "Decision",
+        "technicalType": "",
+        "content": "Keep the 1400 MTU and add the setting to the branch VPN build checklist.",
+        "timestamp": "2026-10-20T15:28:00.000Z",
+        "starred": false,
+        "attachmentIds": [],
+        "createdAt": "2026-10-20T15:28:00.000Z",
+        "updatedAt": "2026-10-20T15:28:00.000Z"
+      }
+    ],
+    "hypotheses": [
+      {
+        "id": "hyp-s0000001",
+        "text": "The internal DNS server is overloaded",
+        "status": "Ruled Out",
+        "reasoning": "Head office lookups to the same server never timed out, and server CPU stayed under normal load.",
+        "evidenceIds": [],
+        "createdAt": "2026-10-20T14:15:00.000Z",
+        "updatedAt": "2026-10-20T14:20:00.000Z"
+      },
+      {
+        "id": "hyp-s0000002",
+        "text": "The ISP link at the branch is dropping packets",
+        "status": "Ruled Out",
+        "reasoning": "Continuous ping across the tunnel showed no loss while lookups were failing.",
+        "evidenceIds": [],
+        "createdAt": "2026-10-20T14:18:00.000Z",
+        "updatedAt": "2026-10-20T14:25:00.000Z"
+      },
+      {
+        "id": "hyp-s0000003",
+        "text": "Large DNS replies are fragmented and dropped over the VPN",
+        "status": "Confirmed",
+        "reasoning": "Firewall log shows fragmented UDP 53 replies dropped, and lowering the MTU stopped the timeouts.",
+        "evidenceIds": [
+          "entry-s0000004",
+          "entry-s0000006"
+        ],
+        "createdAt": "2026-10-20T14:28:00.000Z",
+        "updatedAt": "2026-10-20T15:20:00.000Z"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "task-s0000001",
+        "text": "Check other branches for the same MTU setting",
+        "completed": false,
+        "createdAt": "2026-10-20T15:29:00.000Z"
+      }
+    ],
+    "resolution": {
+      "rootCause": "The branch VPN tunnel used a 1500 byte MTU, so larger DNS replies were fragmented and the branch firewall dropped the fragments.",
+      "fix": "Set the branch VPN interface MTU to 1400.",
+      "validation": "50 of 50 test lookups succeeded after the change, and no timeouts were reported the next day.",
+      "prevention": "Add the MTU value to the branch VPN build checklist and review other branches."
+    },
+    "metadata": {}
+  },
+  "attachments": []
+}
