@@ -16,3 +16,10 @@ const hits = roots
   .filter((path) => readFileSync(path, "utf8").toLowerCase().includes("steve thoms"));
 assert.deepEqual(hits, [], `personal name found in: ${hits.join(", ")}`);
 console.log("No personal name in served pages");
+
+const emailHits = roots
+  .flatMap(files)
+  .filter((path) => /\.(html|xml|txt|json|js|ts|css|md|webmanifest)$/.test(path))
+  .filter((path) => /gmail\.com|js-email/.test(readFileSync(path, "utf8").toLowerCase()));
+assert.deepEqual(emailHits, [], `personal email found in: ${emailHits.join(", ")}`);
+console.log("No personal email in served pages");
