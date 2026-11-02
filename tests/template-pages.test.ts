@@ -79,6 +79,9 @@ const fiveWhys = await Bun.file("public/5-whys-template/index.html").text();
 const incidentReport = await Bun.file(
   "public/incident-report-template/index.html",
 ).text();
+const fishbone = await Bun.file(
+  "public/fishbone-diagram-template/index.html",
+).text();
 const sitemap = await Bun.file("public/sitemap.xml").text();
 
 assertStaticTemplatePage(rca, {
@@ -122,7 +125,81 @@ assert.equal(
   false,
 );
 
-for (const path of ["rca-template/", "5-whys-template/", "incident-report-template/"]) {
+assertStaticTemplatePage(fishbone, {
+  path: "/fishbone-diagram-template/",
+  title: "Fishbone Diagram Template (Ishikawa)",
+  heading: "Fishbone Diagram Template",
+  descriptionPhrase: "fishbone diagram template",
+  templateMarker: "FISHBONE DIAGRAM",
+});
+const fishTitle = fishbone.match(/<title>([^<]+)<\/title>/)?.[1] ?? "";
+assert.equal(fishTitle.length < 60, true, `${fishTitle} (${fishTitle.length})`);
+assert.match(
+  fishbone,
+  /name="description" content="[^"]*Ishikawa diagram template/,
+);
+assert.equal(fishbone.includes('href="/5-whys-template/"'), true);
+assert.equal(fishbone.includes('href="/rca-template/"'), true);
+assert.equal(fishbone.includes('href="/"'), true);
+assert.equal(
+  fishbone.includes(
+    'href="/fishbone-diagram-template/fishbone-diagram-blank.csv"',
+  ),
+  true,
+);
+assert.match(fishbone, /Not a real incident/);
+assert.equal(fishbone.includes('"@type": "Person"'), false);
+assert.equal(fishbone.includes('"author"'), false);
+const fishFaqs = faqEntities(fishbone);
+assert.equal(fishFaqs.length >= 4 && fishFaqs.length <= 6, true, String(fishFaqs.length));
+const csv = await Bun.file(
+  "public/fishbone-diagram-template/fishbone-diagram-blank.csv",
+).text();
+assert.match(
+  csv,
+  /^effect,category_set,category,cause,subcause,evidence,disposition/,
+);
+for (const category of [
+  "Methods",
+  "Machines",
+  "Materials",
+  "Manpower/People",
+  "Measurement",
+  "Mother Nature/Environment",
+  "Policies",
+  "Procedures",
+  "People",
+  "Plant/Technology",
+  "Surroundings",
+  "Suppliers",
+  "Systems",
+  "Skills",
+]) {
+  assert.equal(csv.includes(category), true, category);
+}
+assert.equal(
+  sitemap.includes(`<loc>${productionOrigin}fishbone-diagram-template/</loc>`),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/llms.txt").text()).includes(
+    "https://solvestack-ai.app/fishbone-diagram-template/",
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("index.html").text()).includes(
+    'href="/fishbone-diagram-template/"',
+  ),
+  true,
+);
+
+for (const path of [
+  "rca-template/",
+  "5-whys-template/",
+  "incident-report-template/",
+  "fishbone-diagram-template/",
+]) {
   assert.equal(sitemap.includes(`<loc>${productionOrigin}${path}</loc>`), true);
   const built = await Bun.file(`dist/${path}index.html`).text();
   const expected =
@@ -130,8 +207,16 @@ for (const path of ["rca-template/", "5-whys-template/", "incident-report-templa
       ? rca
       : path === "5-whys-template/"
         ? fiveWhys
-        : incidentReport;
+        : path === "incident-report-template/"
+          ? incidentReport
+          : fishbone;
   assert.equal(built, expected);
 }
+assert.equal(
+  await Bun.file(
+    "dist/fishbone-diagram-template/fishbone-diagram-blank.csv",
+  ).text(),
+  csv,
+);
 
 console.log("SolveStack template page contract passed");

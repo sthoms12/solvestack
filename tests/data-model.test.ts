@@ -33,6 +33,9 @@ const buildFiles = [
   "dist/rca-template/template.css",
   "dist/5-whys-template/index.html",
   "dist/5-whys-template/template.css",
+  "dist/fishbone-diagram-template/index.html",
+  "dist/fishbone-diagram-template/template.css",
+  "dist/fishbone-diagram-template/fishbone-diagram-blank.csv",
 ];
 for (const file of buildFiles)
   assert.equal(
@@ -76,6 +79,12 @@ assert.equal(
 assert.equal(
   (await Bun.file("public/sitemap.xml").text()).includes(
     `<loc>${productionOrigin}5-whys-template/</loc>`,
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/sitemap.xml").text()).includes(
+    `<loc>${productionOrigin}fishbone-diagram-template/</loc>`,
   ),
   true,
 );
