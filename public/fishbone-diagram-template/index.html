@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="A fishbone diagram template (an Ishikawa diagram template): the 6M categories, a fill-in worksheet, a blank CSV, and when to use it instead of 5 Whys." />
+    <link rel="canonical" href="https://solvestack-ai.app/fishbone-diagram-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/fishbone-diagram-template/" />
+    <meta property="og:title" content="Fishbone Diagram Template (Ishikawa)" />
+    <meta property="og:description" content="A fishbone diagram template (an Ishikawa diagram template): the 6M categories, a fill-in worksheet, a blank CSV, and when to use it instead of 5 Whys." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Fishbone Diagram Template (Ishikawa)" />
+    <meta name="twitter:description" content="The 6Ms, a fill-in worksheet, a blank CSV, and when a fishbone diagram beats the 5 whys. Free, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/fishbone-diagram-template/template.css" />
+    <title>Fishbone Diagram Template (Ishikawa) | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Fishbone Diagram Template (Ishikawa)",
+        "description": "A fishbone diagram template, also called an Ishikawa diagram template, with the 6M categories, service alternates, a fill-in worksheet, and a worked IT example.",
+        "url": "https://solvestack-ai.app/fishbone-diagram-template/",
+        "publisher": { "@type": "Organization", "name": "SolveStack" },
+        "about": ["fishbone diagram", "Ishikawa diagram", "cause and effect diagram", "root cause analysis", "5 whys"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a fishbone diagram template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A fishbone diagram template is a blank cause-and-effect chart for one problem. You write the problem at the head and sort possible causes onto category branches. Fishbone diagram, Ishikawa diagram, and cause-and-effect diagram are names for that same chart. The completed chart is a list of causes to investigate, not proof of which one is the root cause." }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the 6M categories?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The 6M categories are Methods, Machines, Materials, Manpower (People), Measurement, and Mother Nature (Environment). Methods covers procedures and the way the work is supposed to run. Machines covers equipment, including software when software is what does the work. Materials covers inputs such as parts, data, and configuration. Manpower covers skills, staffing, and handoffs, not a person's name standing in for a cause. Measurement covers how you detect and count the effect. Mother Nature covers the surroundings and conditions outside the process." }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the 4P and 4S categories?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Service work often uses the 4Ps instead of the 6Ms: Policies, Procedures, People, and Plant/Technology. Another service set is the 4Ss: Surroundings, Suppliers, Systems, and Skills. Use the set that matches the work, and rename a branch when a standard label does not fit. An empty category is a prompt to look again, not a requirement to invent a cause." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I fill in a fishbone diagram?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Agree on one effect, written as something you observed. Choose the categories. Under each category, list causes that could produce that effect, then ask why that cause would be true and write the answer as a smaller branch. Mark which lines have evidence and which are still guesses. Pick one branch to test, and leave the others on the chart so they are not forgotten." }
+          },
+          {
+            "@type": "Question",
+            "name": "When should I use a fishbone diagram instead of the 5 whys?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Use a fishbone diagram when several kinds of cause are still plausible and you need them visible before you choose one. Use the 5 whys when one observation already has a chain you can follow with evidence. The two fit together: sort the causes on the fishbone, then walk the single branch you will test with the 5 whys." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use this template offline?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Fill in the worksheet and print it from your browser, copy the plain-text version, or download the blank CSV. Nothing you type on this page is saved or sent. The SolveStack app linked from this page stores investigation notes in your browser and exports Markdown, HTML, JSON, and ZIP with no account and no cloud service." }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#categories">Categories</a><a href="#steps">How to</a><a href="#template">Template</a><a href="/5-whys-template/">5 Whys</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / FISHBONE</div>
+        <p class="overline">EFFECT → CATEGORIES → ONE BRANCH TO TEST</p>
+        <h1>Fishbone Diagram <em>Template</em></h1>
+        <p class="intro">A fishbone diagram template is a blank cause-and-effect chart — the same chart as an Ishikawa diagram template. You write one problem at the head and sort possible causes onto category bones. The usual bones are the 6Ms: Methods, Machines, Materials, Manpower (People), Measurement, and Mother Nature (Environment). For service work, teams often use the 4Ps instead — Policies, Procedures, People, and Plant/Technology — or the 4Ss — Surroundings, Suppliers, Systems, and Skills. The filled chart lists causes to investigate. It does not prove which one is the root cause. When you know which branch to test, continue with the <a href="/5-whys-template/">5 whys template</a>. When the incident needs a full record, use the <a href="/rca-template/">root cause analysis template</a>.</p>
+        <div class="hero-actions"><a class="primary" href="#sheet">Fill in the worksheet</a><a class="secondary" href="/fishbone-diagram-template/fishbone-diagram-blank.csv" download>Download the blank CSV</a></div>
+        <aside><strong>Local-first boundary</strong><span>The worksheet on this page stays in your browser. SolveStack stores investigation data in IndexedDB. No account, no cloud database, no built-in AI.</span></aside>
+      </section>
+
+      <section class="template" id="categories" aria-labelledby="categories-title">
+        <div class="section-label"><span>01</span><div><p>THE BONES</p><h2 id="categories-title">Six categories, or a set that fits the work.</h2></div></div>
+        <p class="lede">Put the effect at the head. Each bone is a kind of cause, not a cause itself. Specific causes hang off the bone, and a reason for that cause hangs off the cause. Rename a bone when the standard word does not describe the process.</p>
+        <figure class="fish">
+          <div class="fish-row">
+            <article><h3>Methods</h3><p>Procedures, steps, and the way the work is supposed to run. In an IT incident this is the runbook, the change path, and the retry logic.</p></article>
+            <article><h3>Machines</h3><p>Equipment. When software is what does the work — a host, a service, a job — it belongs on this bone too.</p></article>
+            <article><h3>Materials</h3><p>Inputs the process consumes: parts, data, configuration, a feed from another system.</p></article>
+          </div>
+          <div class="fish-spine"><span></span><b>Effect</b></div>
+          <div class="fish-row">
+            <article><h3>Manpower / People</h3><p>Skills, staffing, and handoffs. The bone is here to find a system condition. A person's name is not a cause.</p></article>
+            <article><h3>Measurement</h3><p>How you detect and count the effect: the alarm, the log, the exit code, the definition of success.</p></article>
+            <article><h3>Mother Nature</h3><p>Environment. The surroundings and outside conditions: site, time of day, power, weather, an upstream provider.</p></article>
+          </div>
+          <figcaption>One effect at the head. Category bones off the spine. Causes, then sub-causes, hang off the bones.</figcaption>
+        </figure>
+        <div class="alt-sets">
+          <article>
+            <h3>4Ps, when the work is a service</h3>
+            <ul>
+              <li><strong>Policies</strong> — rules that decide what is allowed.</li>
+              <li><strong>Procedures</strong> — the steps people actually follow.</li>
+              <li><strong>People</strong> — skills, staffing, and handoffs.</li>
+              <li><strong>Plant / Technology</strong> — the place and the systems the service runs on.</li>
+            </ul>
+          </article>
+          <article>
+            <h3>4Ss, another service set</h3>
+            <ul>
+              <li><strong>Surroundings</strong> — the environment the work happens in.</li>
+              <li><strong>Suppliers</strong> — outside parties that provide an input.</li>
+              <li><strong>Systems</strong> — procedures, process, and the technology in the path.</li>
+              <li><strong>Skills</strong> — whether the people doing the work can do it.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="template" id="steps" aria-labelledby="steps-title">
+        <div class="section-label"><span>02</span><div><p>HOW TO FILL IT IN</p><h2 id="steps-title">Sort first. Test one branch second.</h2></div></div>
+        <div class="step-list">
+          <article><span class="number">STEP 01</span><div><h3>Write the effect as an observation</h3><p>Agree on one problem and write it as something observed: what happened, when, and what it affected. "The directory is bad" is already a cause. "Weekday afternoon password resets fail for some accounts" is an effect. One effect per chart. A second problem that does not depend on the first gets its own chart.</p></div></article>
+          <article><span class="number">STEP 02</span><div><h3>Choose the bones</h3><p>Start with the 6Ms. If the work is a service and machines or materials do not describe it, use the 4Ps or the 4Ss. Rename a bone when the standard word does not fit. The labels are a prompt to look widely, not a form you have to satisfy.</p></div></article>
+          <article><span class="number">STEP 03</span><div><h3>Hang causes on the bones</h3><p>For each category, ask what in that category could produce the effect. Write that cause on the bone. A cause that truly belongs in two categories can sit on both. Keep the line short enough that someone else could check it. Include people who know the process — a chart drawn from one person's guess only repeats that guess.</p></div></article>
+          <article><span class="number">STEP 04</span><div><h3>Ask why, and add the smaller branch</h3><p>Take one cause and ask why it would be true. That answer is a sub-cause, hanging off the cause, not a new category. Stop adding branches when the next why is a guess you have no way to check. The longer chain, with evidence on every step, belongs on the <a href="/5-whys-template/">5 whys template</a>.</p></div></article>
+          <article><span class="number">STEP 05</span><div><h3>Mark evidence, guesses, and ruled-out lines</h3><p>Next to each cause, note the evidence or write "guess". If you have shown a cause did not happen, mark it ruled out and say what showed that. A sparse bone is a reason to look again. It is not a reason to invent a cause so the chart looks balanced.</p></div></article>
+          <article><span class="number">STEP 06</span><div><h3>Pick one branch to test</h3><p>Choose the branch that best fits the facts you already have, and say why the others wait. The chart stays a list of hypotheses until a change aimed at that branch keeps the effect from coming back. Write the test, the owner, and the result that would keep the branch or drop it.</p></div></article>
+        </div>
+      </section>
+
+      <section class="tool" id="example" aria-labelledby="example-title">
+        <div class="section-label"><span>03</span><div><p>WORKED EXAMPLE</p><h2 id="example-title">One invented incident, sorted onto the bones.</h2></div></div>
+        <p class="worked-note">Not a real incident. The portal, the job, and the times below are made up so the chart can be read from the effect to the branch worth testing. They are not measurements from an outage.</p>
+        <div class="step-list">
+          <article><span class="number">EFFECT</span><div><h3>Some password resets fail</h3><p>On weekday afternoons, some password resets from the self-service portal fail. Resets of brand-new accounts also fail in the morning, and that failure does not depend on the afternoon one.</p></div></article>
+          <article><span class="number">METHODS</span><div><h3>The runbook skips the window</h3><p>The portal tries the directory write once, then shows a generic failure. The help-desk runbook says to reset the account by hand. Nothing in the runbook asks whether the directory is inside a scheduled job window.</p></div></article>
+          <article><span class="number">MACHINES</span><div><h3>One host, two jobs</h3><p>The directory replica the portal writes to is the same host that runs the weekday reporting job. That job starts at 13:00.</p></div></article>
+          <article><span class="number">MATERIALS</span><div><h3>Morning accounts have no email yet</h3><p>The portal looks the account up by email. Accounts the HR feed created that morning have no email until a later sync, so those resets fail in the morning whether or not the reporting job is running.</p></div></article>
+          <article><span class="number">PEOPLE</span><div><h3>Two calendars</h3><p>The group that owns the reporting job and the group that owns the portal do not share a change calendar. Each side treated the afternoon as free.</p></div></article>
+          <article><span class="number">MEASURE</span><div><h3>The alarm counts the wrong success</h3><p>The portal alarm counts HTTP 500 responses. A reset that returns HTTP 200 and the words "try again later" is counted as success, so the afternoon failures look rare in the alarm and common in the ticket queue.</p></div></article>
+          <article><span class="number">ENVIRONMENT</span><div><h3>Ruled out for this effect</h3><p>The directory host shares a power circuit with another rack. The host stayed up on the afternoons the resets failed, so this bone is ruled out. The note stays on the chart so the next reader does not walk it again.</p></div></article>
+          <article><span class="number">NEXT</span><div><h3>Test one chain, keep the other branch</h3><p>Machines and Methods describe one chain: at 13:00 the reporting job and the directory share a host, and the portal path never checks for that window. Walk that chain on the <a href="/5-whys-template/">5 whys template</a>, with the log line and the job schedule as evidence. The morning email-lookup failures do not depend on that job, so they stay their own branch. Folding them into the afternoon chain would hide one of the two causes.</p></div></article>
+        </div>
+      </section>
+
+      <section class="template" id="choose" aria-labelledby="choose-title">
+        <div class="section-label"><span>04</span><div><p>WHICH TOOL</p><h2 id="choose-title">Fishbone when the cause is still a field. 5 Whys when it is a chain.</h2></div></div>
+        <div class="choice">
+          <article>
+            <h3>Use the fishbone</h3>
+            <ul>
+              <li>You can state the effect, and you cannot yet state one chain.</li>
+              <li>More than one category still looks plausible.</li>
+              <li>A group needs the same picture before anyone picks a favorite cause.</li>
+              <li>The problem keeps returning, and the last write-up jumped to a single why.</li>
+            </ul>
+          </article>
+          <article>
+            <h3>Use the 5 whys</h3>
+            <ul>
+              <li>One observation already has a cause that follows from it.</li>
+              <li>You can point at evidence for the step you are about to write.</li>
+              <li>You are ready to stop on a cause the team can change.</li>
+              <li>A second cause is independent. Give it another chain, not another why on this one.</li>
+            </ul>
+          </article>
+        </div>
+        <p class="lede choice-note">A practical order is the fishbone first, then the <a href="/5-whys-template/">5 whys</a> on the single branch you will test. If the result needs a timeline, owners, and a check that the fix held, that record is the <a href="/rca-template/">root cause analysis template</a>. The fishbone does not replace it.</p>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>05</span><div><p>THE TEMPLATE</p><h2 id="template-title">Copy it, fill it in, or download the blank.</h2></div></div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>FISHBONE DIAGRAM
+=================
+Effect (what you observed, when, and what it affected):
+
+Category set: 6M, or 4P (Policies, Procedures, People, Plant/Technology), or 4S (Surroundings, Suppliers, Systems, Skills).
+Rename a branch if a label does not fit. One effect per chart.
+
+METHODS
+- Cause:
+  - Why that cause could be true (sub-cause):
+  - Evidence, or "guess":
+  - Disposition (keep and test / ruled out / untested):
+
+MACHINES
+- Cause:
+  - Sub-cause:
+  - Evidence, or "guess":
+  - Disposition:
+
+MATERIALS
+- Cause:
+  - Sub-cause:
+  - Evidence, or "guess":
+  - Disposition:
+
+MANPOWER / PEOPLE
+- Cause:
+  - Sub-cause:
+  - Evidence, or "guess":
+  - Disposition:
+  (If this line is a person's name, write the system condition that made the mistake possible.)
+
+MEASUREMENT
+- Cause:
+  - Sub-cause:
+  - Evidence, or "guess":
+  - Disposition:
+
+MOTHER NATURE / ENVIRONMENT
+- Cause:
+  - Sub-cause:
+  - Evidence, or "guess":
+  - Disposition:
+
+BRANCH TO TEST NEXT
+Which branch, and why the others wait:
+What result would keep this branch, and what result would drop it:
+Owner and when it will be checked:
+Where the chain goes next (5 whys, or the RCA record):</pre>
+        </div>
+
+        <div class="sheet" id="sheet">
+          <p class="sheet-kicker">FILL IN ON THIS PAGE, THEN PRINT</p>
+          <h3>Fishbone diagram worksheet</h3>
+          <p class="sheet-note">Nothing you type is saved or sent. Print from your browser before you close the tab. Change a category name if you are using the 4Ps or the 4Ss. The CSV has a blank row for every bone in all three sets. Add a row in the CSV when one bone has more than one cause. In the disposition column write "keep and test", "ruled out", or "untested". Put the effect in the effect column of the first row you use.</p>
+          <label class="wide">Effect
+            <textarea rows="3" aria-label="Effect" placeholder="What you observed, when, and what it affected."></textarea>
+          </label>
+          <div class="bones">
+            <fieldset>
+              <legend>Bone</legend>
+              <label>Category <input type="text" value="Methods" aria-label="Category 1" /></label>
+              <label>Causes and sub-causes <textarea rows="4" aria-label="Causes for category 1"></textarea></label>
+              <label>Evidence, or guess <textarea rows="2" aria-label="Evidence for category 1"></textarea></label>
+              <label>Disposition
+                <select aria-label="Disposition for category 1">
+                  <option>Untested</option>
+                  <option>Keep and test</option>
+                  <option>Ruled out</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Bone</legend>
+              <label>Category <input type="text" value="Machines" aria-label="Category 2" /></label>
+              <label>Causes and sub-causes <textarea rows="4" aria-label="Causes for category 2"></textarea></label>
+              <label>Evidence, or guess <textarea rows="2" aria-label="Evidence for category 2"></textarea></label>
+              <label>Disposition
+                <select aria-label="Disposition for category 2">
+                  <option>Untested</option>
+                  <option>Keep and test</option>
+                  <option>Ruled out</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Bone</legend>
+              <label>Category <input type="text" value="Materials" aria-label="Category 3" /></label>
+              <label>Causes and sub-causes <textarea rows="4" aria-label="Causes for category 3"></textarea></label>
+              <label>Evidence, or guess <textarea rows="2" aria-label="Evidence for category 3"></textarea></label>
+              <label>Disposition
+                <select aria-label="Disposition for category 3">
+                  <option>Untested</option>
+                  <option>Keep and test</option>
+                  <option>Ruled out</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Bone</legend>
+              <label>Category <input type="text" value="Manpower / People" aria-label="Category 4" /></label>
+              <label>Causes and sub-causes <textarea rows="4" aria-label="Causes for category 4"></textarea></label>
+              <label>Evidence, or guess <textarea rows="2" aria-label="Evidence for category 4"></textarea></label>
+              <label>Disposition
+                <select aria-label="Disposition for category 4">
+                  <option>Untested</option>
+                  <option>Keep and test</option>
+                  <option>Ruled out</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Bone</legend>
+              <label>Category <input type="text" value="Measurement" aria-label="Category 5" /></label>
+              <label>Causes and sub-causes <textarea rows="4" aria-label="Causes for category 5"></textarea></label>
+              <label>Evidence, or guess <textarea rows="2" aria-label="Evidence for category 5"></textarea></label>
+              <label>Disposition
+                <select aria-label="Disposition for category 5">
+                  <option>Untested</option>
+                  <option>Keep and test</option>
+                  <option>Ruled out</option>
+                </select>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Bone</legend>
+              <label>Category <input type="text" value="Mother Nature / Environment" aria-label="Category 6" /></label>
+              <label>Causes and sub-causes <textarea rows="4" aria-label="Causes for category 6"></textarea></label>
+              <label>Evidence, or guess <textarea rows="2" aria-label="Evidence for category 6"></textarea></label>
+              <label>Disposition
+                <select aria-label="Disposition for category 6">
+                  <option>Untested</option>
+                  <option>Keep and test</option>
+                  <option>Ruled out</option>
+                </select>
+              </label>
+            </fieldset>
+          </div>
+          <label class="wide">Branch to test next
+            <textarea rows="3" aria-label="Branch to test next" placeholder="Which branch, why the others wait, and what result would keep or drop it."></textarea>
+          </label>
+        </div>
+        <p class="download-row"><a class="secondary" href="/fishbone-diagram-template/fishbone-diagram-blank.csv" download>Download the blank CSV</a></p>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>06</span><div><p>QUESTIONS</p><h2 id="faqs-title">Fishbone diagrams, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What is a fishbone diagram template?</h3><p>A fishbone diagram template is a blank cause-and-effect chart for one problem. You write the problem at the head and sort possible causes onto category branches. Fishbone diagram, Ishikawa diagram, and cause-and-effect diagram are names for that same chart. The completed chart is a list of causes to investigate, not proof of which one is the root cause.</p></article>
+          <article><h3>What are the 6M categories?</h3><p>The 6M categories are Methods, Machines, Materials, Manpower (People), Measurement, and Mother Nature (Environment). Methods covers procedures and the way the work is supposed to run. Machines covers equipment, including software when software is what does the work. Materials covers inputs such as parts, data, and configuration. Manpower covers skills, staffing, and handoffs, not a person's name standing in for a cause. Measurement covers how you detect and count the effect. Mother Nature covers the surroundings and conditions outside the process.</p></article>
+          <article><h3>What are the 4P and 4S categories?</h3><p>Service work often uses the 4Ps instead of the 6Ms: Policies, Procedures, People, and Plant/Technology. Another service set is the 4Ss: Surroundings, Suppliers, Systems, and Skills. Use the set that matches the work, and rename a branch when a standard label does not fit. An empty category is a prompt to look again, not a requirement to invent a cause.</p></article>
+          <article><h3>How do I fill in a fishbone diagram?</h3><p>Agree on one effect, written as something you observed. Choose the categories. Under each category, list causes that could produce that effect, then ask why that cause would be true and write the answer as a smaller branch. Mark which lines have evidence and which are still guesses. Pick one branch to test, and leave the others on the chart so they are not forgotten.</p></article>
+          <article><h3>When should I use a fishbone diagram instead of the 5 whys?</h3><p>Use a fishbone diagram when several kinds of cause are still plausible and you need them visible before you choose one. Use the <a href="/5-whys-template/">5 whys</a> when one observation already has a chain you can follow with evidence. The two fit together: sort the causes on the fishbone, then walk the single branch you will test with the 5 whys.</p></article>
+          <article><h3>Can I use this template offline?</h3><p>Yes. Fill in the worksheet and print it from your browser, copy the plain-text version, or download the blank CSV. Nothing you type on this page is saved or sent. The SolveStack app linked from this page stores investigation notes in your browser and exports Markdown, HTML, JSON, and ZIP with no account and no cloud service.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>07</span><div><p>KEEP GOING</p><h2 id="related-title">The chart is the sorting step.</h2></div></div>
+        <div class="related-cards">
+          <a href="/5-whys-template/"><b>ONE CHAIN</b><span>5 whys template</span><p>Walk the single branch you chose, with evidence on each why, until you reach a cause you can change.</p></a>
+          <a href="/rca-template/"><b>FULL RECORD</b><span>Root cause analysis template</span><p>Problem statement, timeline, cause chain, contributing factors, owners, and the check that the fix held.</p></a>
+          <a href="/incident-report-template/"><b>INCIDENT</b><span>IT incident report template</span><p>Incident ID, severity, timeline, impact, and what was done while the incident was still open.</p></a>
+          <a href="/"><b>SOLVESTACK WORKSPACE</b><span>Open the app</span><p>Capture the symptom, the branches you ruled out, and the branch you tested. Export Markdown, HTML, JSON, or ZIP. No account.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
