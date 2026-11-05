@@ -1,4 +1,4 @@
-import { readWorkspace, writeWorkspace } from "./local-store";
+import { showToast } from "./data-safety";
 
 function enhance() {
   const input = document.querySelector<HTMLInputElement>("#attach");
@@ -46,26 +46,17 @@ function enhance() {
     .forEach((button) => {
       if (button.dataset.ready) return;
       button.dataset.ready = "true";
-      button.onclick = async () => {
+      button.onclick = () => {
         const attachmentId = button.dataset.removeAttachment;
-        if (!attachmentId || !confirm("Remove this evidence attachment?"))
-          return;
-        const data = await readWorkspace<any>();
-        const session = data?.sessions.find(
-          (item: any) => item.id === location.hash.slice(1),
+        if (!attachmentId) return;
+        // Removal runs through main.ts (single IndexedDB owner) so the
+        // in-memory workspace cannot resurrect the attachment on the next
+        // save, and the user gets a 30-second undo instead of a reload.
+        window.dispatchEvent(
+          new CustomEvent("solvestack:remove-attachment", {
+            detail: { attachmentId },
+          }),
         );
-        if (!session) return;
-        data.attachments = data.attachments.filter(
-          (item: any) => item.id !== attachmentId,
-        );
-        session.entries.forEach(
-          (entry: any) =>
-            (entry.attachmentIds = (entry.attachmentIds || []).filter(
-              (id: string) => id !== attachmentId,
-            )),
-        );
-        await writeWorkspace(data);
-        location.reload();
       };
     });
 }

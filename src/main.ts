@@ -10,6 +10,12 @@ import "./enhancements";
 import "./attachment-enhancements";
 import "./reuse-enhancement";
 import { CURRENT_SCHEMA_VERSION, migrateWorkspace } from "./migrations";
+import {
+  backupStatus,
+  formatStorageEstimate,
+  showToast,
+  UNDO_WINDOW_MS,
+} from "./data-safety";
 import { collectFields } from "./dialogs";
 
 type EntryType =
@@ -99,6 +105,8 @@ type Store = {
   schemaVersion: number;
   sessions: Session[];
   attachments: Attachment[];
+  /** ISO timestamp of the last full backup download; undefined = never. */
+  lastBackupAt?: string;
 };
 
 const DB = "solvestack";
@@ -218,6 +226,11 @@ let search = "";
 let entryType: EntryType = "Note";
 let technicalType: TechnicalType = "";
 let savedState = "Loading…";
+let storageEstimate: { usage: number; quota: number } | null = null;
+let pendingPersistCount = 0;
+let persistQueue: Promise<void> = Promise.resolve();
+let scratchTimer: ReturnType<typeof setTimeout> | undefined;
+let attachmentListenerReady = false;
 let welcomeDismissed =
   localStorage.getItem("solvestack-welcome-dismissed") === "true";
 let db: IDBDatabase;
@@ -240,6 +253,11 @@ const storageMessage = (error: unknown) => {
 const load = async () => {
   try {
     db = await openDb();
+    try {
+      await navigator.storage?.persist?.();
+    } catch {
+      // Persistent storage is best-effort; a refusal must not block loading.
+    }
     const tx = db.transaction(STORE, "readonly");
     const raw = await new Promise<Store | undefined>((resolve, reject) => {
       const r = tx.objectStore(STORE).get("data");
@@ -255,11 +273,20 @@ const load = async () => {
     savedState = `Storage unavailable: ${storageMessage(error)}`;
   }
   render();
+  void refreshStorageEstimate();
 };
-const persist = async () => {
+const updateSaveStatus = () => {
+  document.querySelectorAll<HTMLElement>(".save-status").forEach((el) => {
+    el.innerHTML = `<i></i>${savedState}`;
+  });
+  document.querySelectorAll<HTMLElement>(".quiet").forEach((el) => {
+    el.textContent = savedState;
+  });
+};
+const runPersist = async () => {
   store.schemaVersion = CURRENT_SCHEMA_VERSION;
   savedState = "Saving…";
-  render();
+  updateSaveStatus();
   try {
     if (!db)
       throw Error(
@@ -277,7 +304,56 @@ const persist = async () => {
   } catch (error) {
     savedState = `Save failed: ${storageMessage(error)}`;
   }
-  render();
+  updateSaveStatus();
+};
+// Serialised writes: concurrent callers queue instead of interleaving
+// full-workspace IndexedDB transactions. The save status updates in
+// place; persist() no longer re-renders, so typing focus survives a save.
+// Callers that changed data render() after awaiting persist().
+const persist = () => {
+  savedState = "Saving…";
+  updateSaveStatus();
+  pendingPersistCount += 1;
+  const task = persistQueue.then(runPersist);
+  persistQueue = task.then(
+    () => undefined,
+    () => undefined,
+  );
+  return task.finally(() => {
+    pendingPersistCount = Math.max(0, pendingPersistCount - 1);
+  });
+};
+// Scratchpad keystrokes coalesce into one write after the user pauses.
+const schedulePersist = () => {
+  clearTimeout(scratchTimer);
+  scratchTimer = setTimeout(() => void persist(), 500);
+};
+const refreshStorageEstimate = async () => {
+  try {
+    const estimate = await navigator.storage?.estimate?.();
+    if (!estimate) return;
+    storageEstimate = {
+      usage: estimate.usage ?? 0,
+      quota: estimate.quota ?? 0,
+    };
+    const meter = formatStorageEstimate(
+      storageEstimate.usage,
+      storageEstimate.quota,
+      store.attachments.reduce((n, a) => n + a.size, 0),
+    );
+    document
+      .querySelectorAll<HTMLElement>("[data-storage-fill]")
+      .forEach((bar) => {
+        bar.style.width = `${meter.percent}%`;
+      });
+    document
+      .querySelectorAll<HTMLElement>("[data-storage-label]")
+      .forEach((el) => {
+        el.textContent = meter.label;
+      });
+  } catch {
+    // Quota reporting is best-effort; the fallback meter stays in place.
+  }
 };
 const active = () => store.sessions.find((s) => s.id === activeId);
 const statusPill = (status: string) =>
@@ -322,7 +398,14 @@ function sessionCard(s: Session) {
 function dashboard() {
   const activeSessions = store.sessions.filter((s) => s.status === "active");
   const resolved = store.sessions.filter((s) => s.status === "resolved");
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">Good morning, engineer. Pick up where the evidence left off.</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}<section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div><div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
+  const realSessions = store.sessions.filter(
+    (s) => s.id !== "SS-20260818-001",
+  );
+  const backup = backupStatus(store.lastBackupAt, new Date(), realSessions.length);
+  const backupBanner = backup.needsBackup
+    ? `<section class="backup-banner" role="status"><span><strong>${escapeHtml(backup.label)}.</strong> Your investigations live only in this browser — clearing site data removes them.</span><button class="secondary small-button" id="backup-now">Back up now</button></section>`
+    : "";
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">Good morning, engineer. Pick up where the evidence left off.</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}<section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div><div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
 }
 function welcomePanel() {
   return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Keep the investigation understandable while you solve it.</h2><p>Capture what you observe, try, rule out, and resolve. SolveStack keeps the working record on this device, then turns it into portable troubleshooting knowledge.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
@@ -395,7 +478,13 @@ function resolutionView(s: Session) {
 }
 function settings() {
   const bytes = store.attachments.reduce((n, a) => n + a.size, 0);
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.</p><div class="storage-bar"><span data-storage-fill="${Math.min(96, (bytes / 1000000) * 10 + 6)}"></span></div><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json" aria-label="Import SolveStack JSON" hidden /></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
+  const meter = formatStorageEstimate(
+    storageEstimate?.usage,
+    storageEstimate?.quota,
+    bytes,
+  );
+  const backup = backupStatus(store.lastBackupAt);
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json" aria-label="Import SolveStack JSON" hidden /></div><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
 }
 
 function knowledgeMarkdown(s: Session) {
@@ -619,6 +708,70 @@ function bind() {
   document.querySelectorAll<HTMLElement>("[data-storage-fill]").forEach((bar) => {
     bar.style.width = `${bar.dataset.storageFill}%`;
   });
+  if (view === "settings") void refreshStorageEstimate();
+  const doBackup = async () => {
+    store.lastBackupAt = now();
+    download(
+      "solvestack-backup.json",
+      JSON.stringify({ ...store, exportedAt: now() }, null, 2),
+      "application/json",
+    );
+    await persist();
+    render();
+    showToast(
+      `Backup downloaded — ${backupStatus(store.lastBackupAt).label.toLowerCase()}.`,
+    );
+  };
+  document
+    .querySelector("#backup-now")
+    ?.addEventListener("click", () => void doBackup());
+  if (!attachmentListenerReady) {
+    attachmentListenerReady = true;
+    window.addEventListener(
+      "solvestack:remove-attachment",
+      (event: Event) => {
+        void (async () => {
+          const attachmentId = (
+            event as CustomEvent<{ attachmentId: string }>
+          ).detail?.attachmentId;
+          const attachment = store.attachments.find(
+            (a) => a.id === attachmentId,
+          );
+          if (!attachment) return;
+          const priorLinks = new Map<string, string[]>();
+          for (const session of store.sessions)
+            for (const entry of session.entries)
+              if (entry.attachmentIds.includes(attachmentId))
+                priorLinks.set(entry.id, [...entry.attachmentIds]);
+          store.attachments = store.attachments.filter(
+            (a) => a.id !== attachmentId,
+          );
+          for (const session of store.sessions)
+            for (const entry of session.entries)
+              entry.attachmentIds = entry.attachmentIds.filter(
+                (id) => id !== attachmentId,
+              );
+          await persist();
+          render();
+          const restore = async () => {
+            store.attachments.push(attachment);
+            for (const session of store.sessions)
+              for (const entry of session.entries) {
+                const ids = priorLinks.get(entry.id);
+                if (ids) entry.attachmentIds = ids;
+              }
+            await persist();
+            render();
+          };
+          showToast("Evidence removed.", {
+            actionLabel: "Undo",
+            onAction: () => void restore(),
+            durationMs: UNDO_WINDOW_MS,
+          });
+        })();
+      },
+    );
+  }
   const openGuide = () =>
     document.querySelector<HTMLDialogElement>("#guide-dialog")?.showModal();
   const openDataGuide = () =>
@@ -696,6 +849,7 @@ function bind() {
       activeId = s.id;
       view = "session";
       await persist();
+      render();
     });
   document
     .querySelector<HTMLInputElement>("#search")
@@ -742,7 +896,10 @@ function bind() {
     const files = document.querySelector<HTMLInputElement>("#attach")?.files;
     for (const file of files || []) {
       if (file.size > 10_000_000) {
-        alert(`${file.name} is too large. Attachments are limited to 10 MB.`);
+        showToast(
+          `${file.name} is too large. Attachments are limited to 10 MB.`,
+          { durationMs: 8000 },
+        );
         continue;
       }
       try {
@@ -765,13 +922,16 @@ function bind() {
         store.attachments.push(a);
         e.attachmentIds.push(a.id);
       } catch (error) {
-        alert(`Evidence could not be read: ${storageMessage(error)}`);
+        showToast(`Evidence could not be read: ${storageMessage(error)}`, {
+          durationMs: 8000,
+        });
       }
     }
     s.entries.push(e);
     s.updatedAt = now();
     box.value = "";
     await persist();
+    render();
   };
   document.querySelector("#capture-btn")?.addEventListener("click", capture);
   document.querySelector("#capture")?.addEventListener("keydown", (e) => {
@@ -808,6 +968,7 @@ function bind() {
           e.updatedAt = now();
           active()!.updatedAt = now();
           await persist();
+          render();
         }
       }),
   );
@@ -817,19 +978,39 @@ function bind() {
         const e = active()!.entries.find((x) => x.id === b.dataset.star);
         if (e) e.starred = !e.starred;
         await persist();
+        render();
       }),
   );
   document.querySelectorAll<HTMLButtonElement>("[data-delete]").forEach(
     (b) =>
       (b.onclick = async () => {
         const s = active()!;
-        if (confirm("Delete this entry and its evidence links?")) {
-          s.entries = s.entries.filter((e) => e.id !== b.dataset.delete);
-          store.attachments = store.attachments.filter(
-            (a) => a.entryId !== b.dataset.delete,
-          );
+        const entryId = b.dataset.delete!;
+        const index = s.entries.findIndex((e) => e.id === entryId);
+        if (index < 0) return;
+        const entry = s.entries[index];
+        const removedAttachments = store.attachments.filter(
+          (a) => a.entryId === entryId,
+        );
+        s.entries.splice(index, 1);
+        store.attachments = store.attachments.filter(
+          (a) => a.entryId !== entryId,
+        );
+        s.updatedAt = now();
+        await persist();
+        render();
+        const restore = async () => {
+          s.entries.splice(Math.min(index, s.entries.length), 0, entry);
+          store.attachments.push(...removedAttachments);
+          s.updatedAt = now();
           await persist();
-        }
+          render();
+        };
+        showToast("Entry deleted.", {
+          actionLabel: "Undo",
+          onAction: () => void restore(),
+          durationMs: UNDO_WINDOW_MS,
+        });
       }),
   );
   document
@@ -839,7 +1020,7 @@ function bind() {
       if (s) {
         s.scratchpad = (e.target as HTMLTextAreaElement).value;
         s.updatedAt = now();
-        persist();
+        schedulePersist();
       }
     });
   document
@@ -862,6 +1043,7 @@ function bind() {
           attachmentIds: [],
         });
         await persist();
+        render();
       }
     });
   document.querySelector("#edit-focus")?.addEventListener("click", async () => {
@@ -878,6 +1060,7 @@ function bind() {
       s.currentFocus = values.focus;
       s.updatedAt = now();
       await persist();
+      render();
     }
   });
   document.querySelector("#add-hyp")?.addEventListener("click", async () => {
@@ -900,6 +1083,7 @@ function bind() {
         updatedAt: now(),
       });
       await persist();
+      render();
     }
   });
   document.querySelectorAll<HTMLSelectElement>("[data-hyp]").forEach(
@@ -926,6 +1110,7 @@ function bind() {
           }
           h.updatedAt = now();
           await persist();
+          render();
         }
       }),
   );
@@ -941,6 +1126,7 @@ function bind() {
         createdAt: now(),
       });
       await persist();
+      render();
     }
   });
   document.querySelectorAll<HTMLInputElement>("[data-task]").forEach(
@@ -951,6 +1137,7 @@ function bind() {
           t.completed = el.checked;
           t.completedAt = t.completed ? now() : undefined;
           await persist();
+          render();
         }
       }),
   );
@@ -1043,16 +1230,18 @@ function bind() {
         attachmentIds: [],
       });
     await persist();
+    render();
+    if (backupStatus(store.lastBackupAt).needsBackup) {
+      showToast("Session resolved — back up your workspace?", {
+        actionLabel: "Back up now",
+        onAction: () => void doBackup(),
+        durationMs: 10000,
+      });
+    }
   });
   document
     .querySelector("#backup")
-    ?.addEventListener("click", () =>
-      download(
-        "solvestack-backup.json",
-        JSON.stringify({ ...store, exportedAt: now() }, null, 2),
-        "application/json",
-      ),
-    );
+    ?.addEventListener("click", () => void doBackup());
   document
     .querySelector("#restore")
     ?.addEventListener("click", () =>
@@ -1079,12 +1268,16 @@ function bind() {
           return;
         store.sessions = mergeBackup(store.sessions, sessions);
         store.attachments = mergeBackup(store.attachments, attachments);
+        store.lastBackupAt = now();
         await persist();
-        alert(
+        render();
+        showToast(
           `${incoming.kind === "session" ? "Session imported" : "Backup restored"}. Existing records were preserved.`,
         );
       } catch (err) {
-        alert(`Restore failed: ${(err as Error).message}`);
+        showToast(`Restore failed: ${(err as Error).message}`, {
+          durationMs: 8000,
+        });
       }
     });
   document.querySelectorAll("#theme-toggle,#theme-settings").forEach((el) =>
@@ -1101,5 +1294,9 @@ function bind() {
   if ("serviceWorker" in navigator)
     navigator.serviceWorker.register("/service-worker.js");
 }
+
+window.addEventListener("beforeunload", (event) => {
+  if (pendingPersistCount > 0) event.preventDefault();
+});
 
 load();

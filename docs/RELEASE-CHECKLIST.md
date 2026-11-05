@@ -19,6 +19,9 @@
 - Verify individual session JSON import and conflict confirmation.
 - Verify separate knowledge Markdown and RCA Markdown exports.
 - Verify quota failure guidance does not silently discard the working entry.
+- Verify the backup banner appears with no backup on file and clears after a backup download; Settings shows the last-backup date.
+- Verify deleting an entry or an evidence attachment offers Undo for 30 seconds and restores it; verify no `alert()` remains for delete/restore flows.
+- Verify scratchpad typing keeps focus while a save is in flight and closing the tab mid-save prompts before leaving.
 - Review the accessibility tree for named controls and visible focus states.
 - Run `bun test tests` and confirm the registered domain tests report passing cases, not only console smoke messages.
 - Deploy the contents of `dist/` to the selected static host.

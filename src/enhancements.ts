@@ -1,5 +1,6 @@
 import { readWorkspace, writeWorkspace } from "./local-store";
 import { redactSelection, relatedSessions } from "./domain";
+import { showToast } from "./data-safety";
 
 const getData = () => readWorkspace<any>();
 const putData = (data: any) => writeWorkspace(data);
@@ -71,7 +72,7 @@ const wire = () => {
       const start = scratch.selectionStart;
       const end = scratch.selectionEnd;
       if (start === end) {
-        alert("Select text in the scratchpad first.");
+        showToast("Select text in the scratchpad first.");
         return;
       }
       scratch.value = redactSelection(scratch.value, start, end);
