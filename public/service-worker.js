@@ -1,10 +1,42 @@
-const CACHE = "solvestack-v8";
-const FONT_HOSTS = new Set(["fonts.googleapis.com", "fonts.gstatic.com"]);
+const CACHE = "solvestack-v9";
+
+// Every page and static file precached on install, so the whole site works
+// offline on a first visit — not only after a page was visited once.
+const PRECACHE_URLS = [
+  "/",
+  "/index.html",
+  "/404.html",
+  "/manifest.webmanifest",
+  "/icon.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/og-image.png",
+  "/fonts/manrope.woff2",
+  "/fonts/dm-mono-400.woff2",
+  "/fonts/dm-mono-500.woff2",
+  "/use-your-data/",
+  "/use-your-data/guide.css",
+  "/rca-template/",
+  "/rca-template/template.css",
+  "/5-whys-template/",
+  "/5-whys-template/template.css",
+  "/fishbone-diagram-template/",
+  "/fishbone-diagram-template/template.css",
+  "/incident-report-template/",
+  "/incident-report-template/template.css",
+  "/onenote-vs-solvestack/",
+  "/onenote-vs-solvestack/template.css",
+];
+
+// Hashed build assets (dist/assets/*), injected by
+// scripts/generate-sw-precache.mjs at build time. In dev the token is
+// undefined and the list is empty; the runtime cache still covers assets.
+const PRECACHE_ASSETS =
+  typeof __PRECACHE_ASSETS__ !== "undefined" ? __PRECACHE_ASSETS__ : [];
 
 function shouldCache(request, response) {
   if (request.method !== "GET" || !response.ok) return false;
-  const url = new URL(request.url);
-  return url.origin === self.location.origin || FONT_HOSTS.has(url.hostname);
+  return new URL(request.url).origin === self.location.origin;
 }
 
 self.addEventListener("install", (event) => {
@@ -12,15 +44,12 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE)
       .then((cache) =>
-        cache.addAll([
-          "/",
-          "/index.html",
-          "/manifest.webmanifest",
-          "/icon.svg",
-          "/og-image.png",
-          "/use-your-data/",
-          "/use-your-data/guide.css",
-        ]),
+        // allSettled: one missing file must not fail the whole install.
+        Promise.allSettled(
+          [...PRECACHE_URLS, ...PRECACHE_ASSETS].map((url) =>
+            cache.add(url),
+          ),
+        ),
       )
       .then(() => self.skipWaiting()),
   );
@@ -39,19 +68,33 @@ self.addEventListener("activate", (event) => {
 });
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((cached) => {
+    caches.match(event.request).then(async (cached) => {
       if (cached) return cached;
-      return fetch(event.request)
-        .then((response) => {
-          if (shouldCache(event.request, response)) {
-            const copy = response.clone();
-            event.waitUntil(
-              caches.open(CACHE).then((cache) => cache.put(event.request, copy)),
-            );
-          }
-          return response;
-        })
-        .catch(() => cached);
+      try {
+        const response = await fetch(event.request);
+        if (shouldCache(event.request, response)) {
+          const copy = response.clone();
+          event.waitUntil(
+            caches.open(CACHE).then((cache) => cache.put(event.request, copy)),
+          );
+        }
+        return response;
+      } catch {
+        // Offline with nothing cached: never answer with undefined (the
+        // old handler did — respondWith(undefined) throws). Navigations
+        // fall back to the app shell; anything else gets an honest 503.
+        if (event.request.mode === "navigate") {
+          return (
+            (await caches.match("/")) ||
+            (await caches.match("/404.html")) ||
+            new Response("Offline", { status: 503 })
+          );
+        }
+        return (
+          cached ||
+          new Response("Offline", { status: 503, statusText: "Offline" })
+        );
+      }
     }),
   );
 });

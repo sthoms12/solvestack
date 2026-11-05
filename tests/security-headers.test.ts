@@ -36,6 +36,11 @@ assert.equal(directives.get("connect-src")?.includes("'self'"), true);
 assert.equal(directives.get("frame-ancestors"), "'none'");
 assert.equal(directives.get("object-src"), "'none'");
 assert.equal(directives.get("base-uri"), "'self'");
+assert.equal(directives.get("style-src"), "'self'");
+assert.equal(directives.get("font-src"), "'self'");
+// Fonts are self-hosted now: no Google Fonts host may appear in any policy.
+assert.equal(headers.includes("fonts.googleapis.com"), false);
+assert.equal(headers.includes("fonts.gstatic.com"), false);
 assert.match(headers, /X-Content-Type-Options: nosniff/);
 assert.match(headers, /Referrer-Policy: strict-origin-when-cross-origin/);
 assert.match(
@@ -51,7 +56,7 @@ const workerPolicy =
     ?.trim() ?? "";
 assert.equal(
   workerPolicy,
-  "default-src 'none'; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://static.cloudflareinsights.com https://cloudflareinsights.com",
+  "default-src 'none'; connect-src 'self' https://static.cloudflareinsights.com https://cloudflareinsights.com",
 );
 assert.match(
   headers,

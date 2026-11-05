@@ -29,7 +29,7 @@ The Worker asset runtime is defined in `wrangler.jsonc`. It uses `not_found_hand
 
 ## Boundaries
 
-No account, backend, cloud database, AI, or network service is required. The MVP stores sessions and evidence in IndexedDB and provides deterministic Markdown, standalone HTML, JSON, backup, and ZIP knowledge-package export. The service worker caches the application shell for offline use after the first load.
+No account, backend, cloud database, AI, or network service is required. The MVP stores sessions and evidence in IndexedDB and provides deterministic Markdown, standalone HTML, JSON, backup, and ZIP knowledge-package export. The service worker precaches every page, the fonts, and the built assets, so the whole site works offline on a first visit; fonts are self-hosted in `public/fonts` and no request goes to Google Fonts. When a new service worker takes over, the app prompts to reload instead of swapping silently.
 
 The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.
 

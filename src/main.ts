@@ -231,6 +231,7 @@ let pendingPersistCount = 0;
 let persistQueue: Promise<void> = Promise.resolve();
 let scratchTimer: ReturnType<typeof setTimeout> | undefined;
 let attachmentListenerReady = false;
+let swListenerReady = false;
 let welcomeDismissed =
   localStorage.getItem("solvestack-welcome-dismissed") === "true";
 let db: IDBDatabase;
@@ -1291,8 +1292,27 @@ function bind() {
   );
   if (localStorage.getItem("solvestack-theme") === "light")
     document.documentElement.classList.add("light");
-  if ("serviceWorker" in navigator)
-    navigator.serviceWorker.register("/service-worker.js");
+  if ("serviceWorker" in navigator && !swListenerReady) {
+    swListenerReady = true;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => {
+        registration.update().catch(() => {});
+        // A new worker takes over silently today (skipWaiting + claim);
+        // tell the user to reload instead. A first install has no prior
+        // controller, so no toast on a first visit.
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!hadController) return;
+          showToast("SolveStack updated — reload for the latest version.", {
+            actionLabel: "Reload",
+            onAction: () => location.reload(),
+            durationMs: 15000,
+          });
+        });
+      })
+      .catch(() => {});
+  }
 }
 
 window.addEventListener("beforeunload", (event) => {
