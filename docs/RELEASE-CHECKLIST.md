@@ -14,6 +14,9 @@
 - Open the built preview and verify dashboard, session capture, export controls, and settings.
 - Reload after creating an entry and confirm IndexedDB persistence.
 - Verify offline reload after the service worker has cached the shell.
+- Verify an offline first visit to each template/guide page loads, and that an uncached offline navigation falls back to the app shell instead of failing.
+- Verify the shipped service worker lists the hashed assets (no `__PRECACHE_ASSETS__` token left in `dist/service-worker.js`).
+- Verify the manifest serves 192px and 512px PNG icons and the fonts load with no Google Fonts request.
 - Verify attachment capture and ZIP evidence paths.
 - Verify corrupt backup rejection and merge restore behavior.
 - Verify individual session JSON import and conflict confirmation.

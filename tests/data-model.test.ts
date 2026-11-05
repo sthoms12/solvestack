@@ -36,6 +36,11 @@ const buildFiles = [
   "dist/fishbone-diagram-template/index.html",
   "dist/fishbone-diagram-template/template.css",
   "dist/fishbone-diagram-template/fishbone-diagram-blank.csv",
+  "dist/fonts/manrope.woff2",
+  "dist/fonts/dm-mono-400.woff2",
+  "dist/fonts/dm-mono-500.woff2",
+  "dist/icons/icon-192.png",
+  "dist/icons/icon-512.png",
 ];
 for (const file of buildFiles)
   assert.equal(
@@ -48,9 +53,26 @@ assert.equal(
   true,
 );
 assert.equal(
-  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v8"),
+  (await Bun.file("public/manifest.webmanifest").text()).includes(
+    "icon-192.png",
+  ),
   true,
 );
+assert.equal(
+  (await Bun.file("public/manifest.webmanifest").text()).includes(
+    "icon-512.png",
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v9"),
+  true,
+);
+// The build injects the hashed assets into the shipped service worker.
+const shippedSw = await Bun.file("dist/service-worker.js").text();
+assert.equal(shippedSw.includes("__PRECACHE_ASSETS__"), false);
+assert.equal(shippedSw.includes("/assets/"), true);
+assert.equal(shippedSw.includes("solvestack-v9"), true);
 const productionOrigin = "https://solvestack-ai.app/";
 assert.equal(
   (await Bun.file("index.html").text()).includes(
