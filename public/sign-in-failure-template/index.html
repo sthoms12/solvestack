@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free sign-in failure template: an SSO troubleshooting checklist that finds which side of the IdP to app boundary is broken — error, scope, IdP logs, app configuration, policy. Copy it, or run it in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/sign-in-failure-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/sign-in-failure-template/" />
+    <meta property="og:title" content="SSO Sign-In Failure Template" />
+    <meta property="og:description" content="An SSO sign-in failure checklist you can copy: exact error, scope, IdP sign-in logs, app configuration, account and policy state." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SSO Sign-In Failure Template" />
+    <meta name="twitter:description" content="Exact error, scope, IdP logs, app config, policy state. Free sign-in failure checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/sign-in-failure-template/template.css" />
+    <title>SSO Sign-In Failure Template — Troubleshooting Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "SSO Sign-In Failure Template",
+      "description": "An SSO sign-in failure troubleshooting template that identifies which side of the identity provider to application boundary is broken, with a worked example.",
+      "url": "https://solvestack-ai.app/sign-in-failure-template/",
+      "publisher": {
+            "@type": "Organization",
+            "name": "SolveStack"
+      },
+      "about": [
+            "SSO",
+            "sign-in failure",
+            "identity provider",
+            "IT troubleshooting"
+      ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+            {
+                  "@type": "Question",
+                  "name": "What should I check first when SSO sign-in fails?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Capture the exact error text and the correlation or trace ID, then establish scope: one user, one group, or everyone. Those two facts decide where to look next — the IdP sign-in log entry for that trace ID states the failure reason, which is faster than auditing policies by hand."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How do I find the real reason in IdP sign-in logs?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Search the sign-in logs for the correlation ID from the error, or for the user and timestamp. The entry names the failure stage — credential, MFA, conditional-access policy, or application assignment — and usually the specific policy or missing assignment. Work from that stated reason rather than the user's description of the error."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "What are the most common causes of sudden sign-in failures?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "An expired SAML or OIDC signing certificate, a conditional-access policy change, an emptied or renamed assignment group, IdP service degradation, and clock skew on the app server. Sudden failures after a quiet change window are usually one of the first three."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is the worked example a real incident?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Can I run this checklist in SolveStack instead of copying it?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Open the sign-in failure template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is this sign-in failure template free?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account."
+                  }
+            }
+      ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=sign-in-failure">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">CAPTURE → SCOPE → TRACE</p>
+        <h1>SSO Sign-In <em>Failure</em> Template</h1>
+        <p class="intro">When sign-in breaks, the argument starts immediately: identity team or app team? This checklist settles it with evidence — the exact error, the scope, and the IdP's own log entry for the failure — before anyone changes a policy. Copy the plain-text version below, or start from the template in SolveStack.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/?method=sign-in-failure">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks, from the error outward.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Capture the exact error</h3><p>Sign-in failures announce their layer if you read them literally. Screenshot the error, record the exact code, and save the correlation or trace ID before anything else — that ID is the key that unlocks the IdP's log entry later. 'It just says access denied' is not evidence.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Error: the user is not assigned to a role for the application; correlation ID recorded from the browser trace at 10:41 CT. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Establish the scope</h3><p>One user, one group, or everyone determines the suspect list. A single user points at account state or role assignment; a group points at policy; everyone points at the app registration or the IdP itself. Test with a known-good account in the same policy scope before theorizing.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Failures limited to one department group of 22 users; admins and other groups signed in normally. Scope says policy or group assignment, not the IdP. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Read the IdP sign-in logs</h3><p>The IdP already knows why it refused: the sign-in log entry for the correlation ID states the failure reason in plain language — policy evaluation, MFA, assignment, or credential. Work from that reason instead of guessing which conditional-access policy fired.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>IdP log for the trace ID: failure reason 'user not assigned to an application role'; a group rename the previous evening had silently emptied the assignment group. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Check the app side</h3><p>If the IdP clears, inspect the application's half of the handshake: the SAML or OIDC signing certificate expiry, the metadata the app cached, and clock skew between the app server and the IdP. Expired signing certificates are the classic Monday-morning outage.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>App-side check: signing certificate valid for 11 more months; metadata refreshed last quarter; server clock within 2 seconds of the IdP. App side cleared. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Account and policy state</h3><p>Finish with the unglamorous causes: locked or expired accounts, a forced MFA re-registration, a device-compliance policy that started failing after an OS update. These produce 'SSO is down' tickets that are really one policy doing exactly what it was told.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The remaining single-user cases resolved as expired passwords surfaced by the new sign-in flow — a communications issue, not an outage. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>SIGN-IN FAILURE CHECKLIST
+=========================
+App / service:
+IdP:
+Error code shown:
+Affected (all / group / single user):
+MFA method:
+
+1. EXACT ERROR
+   Verbatim error text:
+   Correlation / trace ID:
+
+2. SCOPE
+   One user, one group, or everyone?
+   Known-good account test (same policy scope):
+
+3. IDP LOGS
+   Failure reason stated for the trace ID:
+   Policy or assignment named:
+
+4. APP SIDE
+   Signing certificate expiry:
+   Metadata last refreshed:
+   App server clock vs IdP:
+
+5. ACCOUNT STATE
+   Locked / expired / MFA reset pending:
+   Device compliance or location policy:</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Trace the failure where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>A sign-in failure is only as diagnosable as the evidence captured before the policies get 'fixed'. SolveStack gives the investigation a durable structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/?method=sign-in-failure">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the <a href="/5-whys-template/">5 whys</a> converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Sign-in failures, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should I check first when SSO sign-in fails?</h3><p>Capture the exact error text and the correlation or trace ID, then establish scope: one user, one group, or everyone. Those two facts decide where to look next — the IdP sign-in log entry for that trace ID states the failure reason, which is faster than auditing policies by hand.</p></article>
+          <article><h3>How do I find the real reason in IdP sign-in logs?</h3><p>Search the sign-in logs for the correlation ID from the error, or for the user and timestamp. The entry names the failure stage — credential, MFA, conditional-access policy, or application assignment — and usually the specific policy or missing assignment. Work from that stated reason rather than the user's description of the error.</p></article>
+          <article><h3>What are the most common causes of sudden sign-in failures?</h3><p>An expired SAML or OIDC signing certificate, a conditional-access policy change, an emptied or renamed assignment group, IdP service degradation, and clock skew on the app server. Sudden failures after a quiet change window are usually one of the first three.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I run this checklist in SolveStack instead of copying it?</h3><p>Yes. Open the sign-in failure template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+          <article><h3>Is this sign-in failure template free?</h3><p>Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/expired-certificate-template/"><b>CERT</b><span>Expired certificate template</span><p>The classic sign-in killer: record the exact TLS error, inspect the served chain, and rule out wrong bindings.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/?method=sign-in-failure"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished record as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

@@ -11,7 +11,7 @@ const activate = source.slice(
 );
 const fetchHandler = source.slice(source.indexOf('addEventListener("fetch"'));
 
-assert.match(source, /const CACHE = "solvestack-v10"/);
+assert.match(source, /const CACHE = "solvestack-v11"/);
 assert.match(install, /event\.waitUntil/);
 assert.match(install, /self\.skipWaiting\(\)/);
 // One missing precache file must not fail the whole install.
@@ -55,6 +55,18 @@ for (const url of [
   "/fishbone-diagram-template/template.css",
   "/incident-report-template/",
   "/incident-report-template/template.css",
+  "/vpn-outage-template/",
+  "/vpn-outage-template/template.css",
+  "/sign-in-failure-template/",
+  "/sign-in-failure-template/template.css",
+  "/expired-certificate-template/",
+  "/expired-certificate-template/template.css",
+  "/dns-failure-template/",
+  "/dns-failure-template/template.css",
+  "/disk-full-template/",
+  "/disk-full-template/template.css",
+  "/email-delivery-template/",
+  "/email-delivery-template/template.css",
   "/onenote-vs-solvestack/",
   "/onenote-vs-solvestack/template.css",
 ])

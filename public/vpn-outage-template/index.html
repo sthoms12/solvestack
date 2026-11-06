@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free VPN outage template: a troubleshooting checklist that separates gateway, authentication, and client faults by scope. Copy it, or run the investigation in SolveStack — no account, no cloud." />
+    <link rel="canonical" href="https://solvestack-ai.app/vpn-outage-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/vpn-outage-template/" />
+    <meta property="og:title" content="VPN Outage Template" />
+    <meta property="og:description" content="A VPN outage troubleshooting checklist you can copy: scope, gateway, authentication path, client spread, escalation evidence." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="VPN Outage Template" />
+    <meta name="twitter:description" content="Scope, gateway, auth path, client spread, escalation evidence. Free VPN outage checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/vpn-outage-template/template.css" />
+    <title>VPN Outage Template — Troubleshooting Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "VPN Outage Template",
+      "description": "A VPN outage troubleshooting template that separates gateway, authentication, and client faults by scope, with a worked example and an escalation evidence checklist.",
+      "url": "https://solvestack-ai.app/vpn-outage-template/",
+      "publisher": {
+            "@type": "Organization",
+            "name": "SolveStack"
+      },
+      "about": [
+            "VPN outage",
+            "remote access",
+            "network troubleshooting",
+            "IT troubleshooting"
+      ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+            {
+                  "@type": "Question",
+                  "name": "What should a VPN outage checklist include?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Scope first (who cannot connect, since when), then the gateway and its recent changes, a test of the authentication path with a known-good account, a client-version comparison, and an evidence bundle for escalation. This checklist walks those five in order, because each answer rules a whole layer in or out."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How do I tell whether a VPN outage is the gateway or authentication?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Connect with a known-good test account and watch where it fails. If the tunnel never establishes, look at the gateway, the ISP, or the client. If the tunnel establishes but sign-in or MFA fails, the network path is fine and the fault is in the identity layer — an IdP outage, an expired certificate, or a policy change."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Why does scope matter so much in a VPN outage?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Because scope is the diagnosis shortcut. One user failing is an account or client problem; one site failing points at that site's circuit or gateway peer; every remote user failing at the same minute points at the gateway, the ISP, or the identity provider. Establishing scope takes minutes and prevents hours of checking the wrong layer."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is the worked example a real incident?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Can I run this checklist in SolveStack instead of copying it?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Open the VPN outage template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is this VPN outage template free?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account."
+                  }
+            }
+      ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=vpn-outage">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">SCOPE → ISOLATE → RESTORE</p>
+        <h1>VPN Outage <em>Troubleshooting</em> Template</h1>
+        <p class="intro">A VPN outage is three different failures wearing one name: the gateway, the authentication path, or the clients. This checklist separates them in order, starting with the only question that matters first — who exactly cannot connect? Copy the plain-text version below, or start the investigation in SolveStack and keep the evidence as you go.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/?method=vpn-outage">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks, in the order that isolates the fault.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Confirm the scope</h3><p>Before touching the gateway, establish the blast radius: one user, one site, one client version, or everyone. Scope decides where you look — a single user is an account or client problem; everyone at once is gateway, ISP, or identity. Record the first report time and the last known good connection.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>All remote staff (about 140 users) lost VPN at 08:10 CT; office LAN unaffected; first report 08:12 via the help desk. Last known good: 07:55 successful connections in the gateway log. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Gateway and the last change</h3><p>Check the concentrator or cloud gateway the way you would any suspect service: is it up, is it passing any traffic, and what changed in the last 24 hours? Firmware pushes, certificate renewals, and ISP maintenance line up with outage start times more often than hardware dies quietly.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Gateway CPU and sessions normal; no firmware change in 14 days. The ISP status page showed a regional routing event starting 08:05. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Test the authentication path</h3><p>Most 'VPN is down' reports are identity failures in disguise: an IdP outage, an expired RADIUS or SAML certificate, or an MFA policy change. Connect with a known-good test account. If the tunnel establishes but sign-in fails, the network is fine — stop rebooting it.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>A test account reached the gateway and received an MFA prompt; the IdP status page showed degraded authentication from 08:02. The root cause is upstream of the VPN. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Rule out client spread</h3><p>If only some users fail, compare what the failing clients share: OS version, VPN client build, a recent agent update. A client pushed at 07:00 that breaks split tunneling looks identical to an outage from the help desk's chair.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Failing users were all on client 7.4.1, pushed that morning; 7.3.x users connected normally. Rolling back the client update cleared the reports. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Capture evidence before escalating</h3><p>Vendors and ISPs close vague tickets. Escalate with the scope statement, the gateway log excerpt around the first failure, the auth-path test result, and the exact timestamps. That bundle turns a three-day ticket into a same-day answer.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Escalation packet: scope statement, gateway log 08:00–08:20, test-account result, ISP event ID. The vendor acknowledged an upstream fault within the hour. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>VPN OUTAGE CHECKLIST
+====================
+First report (time, source):
+Scope (one user / site / client version / everyone):
+Last known good connection:
+
+1. SCOPE
+   Who cannot connect, since when, and what do the
+   working users have in common?
+
+2. GATEWAY
+   Gateway / concentrator status:
+   ISP status:
+   Changes in the last 24h (firmware, certs, config):
+
+3. AUTH PATH
+   Test account result:
+   IdP / MFA status:
+   RADIUS / SAML certificate expiry:
+
+4. CLIENTS
+   Failing client versions / OS:
+   Recent client or agent updates:
+
+5. ESCALATION
+   Evidence bundle: scope statement, log excerpt,
+   auth test result, exact timestamps.</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Troubleshoot the outage where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>A VPN outage is only as diagnosable as the notes taken while users are locked out. SolveStack gives the investigation a durable structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/?method=vpn-outage">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the <a href="/5-whys-template/">5 whys</a> converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">VPN outages, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should a VPN outage checklist include?</h3><p>Scope first (who cannot connect, since when), then the gateway and its recent changes, a test of the authentication path with a known-good account, a client-version comparison, and an evidence bundle for escalation. This checklist walks those five in order, because each answer rules a whole layer in or out.</p></article>
+          <article><h3>How do I tell whether a VPN outage is the gateway or authentication?</h3><p>Connect with a known-good test account and watch where it fails. If the tunnel never establishes, look at the gateway, the ISP, or the client. If the tunnel establishes but sign-in or MFA fails, the network path is fine and the fault is in the identity layer — an IdP outage, an expired certificate, or a policy change.</p></article>
+          <article><h3>Why does scope matter so much in a VPN outage?</h3><p>Because scope is the diagnosis shortcut. One user failing is an account or client problem; one site failing points at that site's circuit or gateway peer; every remote user failing at the same minute points at the gateway, the ISP, or the identity provider. Establishing scope takes minutes and prevents hours of checking the wrong layer.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I run this checklist in SolveStack instead of copying it?</h3><p>Yes. Open the VPN outage template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+          <article><h3>Is this VPN outage template free?</h3><p>Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/dns-failure-template/"><b>DNS</b><span>DNS failure template</span><p>When the name will not resolve: compare resolvers, ask the authoritative server, and check TTL before touching records.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/?method=vpn-outage"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished record as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

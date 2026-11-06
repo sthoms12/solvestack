@@ -219,4 +219,77 @@ assert.equal(
   csv,
 );
 
+// Incident template pages (F2 phase B): same static contract as the method
+// pages, plus sitemap, llms.txt, and dist parity for each.
+const incidentTemplatePages: Array<{
+  path: string;
+  title: string;
+  heading: string;
+  descriptionPhrase: string;
+  templateMarker: string;
+}> = [
+  {
+    path: "vpn-outage-template/",
+    title: "VPN Outage Template",
+    heading: "VPN Outage",
+    descriptionPhrase: "VPN outage template",
+    templateMarker: "VPN OUTAGE CHECKLIST",
+  },
+  {
+    path: "sign-in-failure-template/",
+    title: "SSO Sign-In Failure Template",
+    heading: "SSO Sign-In Failure Template",
+    descriptionPhrase: "sign-in failure template",
+    templateMarker: "SIGN-IN FAILURE CHECKLIST",
+  },
+  {
+    path: "expired-certificate-template/",
+    title: "Expired Certificate Template",
+    heading: "Expired Certificate Template",
+    descriptionPhrase: "expired certificate template",
+    templateMarker: "EXPIRED CERTIFICATE CHECKLIST",
+  },
+  {
+    path: "dns-failure-template/",
+    title: "DNS Failure Template",
+    heading: "DNS Failure Template",
+    descriptionPhrase: "DNS failure template",
+    templateMarker: "DNS FAILURE CHECKLIST",
+  },
+  {
+    path: "disk-full-template/",
+    title: "Disk Full Template",
+    heading: "Disk Full Template",
+    descriptionPhrase: "disk full template",
+    templateMarker: "DISK FULL CHECKLIST",
+  },
+  {
+    path: "email-delivery-template/",
+    title: "Email Delivery Template",
+    heading: "Email Delivery Template",
+    descriptionPhrase: "email delivery template",
+    templateMarker: "EMAIL DELIVERY CHECKLIST",
+  },
+];
+const llms = await Bun.file("public/llms.txt").text();
+for (const page of incidentTemplatePages) {
+  const html = await Bun.file(`public/${page.path}index.html`).text();
+  assertStaticTemplatePage(html, page);
+  assert.equal(html.includes('href="/rca-template/"'), true, page.path);
+  assert.equal(html.includes('href="/"'), true, page.path);
+  assert.match(html, /Not a real incident/);
+  assert.equal(
+    sitemap.includes(`<loc>${productionOrigin}${page.path}</loc>`),
+    true,
+    page.path,
+  );
+  assert.equal(
+    llms.includes(`${productionOrigin}${page.path}`),
+    true,
+    page.path,
+  );
+  const built = await Bun.file(`dist/${page.path}index.html`).text();
+  assert.equal(built, html, page.path);
+}
+
 console.log("SolveStack template page contract passed");

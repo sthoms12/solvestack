@@ -35,6 +35,36 @@ const PAGES = [
     path: "/rca-template/",
   },
   {
+    source: "public/vpn-outage-template/index.html",
+    out: "vpn-outage-template.md",
+    path: "/vpn-outage-template/",
+  },
+  {
+    source: "public/sign-in-failure-template/index.html",
+    out: "sign-in-failure-template.md",
+    path: "/sign-in-failure-template/",
+  },
+  {
+    source: "public/expired-certificate-template/index.html",
+    out: "expired-certificate-template.md",
+    path: "/expired-certificate-template/",
+  },
+  {
+    source: "public/dns-failure-template/index.html",
+    out: "dns-failure-template.md",
+    path: "/dns-failure-template/",
+  },
+  {
+    source: "public/disk-full-template/index.html",
+    out: "disk-full-template.md",
+    path: "/disk-full-template/",
+  },
+  {
+    source: "public/email-delivery-template/index.html",
+    out: "email-delivery-template.md",
+    path: "/email-delivery-template/",
+  },
+  {
     source: "public/use-your-data/index.html",
     out: "use-your-data.md",
     path: "/use-your-data/",

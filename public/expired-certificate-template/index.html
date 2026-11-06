@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free expired certificate template: a TLS troubleshooting checklist — record the exact error, inspect the served chain, rule out wrong bindings and client trust, assign the renewal. Copy it, or run it in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/expired-certificate-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/expired-certificate-template/" />
+    <meta property="og:title" content="Expired Certificate Template" />
+    <meta property="og:description" content="An expired certificate checklist you can copy: exact TLS error, served chain inspection, binding checks, client trust, renewal ownership." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Expired Certificate Template" />
+    <meta name="twitter:description" content="Exact error, served chain, bindings, client trust, renewal owner. Free expired certificate checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/expired-certificate-template/template.css" />
+    <title>Expired Certificate Template — TLS Failure Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Expired Certificate Template",
+      "description": "An expired certificate and TLS failure troubleshooting template: identify the exact endpoint and chain link that fails before renewing, with a worked example.",
+      "url": "https://solvestack-ai.app/expired-certificate-template/",
+      "publisher": {
+            "@type": "Organization",
+            "name": "SolveStack"
+      },
+      "about": [
+            "TLS certificate",
+            "certificate expiry",
+            "IT troubleshooting"
+      ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+            {
+                  "@type": "Question",
+                  "name": "What should I check first when a certificate expired error appears?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Record the exact error and client, then inspect the certificate the server actually serves — its dates, issuer, and chain. The renewed certificate may exist in a vault while the server still presents the old one, or the renewal may be bound to the wrong site. Trust what is on the wire."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Why do only some users see a certificate error?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Three usual reasons: a load-balanced pool where only some nodes serve the bad certificate, a client whose clock is wrong so valid certificates look expired, or an outdated client trust store that rejects the chain. Compare a failing and a working client against the same endpoint to separate server faults from client faults."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How do I see the certificate a server is really serving?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Connect to the endpoint and read the presented chain — browsers show it behind the padlock's certificate details, and command-line TLS tools print the leaf and intermediates with dates and issuers. Check every address the name resolves to, not just the first."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is the worked example a real incident?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Can I run this checklist in SolveStack instead of copying it?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Open the expired certificate template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is this expired certificate template free?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account."
+                  }
+            }
+      ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=cert-expired">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">IDENTIFY → INSPECT → RENEW</p>
+        <h1>Expired <em>Certificate</em> Template</h1>
+        <p class="intro">A certificate error names a symptom, not a culprit: the leaf may be expired, the chain incomplete after a rushed renewal, or one client's clock wrong. This checklist identifies the exact endpoint and chain link that fails before anyone renews the wrong certificate. Copy the plain-text version below, or run the investigation in SolveStack.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/?method=cert-expired">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks, from the error to the renewal.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Record the exact error</h3><p>Browsers and clients report different errors for different faults — expired, name mismatch, untrusted chain, revoked. Capture the verbatim error and the client that showed it. The wording alone eliminates half the suspects before you inspect anything.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>'Certificate expired' in Chrome for the customer portal, recorded 07:58 CT with a screenshot; the API client reported a generic TLS failure for the same endpoint. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Inspect the served chain</h3><p>Ask the server what it actually serves: leaf subject, issuer, validity dates, SANs, and whether the intermediate chain is complete. The certificate in your vault may be renewed while the server still presents the old one — trust the wire, not the inventory.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The served leaf expired 6 days earlier despite a renewed certificate sitting in the vault; intermediates complete. The renewal was never installed on this node. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>The wrong-binding trap</h3><p>Multi-site servers and load balancers bind certificates per site or per node. A renewal installed on the wrong binding — or on three of four pool members — produces an outage that 'should be fixed' and intermittently is. Check every endpoint that answers for the name.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Two of four load-balanced nodes still served the expired leaf; health checks passed because TLS was not part of the probe. A rolling restart after install cleared the errors. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Client-side trust and clocks</h3><p>If only some clients fail, suspect the clients: a device clock set wrong makes valid certificates look expired, and an outdated trust store rejects modern chains. Reproduce from a known-good client on the same network before touching the server again.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The remaining reports traced to a kiosk fleet whose clocks drifted after a time-service failure — the certificates were valid; the kiosks' dates were not. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Assign the renewal — and the next one</h3><p>Close the loop while it hurts: record the renewal owner, the new expiry date, and where the certificate is bound. The postmortem that matters for certificates is a calendar entry 30 days before the next expiry, owned by a person, not a team alias.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Renewal owner assigned; the expiry added to the team calendar with a 30-day alert; the other three certificates on the same host inventoried with dates. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>EXPIRED CERTIFICATE CHECKLIST
+=============================
+Endpoint / URL:
+Cert subject + issuer:
+Expiry shown:
+Chain (leaf / intermediate / root):
+Renewal owner:
+
+1. EXACT ERROR
+   Verbatim TLS error and the client that showed it:
+
+2. SERVED CHAIN
+   Leaf dates / issuer / SANs as served:
+   Intermediates complete? (as served, not as filed)
+
+3. BINDINGS
+   Every endpoint answering for the name checked:
+   Pool members / sites still serving the old cert:
+
+4. CLIENT SIDE
+   Known-good client on the same network:
+   Client clock and trust store (if only some fail):
+
+5. RENEWAL
+   Owner (a person):
+   New expiry recorded; 30-day alert set:</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Work the failure where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>A certificate failure is only as diagnosable as the chain evidence captured before the renewal scramble. SolveStack gives the investigation a durable structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/?method=cert-expired">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the <a href="/5-whys-template/">5 whys</a> converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Certificate failures, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should I check first when a certificate expired error appears?</h3><p>Record the exact error and client, then inspect the certificate the server actually serves — its dates, issuer, and chain. The renewed certificate may exist in a vault while the server still presents the old one, or the renewal may be bound to the wrong site. Trust what is on the wire.</p></article>
+          <article><h3>Why do only some users see a certificate error?</h3><p>Three usual reasons: a load-balanced pool where only some nodes serve the bad certificate, a client whose clock is wrong so valid certificates look expired, or an outdated client trust store that rejects the chain. Compare a failing and a working client against the same endpoint to separate server faults from client faults.</p></article>
+          <article><h3>How do I see the certificate a server is really serving?</h3><p>Connect to the endpoint and read the presented chain — browsers show it behind the padlock's certificate details, and command-line TLS tools print the leaf and intermediates with dates and issuers. Check every address the name resolves to, not just the first.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I run this checklist in SolveStack instead of copying it?</h3><p>Yes. Open the expired certificate template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+          <article><h3>Is this expired certificate template free?</h3><p>Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/sign-in-failure-template/"><b>SSO</b><span>SSO sign-in failure template</span><p>When users cannot sign in: capture the exact error, establish scope, and let the IdP logs name the reason.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/?method=cert-expired"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished record as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

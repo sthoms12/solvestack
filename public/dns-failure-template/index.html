@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free DNS failure template: a resolution troubleshooting checklist — compare resolvers, ask the authoritative server, check TTL and split-horizon views before touching records. Copy it, or run it in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/dns-failure-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/dns-failure-template/" />
+    <meta property="og:title" content="DNS Failure Template" />
+    <meta property="og:description" content="A DNS failure checklist you can copy: resolver comparison, authoritative answers, TTL and propagation, split-horizon views, captured evidence." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DNS Failure Template" />
+    <meta name="twitter:description" content="Compare resolvers, ask the authoritative server, check TTL. Free DNS failure checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/dns-failure-template/template.css" />
+    <title>DNS Failure Template — Resolution Troubleshooting Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "DNS Failure Template",
+      "description": "A DNS resolution failure troubleshooting template: prove which resolver and which record is wrong by comparing answers, with a worked example.",
+      "url": "https://solvestack-ai.app/dns-failure-template/",
+      "publisher": {
+            "@type": "Organization",
+            "name": "SolveStack"
+      },
+      "about": [
+            "DNS",
+            "name resolution",
+            "network troubleshooting",
+            "IT troubleshooting"
+      ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+            {
+                  "@type": "Question",
+                  "name": "What should I check first when DNS resolution fails?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Compare answers before changing anything: query the failing name on your internal resolver, a public resolver, and the authoritative nameserver. Where the answers diverge tells you whether the record, a cache, or a forwarding path is wrong — three different fixes that guessing routinely confuses."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How can I tell a resolver problem from a record problem?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "If the authoritative nameserver returns the correct record but a resolver returns something else, the record is fine and the resolver's cache or forwarding is at fault. If the authoritative answer itself is wrong or missing, the fault is in the zone or its delegation."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How long should DNS changes take to propagate?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "As long as the previous record's TTL says — caches may hold the old answer for the full TTL after a change. A 24-hour TTL set during a migration means a full day of mixed answers. Lower TTLs a day before planned changes, and treat 'not propagated yet' as a state to verify with the TTL, not a guess."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is the worked example a real incident?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Can I run this checklist in SolveStack instead of copying it?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Open the DNS failure template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is this DNS failure template free?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account."
+                  }
+            }
+      ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=dns-failure">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">COMPARE → AUTHORITATIVE → PROPAGATE</p>
+        <h1>DNS <em>Failure</em> Template</h1>
+        <p class="intro">DNS failures invite the worst troubleshooting move in IT: editing records and hoping. This checklist proves which resolver and which record is wrong first — by comparing answers instead of changing them. Copy the plain-text version below, or start the investigation in SolveStack with the comparisons already structured.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/?method=dns-failure">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks, all comparisons, no guessing.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Compare the resolvers</h3><p>Query the failing name against your internal resolver and a public one. Different answers mean the record probably exists and one view of it is wrong; the same wrong answer everywhere points upstream — at the zone, the delegation, or the record itself.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The failing name resolved correctly on a public resolver and returned NXDOMAIN internally. The record was fine; the internal view was broken. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Ask the authoritative server</h3><p>Resolvers cache and forward; the authoritative nameserver is the source of truth. Query it directly for the exact record type. If the authoritative answer is right, your problem is caching or forwarding — not the record — and editing the record will only add TTL confusion.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The authoritative server returned the correct A record with a 300-second TTL. The internal resolver had cached an NXDOMAIN from before the record was created. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>TTL and the last change</h3><p>Every DNS surprise has a change and a TTL attached. Find when the record or zone last changed and how long the old answer can legitimately survive in caches. Many 'DNS is down' incidents are a correct change still propagating on a long TTL nobody remembered setting.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>A migration the previous evening raised no errors, but the old record's 24-hour TTL meant some resolvers served the dead address until midday. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Split-horizon and conditional forwarding</h3><p>Enterprises run two truths: internal and external views of the same name. A conditional forwarder removed during cleanup, or a zone transferred to only one view, breaks internal resolution while the internet sees perfection — and every external test you run will pass.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>A cleanup change removed the conditional forwarder for the zone on one internal resolver pair; the other pair still resolved. Forwarding restored and documented. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Capture answers, not impressions</h3><p>DNS evidence is text: save the full resolver output — question, answer, TTL, and which server answered — for the failing name and a working comparison. 'It doesn't resolve' cannot be handed to a network team; two resolver outputs can.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Evidence attached: internal vs public vs authoritative outputs for the failing name, timestamps aligned. The network team confirmed the forwarder gap from the outputs alone. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>DNS FAILURE CHECKLIST
+=====================
+Name that fails:
+Expected answer:
+Record type:
+Recent DNS changes:
+
+1. RESOLVER COMPARISON
+   Internal resolver answer:
+   Public resolver answer:
+
+2. AUTHORITATIVE ANSWER
+   Authoritative nameserver queried directly:
+   Answer and TTL as served:
+
+3. TTL AND CHANGE
+   Last zone / record change:
+   Old answer's TTL (how long mixed answers are legit):
+
+4. VIEWS AND FORWARDING
+   Split-horizon view affected:
+   Conditional forwarders for the zone:
+
+5. EVIDENCE
+   Full resolver outputs saved (failing + working),
+   with the answering server named for each.</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Work the failure where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>A DNS failure is only as diagnosable as the resolver outputs captured before someone edits the zone. SolveStack gives the investigation a durable structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/?method=dns-failure">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the <a href="/5-whys-template/">5 whys</a> converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">DNS failures, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should I check first when DNS resolution fails?</h3><p>Compare answers before changing anything: query the failing name on your internal resolver, a public resolver, and the authoritative nameserver. Where the answers diverge tells you whether the record, a cache, or a forwarding path is wrong — three different fixes that guessing routinely confuses.</p></article>
+          <article><h3>How can I tell a resolver problem from a record problem?</h3><p>If the authoritative nameserver returns the correct record but a resolver returns something else, the record is fine and the resolver's cache or forwarding is at fault. If the authoritative answer itself is wrong or missing, the fault is in the zone or its delegation.</p></article>
+          <article><h3>How long should DNS changes take to propagate?</h3><p>As long as the previous record's TTL says — caches may hold the old answer for the full TTL after a change. A 24-hour TTL set during a migration means a full day of mixed answers. Lower TTLs a day before planned changes, and treat 'not propagated yet' as a state to verify with the TTL, not a guess.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I run this checklist in SolveStack instead of copying it?</h3><p>Yes. Open the DNS failure template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+          <article><h3>Is this DNS failure template free?</h3><p>Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/vpn-outage-template/"><b>VPN</b><span>VPN outage template</span><p>Remote access down: separate gateway, authentication, and client faults by scope before touching anything.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/?method=dns-failure"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished record as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
