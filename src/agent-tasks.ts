@@ -23,6 +23,8 @@ export type AgentTask = {
   label: string;
   description: string;
   instructions: string;
+  /** What to put in the solvestack-reply block (see buildReplyContract). */
+  replyGuidance: string;
 };
 
 export const AGENT_TASKS: AgentTask[] = [
@@ -35,6 +37,8 @@ export const AGENT_TASKS: AgentTask[] = [
 - List hypotheses that are still open and what test would settle each one.
 - Point out any conclusion the recorded evidence does not yet support.
 - End with the three highest-value next steps, in order.`,
+    replyGuidance:
+      "In the reply block: include hypothesisUpdates for any hypothesis your review bears on, and newTasks for your three next steps.",
   },
   {
     id: "summarize",
@@ -45,6 +49,8 @@ export const AGENT_TASKS: AgentTask[] = [
 - Rebuild the timeline from entry timestamps: first detection, key turning points, resolution.
 - Keep it under 300 words and free of jargon; define any technical term you must use.
 - Close with what is being done so it does not recur.`,
+    replyGuidance:
+      "In the reply block: include the finished summary as a single newEntries item of type Note.",
   },
   {
     id: "kb-article",
@@ -55,6 +61,8 @@ Use these sections: Symptom · Environment · Root cause · Fix · Validation ·
 - Write steps a colleague can follow without this session open.
 - Keep commands, error text, and product names verbatim from the record.
 - If a section has no supporting facts in the record, write "Not recorded" rather than inventing content.`,
+    replyGuidance:
+      "In the reply block: include the finished article as a single newEntries item of type Note.",
   },
   {
     id: "contradiction",
@@ -64,6 +72,8 @@ Use these sections: Symptom · Environment · Root cause · Fix · Validation ·
 - For every hypothesis marked ruled out, quote the evidence its reasoning rests on. Flag any ruled-out whose cited evidence is missing, ambiguous, or also consistent with the hypothesis being true.
 - Do the same for the declared root cause: list the entries that support it and any that cut against it.
 - Separate "contradicted by evidence" from "not yet proven" — they are different findings.`,
+    replyGuidance:
+      "In the reply block: include hypothesisUpdates for every hypothesis you audited, with reasoning that quotes the evidence you relied on.",
   },
   {
     id: "prevention",
@@ -73,6 +83,8 @@ Use these sections: Symptom · Environment · Root cause · Fix · Validation ·
 - List each prevention action implied by the resolution, with a suggested owner role and a realistic timeframe.
 - Flag prevention gaps: failure modes this incident exposed that no recorded action covers (monitoring, alerting, documentation, capacity).
 - Order the plan by risk reduced per unit of effort.`,
+    replyGuidance:
+      "In the reply block: include newTasks for the follow-up plan, ordered as in your answer.",
   },
 ];
 
@@ -85,6 +97,32 @@ export const AGENT_STANDING_RULES = `Rules:
 2. Treat every [REDACTED] token as intentionally removed — do not guess it.
 3. Prefer citing entry timestamps and hypothesis statuses over paraphrasing.
 4. Separate observed facts from suggestions, and label which is which.`;
+
+/**
+ * The return-trip contract (solvestack-reply v1): the model answers in
+ * prose, then ends with one fenced JSON block the app can apply after a
+ * user preview (src/ai-reply.ts parses it as untrusted input). The skill
+ * kit export reuses this text verbatim so the contract cannot drift.
+ */
+export function buildReplyContract(taskId: string): string {
+  return `End your reply with exactly one fenced block in this format, so the user can apply your work in SolveStack with one paste:
+
+\`\`\`solvestack-reply
+{
+  "kind": "solvestack-reply",
+  "version": 1,
+  "sessionId": "<the session id from the record>",
+  "task": "${taskId}",
+  "summary": "One or two sentences: the headline of your answer.",
+  "newEntries": [{ "type": "Note", "content": "..." }],
+  "hypothesisUpdates": [{ "matchText": "<hypothesis text copied verbatim from the record>", "status": "Ruled Out", "reasoning": "..." }],
+  "newTasks": ["..."],
+  "resolutionDraft": { "rootCause": "...", "fix": "...", "validation": "...", "prevention": "..." }
+}
+\`\`\`
+
+Include only the fields your answer actually supports — omit the rest. Copy hypothesis text exactly; the app matches on it. Hypothesis status must be one of: Investigating, Likely, Confirmed, Ruled Out. Entry type must be one of: Note, Observation, Action, Evidence, Hypothesis, Decision. Everything in the block is a proposal: the user reviews it in a preview before anything is applied, and a resolutionDraft never resolves the session by itself.`;
+}
 
 function hypothesisSummary(session: AgentPackSession): string {
   if (session.hypotheses.length === 0) return "none recorded";
@@ -135,6 +173,11 @@ export function buildAgentPrompt(
     "",
     "## Your task",
     task.instructions,
+    "",
+    "## How to reply",
+    task.replyGuidance,
+    "",
+    buildReplyContract(task.id),
     "",
     closing === "handoff"
       ? "I will paste the full session record in my next message. Wait for it, then carry out the task above using only that record."
