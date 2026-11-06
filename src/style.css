@@ -1099,6 +1099,27 @@ h2 em {
   .rail-bottom span {
     display: none;
   }
+  /* Mobile top-bar fit: the wordmark and the two guide buttons leave the
+     bar (guides stay reachable — field guide in Settings, data guide
+     after exports) so brand mark + 4 destinations + theme toggle fit a
+     phone-width screen with no sideways pan. */
+  .brand > div {
+    display: none;
+  }
+  #open-guide,
+  #open-data-guide {
+    display: none;
+  }
+  /* Compact workspace actions: nine full-size buttons otherwise stack
+     ~230px tall above the session title. */
+  .workspace-actions {
+    gap: 7px;
+  }
+  .workspace-actions .primary,
+  .workspace-actions .secondary {
+    padding: 8px 11px;
+    font-size: 13px;
+  }
   .main {
     padding: 28px 16px;
     min-width: 0;
