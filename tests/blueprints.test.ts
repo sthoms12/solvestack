@@ -42,12 +42,17 @@ describe("blueprint data contract", () => {
     }
   });
 
-  test("incident blueprints carry no public template page yet (phase B)", () => {
-    for (const id of INCIDENT_IDS) {
-      const blueprint = blueprintById(id);
-      expect(blueprint.kind).toBe("incident");
-      expect(blueprint.templatePath).toBeUndefined();
-    }
+  test("incident blueprints link to their public template pages (phase B)", () => {
+    const expected: Record<string, string> = {
+      "vpn-outage": "/vpn-outage-template/",
+      "sign-in-failure": "/sign-in-failure-template/",
+      "cert-expired": "/expired-certificate-template/",
+      "dns-failure": "/dns-failure-template/",
+      "disk-full": "/disk-full-template/",
+      "email-delivery": "/email-delivery-template/",
+    };
+    for (const [id, path] of Object.entries(expected))
+      expect(blueprintById(id).templatePath).toBe(path);
     // Methods keep theirs.
     expect(blueprintById("rca").templatePath).toBe("/rca-template/");
   });

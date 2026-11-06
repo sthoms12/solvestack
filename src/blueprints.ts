@@ -228,6 +228,7 @@ export const BLUEPRINTS: Blueprint[] = [
         content: "Gateway status / error output (paste the exact text).",
       },
     ],
+    templatePath: "/vpn-outage-template/",
   },
   {
     id: "sign-in-failure",
@@ -265,6 +266,7 @@ export const BLUEPRINTS: Blueprint[] = [
           "Scope: single user vs group vs everyone — test before theorizing.",
       },
     ],
+    templatePath: "/sign-in-failure-template/",
   },
   {
     id: "cert-expired",
@@ -301,6 +303,7 @@ export const BLUEPRINTS: Blueprint[] = [
         content: "Who sees it: all clients, one browser, one network.",
       },
     ],
+    templatePath: "/expired-certificate-template/",
   },
   {
     id: "dns-failure",
@@ -337,6 +340,7 @@ export const BLUEPRINTS: Blueprint[] = [
         content: "Scope: one name, one zone, or all resolution.",
       },
     ],
+    templatePath: "/dns-failure-template/",
   },
   {
     id: "disk-full",
@@ -373,6 +377,7 @@ export const BLUEPRINTS: Blueprint[] = [
         content: "Top directories by size (command output).",
       },
     ],
+    templatePath: "/disk-full-template/",
   },
   {
     id: "email-delivery",
@@ -409,6 +414,7 @@ export const BLUEPRINTS: Blueprint[] = [
         content: "Direction and scope: one domain, one user, or everyone.",
       },
     ],
+    templatePath: "/email-delivery-template/",
   },
 ];
 

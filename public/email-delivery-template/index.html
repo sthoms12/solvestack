@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free email delivery template: a mail flow troubleshooting checklist — follow one message end-to-end, read the bounce, trace the queue, verify SPF, DKIM, and DMARC. Copy it, or run it in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/email-delivery-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/email-delivery-template/" />
+    <meta property="og:title" content="Email Delivery Template" />
+    <meta property="og:description" content="An email delivery checklist you can copy: one-message trace, bounce codes, queue and relay path, SPF, DKIM, and DMARC verification." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Email Delivery Template" />
+    <meta name="twitter:description" content="Trace one message, read the bounce, verify SPF, DKIM, DMARC. Free email delivery checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/email-delivery-template/template.css" />
+    <title>Email Delivery Template — Mail Flow Troubleshooting Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Email Delivery Template",
+      "description": "An email delivery failure troubleshooting template: follow one message end-to-end to separate authentication, reputation, and queue faults, with a worked example.",
+      "url": "https://solvestack-ai.app/email-delivery-template/",
+      "publisher": {
+            "@type": "Organization",
+            "name": "SolveStack"
+      },
+      "about": [
+            "email delivery",
+            "SPF",
+            "DKIM",
+            "DMARC",
+            "IT troubleshooting"
+      ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+            {
+                  "@type": "Question",
+                  "name": "What should I check first when email is not delivered?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Pick one specific failed message and get its full bounce. The enhanced status code and the receiving server's stated reason divide the problem immediately: 5.7.x means authentication or policy, 5.1.x means addressing, 4.x means a temporary condition. General checks come after that one message is explained."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How do SPF, DKIM, and DMARC affect email delivery?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "SPF lists which servers may send for your domain, DKIM cryptographically signs messages, and DMARC tells receivers what to do when the first two fail — including rejecting the mail. A sending service missing from SPF, or signing with an unaligned domain, fails DMARC, and receivers with strict policies bounce mail that used to flow."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Why is email failing to only one domain?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Because receivers enforce policy independently. One domain may enforce DMARC rejection while others quarantine, or its gateway may block your IPs or content patterns specifically. Scope — one domain, one direction, one sender system — is evidence: it rules out your whole mail platform and focuses the trace."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is the worked example a real incident?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Can I run this checklist in SolveStack instead of copying it?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Open the email delivery template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is this email delivery template free?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account."
+                  }
+            }
+      ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=email-delivery">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">TRACE → READ → VERIFY</p>
+        <h1>Email <em>Delivery</em> Template</h1>
+        <p class="intro">'Email is down' is never the unit of failure. One message, followed from sender to the exact point of refusal, tells you whether you have an authentication problem, a reputation problem, or a queue problem. This checklist traces that one message. Copy the plain-text version below, or run the trace in SolveStack.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/?method=email-delivery">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks, one message at a time.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Pick one message and follow it</h3><p>Choose a specific failed message — sender, recipient, timestamp — and refuse to generalize until it is explained. Mail systems fail per-domain, per-recipient, and per-authentication-result; an 'all email' conclusion from one bounce is how afternoons disappear.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Traced message: invoices to one customer domain, sent 09:14 CT. Other external mail flowed normally — direction and scope narrowed to one recipient domain. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Read the bounce properly</h3><p>The bounce message is the receiving server's own testimony: the enhanced status code (5.7.x is authentication or policy, 5.1.x is addressing, 4.x is temporary) and the plain-language reason after it. Save the full bounce — headers included — before interpreting a summary of it.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Bounce code 5.7.26: DMARC failure reported by the receiving domain. The refusal was authentication policy, not reputation or content. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Trace the queue and relays</h3><p>Follow the message through your own infrastructure: submission, queue, relay, and the receiving server's response to the connection. Where the trace stops is where the fault lives — a queue backing up is yours; a refusal at the far end is evidence to work with, not a mystery.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The message left the relay at 09:14:22 and was refused during the receiving handshake; queue empty, no internal backlog. The fault isolated to the receiving side's policy checks. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Verify SPF, DKIM, and DMARC</h3><p>Authentication failures are configuration facts, checkable from outside: does SPF authorize the sending service, does DKIM sign and align, does the DMARC policy reject on failure? A new sending service added without an SPF update is the classic silent break.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>A billing platform added the previous week sent as the domain without appearing in SPF, and its DKIM did not align; DMARC at reject turned that into hard bounces. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Reputation and direction</h3><p>If authentication is clean and one direction still fails, check reputation: blocklist status for the sending IPs and domain, and whether the failures correlate with volume or content changes. Separate 'they refuse us' from 'we cannot send' — the fixes live in different organizations.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Sending IP clean on major blocklists; the failures were DMARC-only for the new platform. Reputation cleared, the fix assigned to the authentication records. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>EMAIL DELIVERY CHECKLIST
+========================
+Sender to recipient:
+Failing direction (inbound / outbound):
+Bounce code:
+Queue / relay:
+
+1. ONE MESSAGE
+   Sender, recipient, timestamp of the traced message:
+   Scope (one domain / one direction / everyone):
+
+2. BOUNCE
+   Enhanced status code:
+   Receiving server's stated reason:
+   Full bounce saved (headers included):
+
+3. QUEUE TRACE
+   Submission to relay timestamps:
+   Point where the trace stops:
+
+4. AUTHENTICATION
+   SPF authorizes the sending service:
+   DKIM signs and aligns:
+   DMARC policy (none / quarantine / reject):
+
+5. REPUTATION
+   Sending IP / domain blocklist status:
+   Volume or content change correlation:</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Trace the message where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>A mail flow failure is only as diagnosable as the trace captured before the DNS records get 'fixed'. SolveStack gives the investigation a durable structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/?method=email-delivery">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the <a href="/5-whys-template/">5 whys</a> converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Email delivery, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should I check first when email is not delivered?</h3><p>Pick one specific failed message and get its full bounce. The enhanced status code and the receiving server's stated reason divide the problem immediately: 5.7.x means authentication or policy, 5.1.x means addressing, 4.x means a temporary condition. General checks come after that one message is explained.</p></article>
+          <article><h3>How do SPF, DKIM, and DMARC affect email delivery?</h3><p>SPF lists which servers may send for your domain, DKIM cryptographically signs messages, and DMARC tells receivers what to do when the first two fail — including rejecting the mail. A sending service missing from SPF, or signing with an unaligned domain, fails DMARC, and receivers with strict policies bounce mail that used to flow.</p></article>
+          <article><h3>Why is email failing to only one domain?</h3><p>Because receivers enforce policy independently. One domain may enforce DMARC rejection while others quarantine, or its gateway may block your IPs or content patterns specifically. Scope — one domain, one direction, one sender system — is evidence: it rules out your whole mail platform and focuses the trace.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I run this checklist in SolveStack instead of copying it?</h3><p>Yes. Open the email delivery template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+          <article><h3>Is this email delivery template free?</h3><p>Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/dns-failure-template/"><b>DNS</b><span>DNS failure template</span><p>SPF, DKIM, and DMARC live in DNS: compare resolvers and ask the authoritative server when records look wrong.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/?method=email-delivery"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished record as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

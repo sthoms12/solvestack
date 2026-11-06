@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free disk full template: a storage troubleshooting checklist — measure the growth, find what grew, fix rotation, free space safely, and set the prevention. Copy it, or run the investigation in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/disk-full-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/disk-full-template/" />
+    <meta property="og:title" content="Disk Full Template" />
+    <meta property="og:description" content="A disk full checklist you can copy: measure first, find what grew, rotation and dumps, safe recovery, prevention with an owner." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Disk Full Template" />
+    <meta name="twitter:description" content="Measure, find what grew, fix rotation, free safely, prevent. Free disk full checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/disk-full-template/template.css" />
+    <title>Disk Full Template — Storage Exhaustion Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Disk Full Template",
+      "description": "A disk full and storage exhaustion troubleshooting template: stop the growth first, then find what grew, with a worked example and a prevention checklist.",
+      "url": "https://solvestack-ai.app/disk-full-template/",
+      "publisher": {
+            "@type": "Organization",
+            "name": "SolveStack"
+      },
+      "about": [
+            "disk full",
+            "storage exhaustion",
+            "IT troubleshooting"
+      ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+            {
+                  "@type": "Question",
+                  "name": "What should I do first when a disk fills up?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Measure before deleting: record the free space and how fast it is shrinking, then find the largest and fastest-growing directories. The growth rate tells you whether this is a runaway process or slow capacity creep, and deleting blind destroys the evidence of which one it was."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "How do I find what is consuming the disk?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "List directories by size, then by recent growth — the two lists answer different questions. The biggest directory is usually legitimate data; the one that grew in the incident window is the culprit, commonly logs with broken rotation, dump files, or temp data from a looping process."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is it safe to delete log files to free space?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Usually, with two cautions: deleting a file a process holds open may not free the space until the process restarts — truncating works better — and the logs may be the only evidence of the fault that filled the disk. Rotate or archive first when the service allows it, and record what was removed."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is the worked example a real incident?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Can I run this checklist in SolveStack instead of copying it?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Open the disk full template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP."
+                  }
+            },
+            {
+                  "@type": "Question",
+                  "name": "Is this disk full template free?",
+                  "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account."
+                  }
+            }
+      ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=disk-full">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">MEASURE → LOCATE → RECOVER</p>
+        <h1>Disk <em>Full</em> Template</h1>
+        <p class="intro">A full disk tempts the fastest bad move in operations: deleting whatever is large. This checklist measures first — free space, growth rate, and the largest paths — so the space you free is the space that was actually leaking, and the cause survives to be fixed. Copy the plain-text version below, or run the investigation in SolveStack.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/?method=disk-full">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks, measurement before deletion.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Measure before deleting</h3><p>Record the volume, the free space, and how fast it is shrinking. A disk filling in minutes is a runaway process; a disk that crept full over months is capacity. The growth rate decides whether you have an afternoon or an emergency.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Volume at 100%, shrinking 2 GB per hour since 06:00 CT — emergency pace. Free space and growth rate recorded before any cleanup. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Find what grew</h3><p>Rank directories by size, then rank by recent change. The largest directory is often years of legitimate data; the fastest-growing one is your culprit. Compare both lists before concluding anything.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Largest: a 400 GB database (expected). Fastest-growing: the application heap-dump folder, 180 GB in 6 hours after an out-of-memory loop started writing dumps. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Rotation and dump settings</h3><p>Logs that never rotate and dumps that never expire are configuration failures, not mysteries. Check the rotation policy, whether it is actually running, and the dump retention for the failing service. A rotation job silently failing for weeks fills disks on schedule.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>The log rotation config existed, but its scheduled job had failed since a credential change 5 weeks earlier; logs grew unbounded in two directories. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Free space safely</h3><p>Recover space in ways that preserve evidence and service: truncate or rotate logs rather than deleting open files, expire dumps by age, extend the volume if it is simply undersized. Note exactly what was removed — the next engineer inherits your deletions.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Freed 120 GB by expiring heap dumps older than 24 hours and rotating logs; no live data deleted. Actions and byte counts logged in the session. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Set the prevention</h3><p>A disk that filled once will fill again on the same schedule. Prevention is one of three things: an alert threshold with headroom to act, a rotation or retention fix that removes the growth source, or a capacity change with a date. Record which one — not 'monitor closely'.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Prevention set: alert at 80% with a 7-day trend, dump retention capped at 48 hours, and the rotation job given a failure alert of its own. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>DISK FULL CHECKLIST
+===================
+Host / volume:
+First alert time:
+Growth rate:
+Retention / rotation in place:
+
+1. MEASURE
+   Free space now:
+   Rate of shrink (per hour):
+
+2. LOCATE
+   Largest directories:
+   Fastest-growing directories (incident window):
+
+3. ROTATION AND DUMPS
+   Rotation policy present and actually running:
+   Dump / temp retention setting:
+
+4. RECOVER
+   Space freed (what, how much — logged):
+   Method (truncate / rotate / expire / extend):
+
+5. PREVENTION
+   Alert threshold with headroom:
+   Retention fix or capacity change, with a date:</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Work the failure where it happens.</h2></div></div>
+        <div class="tool-grid"><div><p>A disk-full incident is only as diagnosable as the measurements taken before the cleanup. SolveStack gives the investigation a durable structure while the work is still happening — then exports the whole record as portable files.</p><div class="tool-actions"><a class="primary" href="/?method=disk-full">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The original symptom</strong> — what the problem statement is built from</li>
+            <li><strong>Commands and observations</strong> — the raw material of the timeline</li>
+            <li><strong>Evidence</strong> — logs, screenshots, and attachments captured as you go</li>
+            <li><strong>Competing hypotheses</strong> — written down before you commit to one</li>
+            <li><strong>Causes ruled out</strong> — the dead ends, preserved instead of forgotten</li>
+            <li><strong>The confirmed root cause</strong> — what the <a href="/5-whys-template/">5 whys</a> converge on</li>
+            <li><strong>The validation</strong> — proof the resolution actually worked</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Disk-full incidents, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should I do first when a disk fills up?</h3><p>Measure before deleting: record the free space and how fast it is shrinking, then find the largest and fastest-growing directories. The growth rate tells you whether this is a runaway process or slow capacity creep, and deleting blind destroys the evidence of which one it was.</p></article>
+          <article><h3>How do I find what is consuming the disk?</h3><p>List directories by size, then by recent growth — the two lists answer different questions. The biggest directory is usually legitimate data; the one that grew in the incident window is the culprit, commonly logs with broken rotation, dump files, or temp data from a looping process.</p></article>
+          <article><h3>Is it safe to delete log files to free space?</h3><p>Usually, with two cautions: deleting a file a process holds open may not free the space until the process restarts — truncating works better — and the logs may be the only evidence of the fault that filled the disk. Rotate or archive first when the service allows it, and record what was removed.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each section reads when filled in, with realistic-looking but invented details.</p></article>
+          <article><h3>Can I run this checklist in SolveStack instead of copying it?</h3><p>Yes. Open the disk full template in SolveStack and the session starts with the checklist's fields, hypotheses, and checks already in place — data stays in your browser's IndexedDB, no account needed — then export the record as Markdown, HTML, JSON, or ZIP.</p></article>
+          <article><h3>Is this disk full template free?</h3><p>Yes. The template on this page is free to copy and use, and SolveStack runs free in your browser with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Where the analysis lives next.</h2></div></div>
+        <div class="related-cards">
+          <a href="/incident-report-template/"><b>REPORT</b><span>IT incident report template</span><p>After the recovery: severity, timeline, impact, root cause, remediation, and action items with owners.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>RCA template</span><p>For the deeper analysis: problem statement, timeline, 5 whys, contributing factors, and corrective actions.</p></a>
+          <a href="/?method=disk-full"><b>SOLVESTACK WORKSPACE</b><span>Run the investigation locally</span><p>Capture symptoms, evidence, hypotheses, and resolutions in your browser — no account, no cloud. Export the finished record as Markdown, HTML, JSON, or ZIP.</p></a>
+          <a href="/use-your-data/"><b>FIELD GUIDE</b><span>Use your troubleshooting data</span><p>Turn exported investigations into searchable knowledge, runbooks, review material, and durable archives — in four portable formats.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

@@ -11,6 +11,12 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 - https://solvestack-ai.app/5-whys-template/ — 5 whys template with a worked IT example
 - https://solvestack-ai.app/fishbone-diagram-template/ — fishbone (Ishikawa) diagram template with the 6M categories, a worksheet, and a blank CSV
 - https://solvestack-ai.app/incident-report-template/ — IT incident report template with a worked example
+- https://solvestack-ai.app/vpn-outage-template/ — VPN outage troubleshooting template and checklist
+- https://solvestack-ai.app/sign-in-failure-template/ — SSO sign-in failure troubleshooting template and checklist
+- https://solvestack-ai.app/expired-certificate-template/ — expired certificate (TLS) troubleshooting template and checklist
+- https://solvestack-ai.app/dns-failure-template/ — DNS failure troubleshooting template and checklist
+- https://solvestack-ai.app/disk-full-template/ — disk full troubleshooting template and checklist
+- https://solvestack-ai.app/email-delivery-template/ — email delivery failure troubleshooting template and checklist
 - https://solvestack-ai.app/onenote-vs-solvestack/ - honest comparison of OneNote and SolveStack for IT troubleshooting notes, citing Microsoft support pages, with a sample SolveStack export
 
 ## Product boundaries
