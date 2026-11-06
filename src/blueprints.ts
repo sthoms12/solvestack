@@ -3,7 +3,13 @@ export type BlueprintId =
   | "rca"
   | "5-whys"
   | "fishbone"
-  | "incident-report";
+  | "incident-report"
+  | "vpn-outage"
+  | "sign-in-failure"
+  | "cert-expired"
+  | "dns-failure"
+  | "disk-full"
+  | "email-delivery";
 
 export type BlueprintEntrySeed = {
   type:
@@ -28,6 +34,8 @@ export type BlueprintEntrySeed = {
 
 export type Blueprint = {
   id: BlueprintId;
+  /** "method" = a way of investigating; "incident" = a named failure to start from. */
+  kind: "method" | "incident";
   label: string;
   shortLabel: string;
   description: string;
@@ -44,6 +52,7 @@ export type Blueprint = {
 export const BLUEPRINTS: Blueprint[] = [
   {
     id: "blank",
+    kind: "method",
     label: "Blank investigation",
     shortLabel: "Blank",
     description: "Start empty and capture as you go.",
@@ -56,6 +65,7 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "rca",
+    kind: "method",
     label: "Root cause analysis",
     shortLabel: "RCA",
     description:
@@ -91,6 +101,7 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "5-whys",
+    kind: "method",
     label: "5 Whys chain",
     shortLabel: "5 Whys",
     description:
@@ -118,6 +129,7 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "fishbone",
+    kind: "method",
     label: "Fishbone / Ishikawa",
     shortLabel: "Fishbone",
     description:
@@ -151,6 +163,7 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "incident-report",
+    kind: "method",
     label: "Incident report",
     shortLabel: "Incident",
     description:
@@ -179,6 +192,223 @@ export const BLUEPRINTS: Blueprint[] = [
       },
     ],
     templatePath: "/incident-report-template/",
+  },
+  {
+    id: "vpn-outage",
+    kind: "incident",
+    label: "VPN / remote access outage",
+    shortLabel: "VPN outage",
+    description:
+      "Remote access failure: separate gateway, auth, and client faults by scope.",
+    tags: ["vpn", "network"],
+    currentFocus: "Restore access first; separate gateway, auth, and client faults.",
+    scratchpad:
+      "Gateway / concentrator:\nAffected scope (all users / site / client version):\nAuth path (IdP / MFA):\nLast change:",
+    hypotheses: [
+      "Gateway or ISP fault",
+      "Auth / IdP-side failure (MFA, certificate, policy)",
+      "Client-side break (update, configuration drift)",
+    ],
+    tasks: [
+      "Confirm scope: one user, one site, or everyone",
+      "Check gateway status and recent changes",
+      "Test the auth path with a known-good account",
+      "Rule out client version / OS update spread",
+      "Capture provider or vendor status before escalating",
+    ],
+    entries: [
+      {
+        type: "Observation",
+        content:
+          "Scope check: who is affected, since when, and what changed last.",
+      },
+      {
+        type: "Evidence",
+        technicalType: "Error",
+        content: "Gateway status / error output (paste the exact text).",
+      },
+    ],
+  },
+  {
+    id: "sign-in-failure",
+    kind: "incident",
+    label: "SSO / sign-in failure",
+    shortLabel: "Sign-in failure",
+    description:
+      "Identity failure: find which side of the IdP to app boundary is broken.",
+    tags: ["sso", "identity"],
+    currentFocus:
+      "Identify which side of the IdP to app boundary the failure lives on.",
+    scratchpad:
+      "App / service:\nIdP:\nError code shown:\nAffected (all / group / single user):\nMFA method:",
+    hypotheses: [
+      "IdP policy or conditional-access change",
+      "App-side configuration (certificate, metadata, clock skew)",
+      "Account state (locked, expired, MFA reset)",
+    ],
+    tasks: [
+      "Capture the exact error and correlation / trace ID",
+      "Test with a known-good account in the same policy scope",
+      "Check IdP sign-in logs for the failure reason",
+      "Verify the app certificate / metadata expiry",
+      "Rule out device compliance or location policy",
+    ],
+    entries: [
+      {
+        type: "Evidence",
+        technicalType: "Error",
+        content: "Exact error text and trace ID from a failing sign-in.",
+      },
+      {
+        type: "Note",
+        content:
+          "Scope: single user vs group vs everyone — test before theorizing.",
+      },
+    ],
+  },
+  {
+    id: "cert-expired",
+    kind: "incident",
+    label: "Expired certificate / TLS failure",
+    shortLabel: "Cert expired",
+    description:
+      "TLS failure: name the exact endpoint and chain link before renewing anything.",
+    tags: ["tls", "certificate"],
+    currentFocus:
+      "Name the exact endpoint and chain link that fails before renewing anything.",
+    scratchpad:
+      "Endpoint / URL:\nCert subject + issuer:\nExpiry shown:\nChain (leaf / intermediate / root):\nRenewal owner:",
+    hypotheses: [
+      "Leaf certificate simply expired",
+      "Chain incomplete after a renewal",
+      "Client-side trust or clock problem",
+    ],
+    tasks: [
+      "Record the browser / client TLS error verbatim",
+      "Inspect the served chain (dates, issuer, SANs)",
+      "Check for a renewed cert bound to the wrong site or service",
+      "Verify client clock and trust store if only some clients fail",
+      "Note the renewal owner and next expiry in the resolution",
+    ],
+    entries: [
+      {
+        type: "Evidence",
+        technicalType: "Error",
+        content: "TLS error text and the served certificate dates.",
+      },
+      {
+        type: "Observation",
+        content: "Who sees it: all clients, one browser, one network.",
+      },
+    ],
+  },
+  {
+    id: "dns-failure",
+    kind: "incident",
+    label: "DNS resolution failure",
+    shortLabel: "DNS failure",
+    description:
+      "Name resolution failure: prove which resolver and which record is wrong.",
+    tags: ["dns", "network"],
+    currentFocus:
+      "Prove which resolver and which record is wrong before touching records.",
+    scratchpad:
+      "Name that fails:\nExpected answer:\nResolver(s) tested:\nRecord type:\nRecent DNS changes:",
+    hypotheses: [
+      "Record missing or wrong after a change",
+      "Resolver-specific fault (cache, split-horizon, forwarding)",
+      "Registrar / delegation problem",
+    ],
+    tasks: [
+      "Query the failing name against internal and public resolvers",
+      "Compare with the authoritative nameserver answer",
+      "Check TTL and when the last change propagates",
+      "Rule out split-horizon view differences",
+      "Capture the exact resolver output as evidence",
+    ],
+    entries: [
+      {
+        type: "Evidence",
+        technicalType: "Command output",
+        content: "Resolver output for the failing name (internal vs public).",
+      },
+      {
+        type: "Observation",
+        content: "Scope: one name, one zone, or all resolution.",
+      },
+    ],
+  },
+  {
+    id: "disk-full",
+    kind: "incident",
+    label: "Disk full / storage exhaustion",
+    shortLabel: "Disk full",
+    description:
+      "Storage exhaustion: stop the growth first, then find what grew.",
+    tags: ["storage", "disk"],
+    currentFocus:
+      "Stop the growth first, then find what grew — deleting blind hides the cause.",
+    scratchpad:
+      "Host / volume:\nFirst alert time:\nGrowth rate:\nLargest directories:\nRetention / rotation in place:",
+    hypotheses: [
+      "Log or temp growth (rotation broken)",
+      "Runaway process or dump files",
+      "Genuine data growth past capacity",
+    ],
+    tasks: [
+      "Record current free space and growth rate",
+      "Identify the largest and fastest-growing paths before deleting",
+      "Check log rotation and dump settings",
+      "Free space safely (truncate / rotate, not blind delete)",
+      "Set a prevention: alert threshold or rotation fix",
+    ],
+    entries: [
+      {
+        type: "Observation",
+        content: "Volume, free space, and when it crossed the threshold.",
+      },
+      {
+        type: "Evidence",
+        technicalType: "Command output",
+        content: "Top directories by size (command output).",
+      },
+    ],
+  },
+  {
+    id: "email-delivery",
+    kind: "incident",
+    label: "Email delivery failure",
+    shortLabel: "Email delivery",
+    description:
+      "Mail flow failure: follow one message end-to-end instead of 'email is down'.",
+    tags: ["email", "dns"],
+    currentFocus:
+      "Follow one message end-to-end; 'email is down' is never the unit of failure.",
+    scratchpad:
+      "Sender to recipient:\nFailing direction (inbound / outbound):\nBounce code:\nSPF / DKIM / DMARC status:\nQueue / relay:",
+    hypotheses: [
+      "Authentication failure (SPF / DKIM / DMARC)",
+      "Reputation or blocklist listing",
+      "Queue / relay fault or recipient-side rejection",
+    ],
+    tasks: [
+      "Get the exact bounce / NDR code for one message",
+      "Trace that message through the queue / relay logs",
+      "Verify SPF, DKIM, and DMARC for the sending domain",
+      "Check blocklists if reputation is suspected",
+      "Test a known-good external recipient to isolate direction",
+    ],
+    entries: [
+      {
+        type: "Evidence",
+        technicalType: "Log",
+        content: "Full bounce message / NDR for one failed email.",
+      },
+      {
+        type: "Observation",
+        content: "Direction and scope: one domain, one user, or everyone.",
+      },
+    ],
   },
 ];
 

@@ -17,13 +17,32 @@ import {
 } from "../src/vault";
 import { migrateWorkspace, CURRENT_SCHEMA_VERSION } from "../src/migrations";
 
-test("blueprints cover the SEO method funnel", () => {
+test("blueprints cover the SEO method funnel and the incident gallery", () => {
   expect(BLUEPRINTS.map((b) => b.id)).toEqual([
     "blank",
     "rca",
     "5-whys",
     "fishbone",
     "incident-report",
+    "vpn-outage",
+    "sign-in-failure",
+    "cert-expired",
+    "dns-failure",
+    "disk-full",
+    "email-delivery",
+  ]);
+  expect(
+    BLUEPRINTS.filter((b) => b.kind === "method").map((b) => b.id),
+  ).toEqual(["blank", "rca", "5-whys", "fishbone", "incident-report"]);
+  expect(
+    BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => b.id),
+  ).toEqual([
+    "vpn-outage",
+    "sign-in-failure",
+    "cert-expired",
+    "dns-failure",
+    "disk-full",
+    "email-delivery",
   ]);
   expect(blueprintById("rca").tasks.length).toBeGreaterThan(0);
   expect(parseMethodParam("?method=5-whys", "")).toBe("5-whys");
