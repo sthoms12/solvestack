@@ -1,3 +1,9 @@
+import {
+  agentTaskById,
+  buildAgentPrompt,
+  type AgentTaskId,
+} from "./agent-tasks";
+
 /**
  * Redaction patterns, applied in array order (security audit run 1:
  * agent-pack-redaction-pattern-gaps). Order matters: PEM blocks, JWTs,
@@ -183,7 +189,20 @@ export function redactSessionForAgent(session: AgentPackSession): AgentPackSessi
   };
 }
 
-export function agentPackReadme(session: AgentPackSession): string {
+export function agentPackReadme(
+  session: AgentPackSession,
+  taskLabel?: string,
+): string {
+  const taskSection = taskLabel
+    ? `
+## Requested task
+
+**${taskLabel}** — the full prompt is in \`PROMPT.md\`. Follow it within the rules above.
+`
+    : "";
+  const promptLine = taskLabel
+    ? "\n- `PROMPT.md` — the task prompt to give the reviewing tool first"
+    : "";
   return `# SolveStack agent pack
 
 This package is a **redaction-first** handoff for organization-approved AI tools.
@@ -196,10 +215,10 @@ SolveStack itself does not call a model and does not upload this file.
 3. Treat every \`[REDACTED]\` token as intentionally removed — do not guess it.
 4. Prefer citing entry timestamps and hypothesis statuses over paraphrasing.
 5. If asked for recommendations, separate **observed facts** from **suggestions**.
-
+${taskSection}
 ## Contents
 
-- \`AGENT.md\` — this file
+- \`AGENT.md\` — this file${promptLine}
 - \`knowledge.md\` — human-readable investigation summary (also redacted)
 - \`session.redacted.json\` — structured record without attachment binaries
 - \`evidence-manifest.json\` — filenames and MIME types only (no file bodies)
@@ -209,51 +228,114 @@ Generated: ${new Date().toISOString()}
 `;
 }
 
-export function buildAgentPackFiles(input: {
+type AgentPackInput = {
   session: AgentPackSession;
   knowledgeMarkdown: string;
   attachments: AgentPackAttachmentMeta[];
   schemaVersion: number;
-}): { name: string; text: string }[] {
+};
+
+function redactedAttachments(input: AgentPackInput) {
+  return input.attachments.map((attachment) => ({
+    id: attachment.id,
+    filename: redactText(attachment.filename),
+    mimeType: attachment.mimeType,
+    size: attachment.size,
+    description: redactText(attachment.description),
+  }));
+}
+
+function sessionJsonObject(
+  input: AgentPackInput,
+  redacted: AgentPackSession,
+) {
+  return {
+    schemaVersion: input.schemaVersion,
+    kind: "solvestack-agent-pack",
+    session: redacted,
+    attachments: redactedAttachments(input),
+  };
+}
+
+export function buildAgentPackFiles(
+  input: AgentPackInput & { taskId?: AgentTaskId },
+): { name: string; text: string }[] {
   const redacted = redactSessionForAgent(input.session);
   const knowledge = redactText(input.knowledgeMarkdown);
-  return [
-    { name: "AGENT.md", text: agentPackReadme(redacted) },
+  const task = input.taskId ? agentTaskById(input.taskId) : undefined;
+  const files: { name: string; text: string }[] = [
+    { name: "AGENT.md", text: agentPackReadme(redacted, task?.label) },
+  ];
+  if (task)
+    files.push({
+      name: "PROMPT.md",
+      text: `${buildAgentPrompt(redacted, task)}\n`,
+    });
+  files.push(
     { name: "knowledge.md", text: knowledge },
     {
       name: "session.redacted.json",
-      text: JSON.stringify(
-        {
-          schemaVersion: input.schemaVersion,
-          kind: "solvestack-agent-pack",
-          session: redacted,
-          attachments: input.attachments.map((attachment) => ({
-            id: attachment.id,
-            filename: redactText(attachment.filename),
-            mimeType: attachment.mimeType,
-            size: attachment.size,
-            description: redactText(attachment.description),
-          })),
-        },
-        null,
-        2,
-      ),
+      text: JSON.stringify(sessionJsonObject(input, redacted), null, 2),
     },
     {
       name: "evidence-manifest.json",
       text: JSON.stringify(
         {
           note: "Binaries intentionally omitted from agent packs.",
-          files: input.attachments.map((attachment) => ({
-            id: attachment.id,
-            filename: redactText(attachment.filename),
-            mimeType: attachment.mimeType,
-            size: attachment.size,
-          })),
+          files: redactedAttachments(input).map(
+            ({ description: _description, ...file }) => file,
+          ),
         },
         null,
         2,
       ),
     },
-  ];
+  );
+  return files;
+}
+
+/**
+ * Single-file variant of the agent pack for pasting into an AI chat box:
+ * the task prompt first, then the redacted knowledge summary, the redacted
+ * session JSON in a fenced block, and the evidence manifest. Same
+ * redaction path as the ZIP pack — built only from the redacted session.
+ */
+export function buildPastePack(
+  input: AgentPackInput & { taskId: AgentTaskId },
+): string {
+  const redacted = redactSessionForAgent(input.session);
+  const knowledge = redactText(input.knowledgeMarkdown);
+  const task = agentTaskById(input.taskId);
+  const manifest = redactedAttachments(input);
+  return [
+    buildAgentPrompt(redacted, task),
+    "",
+    "---",
+    "",
+    "# Knowledge summary (redacted)",
+    "",
+    knowledge,
+    "",
+    "---",
+    "",
+    "# Session record (redacted JSON)",
+    "",
+    "```json",
+    JSON.stringify(sessionJsonObject(input, redacted), null, 2),
+    "```",
+    "",
+    "---",
+    "",
+    "# Evidence manifest",
+    "",
+    "Binaries intentionally omitted from agent packs.",
+    "",
+    ...(manifest.length
+      ? manifest.map(
+          (file) =>
+            `- ${file.filename} (${file.mimeType}, ${file.size} bytes)${file.description ? ` — ${file.description}` : ""}`,
+        )
+      : ["- No attachments."]),
+    "",
+  ].join("\n");
 }
