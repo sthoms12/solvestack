@@ -174,9 +174,10 @@ const blankResolution = (): Resolution => ({
   validation: "",
   prevention: "",
 });
+const SEED_SESSION_ID = "SS-20260818-001";
 const seed: Session = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
-  id: "SS-20260818-001",
+  id: SEED_SESSION_ID,
   title: "Outbound mail delayed for select users",
   problem:
     "Three users report delayed outbound mail. Determine whether the external gateway or Exchange Online is holding messages.",
@@ -463,19 +464,29 @@ function render() {
   bind();
 }
 function sessionCard(s: Session) {
-  return `<button class="session-card" data-open="${escapeHtml(s.id)}"><div class="card-top"><span class="session-id">${escapeHtml(s.id)}</span>${statusPill(s.status)}</div><h3>${escapeHtml(s.title)}</h3><p>${escapeHtml(s.problem)}</p><div class="card-meta"><span>${escapeHtml(s.system || "Unspecified")}</span><span>${s.entries.length} entries</span><span>${dateLabel(s.updatedAt)}</span></div><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></button>`;
+  return `<button class="session-card" data-open="${escapeHtml(s.id)}"><div class="card-top"><span class="session-id">${escapeHtml(s.id)}</span><span class="card-pills">${s.id === SEED_SESSION_ID ? '<span class="status example">Example</span>' : ""}${statusPill(s.status)}</span></div><h3>${escapeHtml(s.title)}</h3><p>${escapeHtml(s.problem)}</p><div class="card-meta"><span>${escapeHtml(s.system || "Unspecified")}</span><span>${s.entries.length} entries</span><span>${dateLabel(s.updatedAt)}</span></div><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></button>`;
 }
 function dashboard() {
   const activeSessions = store.sessions.filter((s) => s.status === "active");
   const resolved = store.sessions.filter((s) => s.status === "resolved");
   const realSessions = store.sessions.filter(
-    (s) => s.id !== "SS-20260818-001",
+    (s) => s.id !== SEED_SESSION_ID,
   );
   const backup = backupStatus(store.lastBackupAt, new Date(), realSessions.length);
   const backupBanner = backup.needsBackup
     ? `<section class="backup-banner" role="status"><span><strong>${escapeHtml(backup.label)}.</strong> Your investigations live only in this browser — clearing site data removes them.</span><button class="secondary small-button" id="backup-now">Back up now</button></section>`
     : "";
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">Good morning, engineer. Pick up where the evidence left off.</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div><div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
+  // First-run state (panel up, no real sessions yet): lead with the
+  // proposition instead of a greeting that presumes a returning user.
+  const firstRun = !welcomeDismissed && realSessions.length === 0;
+  const lede = firstRun
+    ? "A field notebook for troubleshooting: capture the investigation while it happens — what you observe, try, and rule out — then turn the fix into knowledge you can reuse."
+    : "Good morning, engineer. Pick up where the evidence left off.";
+  const exampleNote =
+    realSessions.length === 0 && activeSessions.length
+      ? '<p class="example-note">The session below is a worked example — open it to see how a finished investigation reads.</p>'
+      : "";
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
 }
 function patternDesk() {
   const patterns = buildPatterns(store.sessions);
@@ -550,7 +561,7 @@ function knowledgeArticleView(s: Session) {
   return `<header class="workspace-header"><button class="back-button" id="kb-back">${icon("back")} Knowledge</button><div class="workspace-actions"><button class="secondary" data-open="${escapeHtml(s.id)}">Open session</button><button class="secondary" id="kb-export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="kb-export-runbook">Runbook MD</button><button class="secondary" id="kb-export-agent" title="Redacted pack for approved AI tools">Agent pack</button></div></header><div class="knowledge-article"><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")} <span class="slash">/</span> RESOLVED ${dateLabel(s.resolvedAt || s.updatedAt)}</div><h1>${escapeHtml(s.title)}</h1><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div>${para("PROBLEM", s.problem)}${starred.length ? `<section class="article-section"><span class="section-kicker">KEY FINDINGS</span><ul>${starred.map((e) => `<li>${escapeHtml(e.content)}</li>`).join("")}</ul></section>` : ""}${para("ROOT CAUSE", s.resolution.rootCause)}${para("RESOLUTION", s.resolution.fix)}${para("VALIDATION", s.resolution.validation)}${para("PREVENTION", s.resolution.prevention)}${ruledOut.length ? `<section class="article-section"><span class="section-kicker">RULED OUT</span><ul>${ruledOut.map((h) => `<li><strong>${escapeHtml(h.text)}</strong>${h.reasoning ? ` — ${escapeHtml(h.reasoning)}` : ""}</li>`).join("")}</ul></section>` : ""}${timeline.length ? `<section class="article-section"><span class="section-kicker">TIMELINE</span><ul>${timeline.map((e) => `<li><time>${dateLabel(e.timestamp)}</time> <strong>${escapeHtml(e.type)}</strong> — ${escapeHtml(e.content)}</li>`).join("")}</ul></section>` : ""}${related.length ? `<section class="article-section"><span class="section-kicker">RELATED INVESTIGATIONS</span><div class="related-list">${related.map(({ session, reasons }) => `<button class="search-result" ${session.status === "resolved" ? `data-article="${escapeHtml(session.id)}"` : `data-open="${escapeHtml(session.id)}"`}><strong>${escapeHtml(session.title)}</strong><small>${reasons.join(" · ")}</small></button>`).join("")}</div></section>` : ""}</div>`;
 }
 function welcomePanel() {
-  return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Keep the investigation understandable while you solve it.</h2><p>Capture what you observe, try, rule out, and resolve. SolveStack keeps the working record on this device, then turns it into portable troubleshooting knowledge.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
+  return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Troubleshooting, written down while it happens.</h2><p>Start a session when something breaks. Capture what you observe, what you try, and what you rule out — when it's fixed, the same session becomes a knowledge article or a runbook for next time. Everything stays in this browser.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>Free. No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
 }
 function guideDialog() {
   return `<dialog id="guide-dialog" class="guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / 01–06</span><h2>How SolveStack works</h2><p>Use it when a technical problem involves multiple tests, possible causes, evidence, or decisions worth preserving.</p></div><button class="guide-close" value="close" aria-label="Close guide">×</button></header><ol class="guide-steps"><li><b>Capture</b><span>Start a session as troubleshooting begins. Record observations, commands, errors, screenshots, and references as they happen.</span></li><li><b>Structure</b><span>Label entries by reasoning type so another engineer can follow what you knew and when you knew it.</span></li><li><b>Investigate</b><span>Track hypotheses, next steps, evidence, and the current focus without turning the work into a ticket form.</span></li><li><b>Rule out</b><span>Keep failed theories and explain why they were eliminated. Dead ends are valuable troubleshooting knowledge.</span></li><li><b>Resolve</b><span>Record the root cause, fix, validation, and prevention while the details are still fresh.</span></li><li><b>Reuse</b><span>Export Markdown, HTML, JSON, or a ZIP package. Store the result in your existing knowledge system.</span></li></ol><section class="guide-example"><span class="section-kicker">EXAMPLE INVESTIGATION</span><strong>Exchange Online outbound mail delay</strong><p>Capture affected users, service-health checks, message traces, connector tests, the gateway hypothesis, why other causes were ruled out, and how delivery was validated after the fix.</p></section><footer><p><strong>Built for:</strong> IT engineers, administrators, support specialists, consultants, and technical problem-solvers.</p><p><strong>Not designed as:</strong> a ticketing system, incident-management platform, cloud knowledge base, or AI assistant.</p><button class="secondary" id="guide-to-data" value="close">See what exports can become</button><button class="primary" value="close">Got it</button></footer></form></dialog>`;
@@ -1140,25 +1151,45 @@ function bind() {
     pendingMethod = null;
     if (location.search.includes("method=") || location.hash.startsWith("#method="))
       history.replaceState(null, "", "/");
-    const values = await collectFields("Start a troubleshooting session", [
-      {
-        name: "method",
-        label: "Investigation method",
-        value: preferred,
-        options: BLUEPRINTS.map((blueprint) => ({
-          value: blueprint.id,
-          label: `${blueprint.kind === "incident" ? `Incident: ${blueprint.label}` : blueprint.label} — ${blueprint.description}`,
-        })),
-      },
-      {
-        name: "problem",
-        label: "What’s happening?",
-        multiline: true,
-        required: true,
-      },
-      { name: "system", label: "System / product (optional)" },
-      { name: "tags", label: "Tags, separated by commas (optional)" },
-    ]);
+    const values = await collectFields(
+      "Start a troubleshooting session",
+      [
+        {
+          name: "method",
+          label: "Investigation method",
+          value: preferred,
+          options: BLUEPRINTS.map((blueprint) => ({
+            value: blueprint.id,
+            label:
+              blueprint.kind === "incident"
+                ? `Incident: ${blueprint.label}`
+                : blueprint.label,
+          })),
+          optionHints: Object.fromEntries(
+            BLUEPRINTS.map((blueprint) => [
+              blueprint.id,
+              blueprint.kind === "incident"
+                ? "Pre-fills a starting focus, the first checks as next steps, and the likely causes to rule in or out. You can edit or delete any of it."
+                : blueprint.id === "blank"
+                  ? "An empty session. Add entries, hypotheses, and next steps as you go."
+                  : "Pre-fills the method's working structure — a focus line, a scratchpad scaffold, and starter tasks. Edit anything as the investigation develops.",
+            ]),
+          ),
+        },
+        {
+          name: "problem",
+          label: "What’s happening?",
+          multiline: true,
+          required: true,
+          placeholder:
+            blueprintById(preferred).exampleProblem ||
+            "e.g. Users in one office can't reach the file server since this morning's firewall change.",
+        },
+        { name: "system", label: "System / product (optional)" },
+        { name: "tags", label: "Tags, separated by commas (optional)" },
+      ],
+      { confirmLabel: "Start session" },
+    );
     if (!values?.problem.trim()) return;
     const blueprint = blueprintById(values.method);
     const stamp = now();

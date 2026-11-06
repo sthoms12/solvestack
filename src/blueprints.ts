@@ -42,6 +42,8 @@ export type Blueprint = {
   tags: string[];
   currentFocus: string;
   scratchpad: string;
+  /** Example "What's happening?" text shown as the start dialog placeholder. */
+  exampleProblem?: string;
   hypotheses: string[];
   tasks: string[];
   entries: BlueprintEntrySeed[];
@@ -195,6 +197,8 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "vpn-outage",
+    exampleProblem:
+      "e.g. Remote staff can't connect to the VPN since about 09:00 — the gateway shows up, but no traffic passes.",
     kind: "incident",
     label: "VPN / remote access outage",
     shortLabel: "VPN outage",
@@ -232,6 +236,8 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "sign-in-failure",
+    exampleProblem:
+      "e.g. Several users get 'password incorrect' on the new SSO portal this morning, though their passwords haven't changed.",
     kind: "incident",
     label: "SSO / sign-in failure",
     shortLabel: "Sign-in failure",
@@ -270,6 +276,8 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "cert-expired",
+    exampleProblem:
+      "e.g. The customer portal shows a certificate-expired warning in every browser, and visitors are bouncing.",
     kind: "incident",
     label: "Expired certificate / TLS failure",
     shortLabel: "Cert expired",
@@ -307,6 +315,8 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "dns-failure",
+    exampleProblem:
+      "e.g. Internal hostnames stopped resolving after last night's DNS change; IP addresses still work.",
     kind: "incident",
     label: "DNS resolution failure",
     shortLabel: "DNS failure",
@@ -344,6 +354,8 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "disk-full",
+    exampleProblem:
+      "e.g. The file server's data volume hit 100% overnight and the shares have gone read-only.",
     kind: "incident",
     label: "Disk full / storage exhaustion",
     shortLabel: "Disk full",
@@ -381,6 +393,8 @@ export const BLUEPRINTS: Blueprint[] = [
   },
   {
     id: "email-delivery",
+    exampleProblem:
+      "e.g. Invoices sent since Tuesday land in spam for Gmail recipients; other domains are fine.",
     kind: "incident",
     label: "Email delivery failure",
     shortLabel: "Email delivery",
