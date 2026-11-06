@@ -43,7 +43,11 @@ export function collectFields(
   return new Promise((resolve) => {
     const dialog = document.createElement("dialog");
     dialog.className = "form-dialog";
-    dialog.innerHTML = `<form method="dialog"><span class="section-kicker">SOLVESTACK</span><h2>${escape(title)}</h2>${fields.map(fieldMarkup).join("")}<div class="button-row"><button value="cancel" class="secondary">Cancel</button><button value="confirm" class="primary">Save</button></div></form>`;
+    // The Cancel button carries formnovalidate: as a submit button in a
+    // method="dialog" form it would otherwise run native validation, and a
+    // single empty required field would make Cancel unclickable — on a
+    // phone, with no Esc key, the dialog becomes a trap.
+    dialog.innerHTML = `<form method="dialog"><span class="section-kicker">SOLVESTACK</span><h2>${escape(title)}</h2>${fields.map(fieldMarkup).join("")}<div class="button-row"><button value="cancel" class="secondary" formnovalidate>Cancel</button><button value="confirm" class="primary">Save</button></div></form>`;
     document.body.append(dialog);
     dialog.addEventListener("close", () => {
       const result =
@@ -55,7 +59,18 @@ export function collectFields(
       dialog.remove();
       resolve(result);
     });
+    // Backdrop click dismisses, like Cancel (a showModal dialog gives
+    // touch users no other chrome-level exit).
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) {
+        dialog.returnValue = "cancel";
+        dialog.close();
+      }
+    });
     dialog.showModal();
-    dialog.querySelector<HTMLElement>("input,textarea,select")?.focus();
+    // Autofocus is a desktop speed-up; on touch devices it summons the
+    // keyboard before the user has decided to type anything.
+    if (window.matchMedia("(pointer: fine)").matches)
+      dialog.querySelector<HTMLElement>("input,textarea,select")?.focus();
   });
 }
