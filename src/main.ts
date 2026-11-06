@@ -32,8 +32,10 @@ import {
 } from "./vault";
 import {
   buildAgentPackFiles,
+  buildDeltaSession,
   buildPastePack,
   redactSessionForAgent,
+  type PackMarker,
 } from "./agent-pack";
 import { AGENT_TASKS, agentTaskById, buildAgentPrompt } from "./agent-tasks";
 import { aiHandoffById, buildHandoffUrl } from "./ai-handoff";
@@ -894,10 +896,55 @@ async function makeZip(s: Session) {
   }
   download(`${s.id}-knowledge-package.zip`, zipBytes(files), "application/zip");
 }
+/** Delta-pack markers: device-local metadata (deliberately not session
+ * schema) recording when the last pack left and the hypothesis states at
+ * that moment, so the next export can offer "changes since last pack". */
+const packMarkerKey = (id: string) => `solvestack-lastpack-${id}`;
+function resolutionKey(s: Session): string {
+  const text = JSON.stringify(s.resolution);
+  let hash = 0;
+  for (let i = 0; i < text.length; i++)
+    hash = (hash * 31 + text.charCodeAt(i)) | 0;
+  return hash.toString(36);
+}
+function readPackMarker(id: string): PackMarker | null {
+  try {
+    const raw = localStorage.getItem(packMarkerKey(id));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PackMarker;
+    if (
+      typeof parsed?.at !== "string" ||
+      typeof parsed?.hypothesisStates !== "object" ||
+      !parsed.hypothesisStates
+    )
+      return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+function writePackMarker(s: Session) {
+  try {
+    localStorage.setItem(
+      packMarkerKey(s.id),
+      JSON.stringify({
+        at: now(),
+        hypothesisStates: Object.fromEntries(
+          s.hypotheses.map((h) => [h.text, h.status]),
+        ),
+        resolutionKey: resolutionKey(s),
+      }),
+    );
+  } catch {
+    // Storage full/blocked: delta packs simply stop being offered.
+  }
+}
+
 async function makeAgentPack(s: Session) {
   // One dialog up front: what should the AI do with the pack, and in which
   // format? Dismissing it falls back to the plain pack, exactly as before
   // tasks existed.
+  const marker = readPackMarker(s.id);
   const values = await collectFields("Export an agent pack", [
     {
       name: "task",
@@ -926,7 +973,47 @@ async function makeAgentPack(s: Session) {
         },
       ],
     },
+    ...(marker
+      ? [
+          {
+            name: "scope",
+            label: `Pack scope — last pack ${dateLabel(marker.at)}`,
+            value: "full",
+            options: [
+              { value: "full", label: "Full pack — the whole record" },
+              {
+                value: "delta",
+                label:
+                  "Changes since last pack — new entries + changed hypotheses",
+              },
+            ],
+          },
+        ]
+      : []),
   ]);
+  // Delta scope: filter to changes since the marker before any format
+  // path runs, so ZIP, paste, and handoff all send the same record.
+  let packSession: Session = s;
+  let deltaSince: string | undefined;
+  if (values?.scope === "delta" && marker) {
+    const delta = buildDeltaSession(s, marker);
+    const resolutionChanged =
+      marker.resolutionKey !== undefined &&
+      marker.resolutionKey !== resolutionKey(s);
+    if (
+      delta.changedEntries === 0 &&
+      delta.changedHypotheses === 0 &&
+      !resolutionChanged
+    ) {
+      showToast(
+        `Nothing changed since the last pack (${dateLabel(marker.at)}) — a full pack is the useful export here.`,
+        { durationMs: 8000 },
+      );
+      return;
+    }
+    packSession = delta.session;
+    deltaSince = marker.at;
+  }
   const encoder = new TextEncoder();
   const attachments = store.attachments
     .filter((a) => a.sessionId === s.id)
@@ -945,16 +1032,18 @@ async function makeAgentPack(s: Session) {
     // the pack already copied. See src/ai-handoff.ts.
     const task = agentTaskById(values.task);
     const pastePack = buildPastePack({
-      session: s,
-      knowledgeMarkdown: knowledgeMarkdown(s),
+      session: packSession,
+      knowledgeMarkdown: knowledgeMarkdown(packSession),
       attachments,
       schemaVersion: CURRENT_SCHEMA_VERSION,
       taskId: task.id,
+      deltaSince,
     });
     const prompt = buildAgentPrompt(
-      redactSessionForAgent(s),
+      redactSessionForAgent(packSession),
       task,
       "handoff",
+      deltaSince,
     );
     let copied = true;
     try {
@@ -984,6 +1073,7 @@ async function makeAgentPack(s: Session) {
       showToast(
         `Pack copied — if the prompt isn't filled in, paste into ${handoff.label} and send.`,
       );
+    writePackMarker(s);
     return;
   }
   if (values?.format === "paste") {
@@ -991,23 +1081,26 @@ async function makeAgentPack(s: Session) {
       `${s.id}-ai-pack.md`,
       encoder.encode(
         buildPastePack({
-          session: s,
-          knowledgeMarkdown: knowledgeMarkdown(s),
+          session: packSession,
+          knowledgeMarkdown: knowledgeMarkdown(packSession),
           attachments,
           schemaVersion: CURRENT_SCHEMA_VERSION,
           taskId: agentTaskById(values.task).id,
+          deltaSince,
         }),
       ),
       "text/markdown",
     );
+    writePackMarker(s);
     return;
   }
   const pack = buildAgentPackFiles({
-    session: s,
-    knowledgeMarkdown: knowledgeMarkdown(s),
+    session: packSession,
+    knowledgeMarkdown: knowledgeMarkdown(packSession),
     attachments,
     schemaVersion: CURRENT_SCHEMA_VERSION,
     taskId: values ? agentTaskById(values.task).id : undefined,
+    deltaSince,
   });
   download(
     `${s.id}-agent-pack.zip`,
@@ -1019,6 +1112,7 @@ async function makeAgentPack(s: Session) {
     ),
     "application/zip",
   );
+  writePackMarker(s);
 }
 
 /** Itemized preview of an AI reply plan; resolves true only on Apply. */
