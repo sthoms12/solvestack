@@ -1445,6 +1445,7 @@ function bind() {
       validation: values.validation,
       prevention: values.prevention,
     };
+    const firstResolve = s.status !== "resolved";
     s.status = "resolved";
     s.resolvedAt = s.resolvedAt || now();
     s.updatedAt = now();
@@ -1461,6 +1462,9 @@ function bind() {
         attachmentIds: [],
       });
     await persist();
+    if (firstResolve) {
+      try { (window as unknown as { glass?: { capture: (event: string) => void } }).glass?.capture("case_resolved"); } catch { /* analytics is best-effort */ }
+    }
     render();
     if (backupStatus(store.lastBackupAt).needsBackup) {
       showToast("Session resolved — back up your workspace?", {
