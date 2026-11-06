@@ -1,4 +1,4 @@
-const CACHE = "solvestack-v9";
+const CACHE = "solvestack-v10";
 
 // Every page and static file precached on install, so the whole site works
 // offline on a first visit — not only after a page was visited once.
@@ -16,6 +16,7 @@ const PRECACHE_URLS = [
   "/fonts/dm-mono-500.woff2",
   "/use-your-data/",
   "/use-your-data/guide.css",
+  "/agent-adapter/",
   "/rca-template/",
   "/rca-template/template.css",
   "/5-whys-template/",

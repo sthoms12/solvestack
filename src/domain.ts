@@ -83,7 +83,7 @@ export function parsePortableData(value: unknown) {
   if (!value || typeof value !== "object")
     throw new Error("Unsupported or corrupt SolveStack file.");
   const input = value as Record<string, unknown>;
-  if (![1, 2].includes(Number(input.schemaVersion)))
+  if (![1, 2, 3].includes(Number(input.schemaVersion)))
     throw new Error("Unsupported SolveStack schema version.");
   if (input.session && typeof input.session === "object") {
     const session = input.session as Record<string, unknown>;

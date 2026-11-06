@@ -2,18 +2,19 @@
 
 SolveStack stores one versioned workspace record in IndexedDB under the `workspace` object store and `data` key.
 
-The current persisted format is `schemaVersion: 2`. A workspace contains `sessions` and normalized `attachments`. Session records own entries, hypotheses, tasks, scratchpad text, resolution fields, and metadata. Attachment records retain the original data URL and relationship IDs.
+The current persisted format is `schemaVersion: 3`. A workspace contains `sessions` and normalized `attachments`. Session records own entries, hypotheses, tasks, scratchpad text, resolution fields, and metadata (including optional `blueprint` method id). Attachment records may keep an inline data URL and/or an OPFS `blobRef` (`opfs:<attachmentId>`).
 
-`src/migrations.ts` contains the executable migration boundary. Version 1 workspaces upgrade deterministically to version 2 by adding session metadata plus entry and hypothesis creation/update timestamps. Future versions are rejected without overwriting local data.
+`src/migrations.ts` contains the executable migration boundary. Version 1 workspaces upgrade to version 2 (session metadata + timestamps), then to version 3 (optional `blobRef` on attachments). Future versions are rejected without overwriting local data.
 
 ## Data safety (P0)
 
 - `lastBackupAt` (ISO string, optional) records the last full backup
   download on the workspace record. It is set by the Backup button, by a
-  successful restore, and survives migration (unknown top-level fields are
-  preserved). Absent means "never backed up". The dashboard shows a banner
-  while a backup is due (never, or 7+ days old with real sessions) and
-  Settings shows the same status next to the backup controls.
+  successful restore or vault import, by encrypted vault export, and survives
+  migration (unknown top-level fields are preserved). Absent means "never
+  backed up". The dashboard shows a banner while a backup is due (never, or
+  7+ days old with real sessions) and Settings shows the same status next to
+  the backup controls.
 - Writes are serialised: `persist()` in `src/main.ts` queues full-workspace
   IndexedDB transactions instead of interleaving them, updates the save
   status in place, and never re-renders. Callers that changed data render
@@ -29,7 +30,20 @@ The current persisted format is `schemaVersion: 2`. A workspace contains `sessio
 - Storage is requested as persistent (`navigator.storage.persist()`) on
   load, best-effort. Settings shows the real quota from
   `navigator.storage.estimate()` when available, falling back to the
-  evidence-only estimate.
+  evidence-only estimate. Large attachments prefer the Origin Private File
+  System when the browser supports it.
+
+## Encrypted vault
+
+Settings can export an AES-GCM vault (`format: solvestack-vault`) derived
+from a user passphrase via PBKDF2. The passphrase never leaves the browser
+except as key material computed locally. Import decrypts then merges with
+the same conflict policy as JSON backup restore.
+
+## Agent pack
+
+Session export can produce a redaction-first ZIP for organization-approved
+AI tools. Binaries are omitted; see `/agent-adapter/`.
 
 Future migrations must:
 

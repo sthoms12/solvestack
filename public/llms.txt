@@ -6,6 +6,7 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 
 - https://solvestack-ai.app/ — product and workflow overview
 - https://solvestack-ai.app/use-your-data/ — guide to turning exports into durable troubleshooting knowledge
+- https://solvestack-ai.app/agent-adapter/ — bring-your-own agent pack protocol (redaction-first, no hosted model)
 - https://solvestack-ai.app/rca-template/ — root cause analysis template for IT incidents
 - https://solvestack-ai.app/5-whys-template/ — 5 whys template with a worked IT example
 - https://solvestack-ai.app/fishbone-diagram-template/ — fishbone (Ishikawa) diagram template with the 6M categories, a worksheet, and a blank CSV
@@ -14,7 +15,8 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 
 ## Product boundaries
 
-- Core data stays in IndexedDB in the current browser profile.
+- Core data stays in IndexedDB in the current browser profile (large evidence may use OPFS).
 - SolveStack has no account, cloud database, or built-in AI service.
-- Users choose when to export Markdown, HTML, JSON, backups, or ZIP knowledge packages.
+- Method deep links: `/?method=rca`, `/?method=5-whys`, `/?method=fishbone`, `/?method=incident-report`.
+- Users choose when to export Markdown, HTML, JSON, backups, ZIP knowledge packages, encrypted vaults, or redacted agent packs.
 - Exported records should be redacted before they are shared with external tools.

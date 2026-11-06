@@ -29,6 +29,7 @@ const buildFiles = [
   "dist/sitemap.xml",
   "dist/use-your-data/index.html",
   "dist/use-your-data/guide.css",
+  "dist/agent-adapter/index.html",
   "dist/rca-template/index.html",
   "dist/rca-template/template.css",
   "dist/5-whys-template/index.html",
@@ -65,14 +66,14 @@ assert.equal(
   true,
 );
 assert.equal(
-  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v9"),
+  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v10"),
   true,
 );
 // The build injects the hashed assets into the shipped service worker.
 const shippedSw = await Bun.file("dist/service-worker.js").text();
 assert.equal(shippedSw.includes("__PRECACHE_ASSETS__"), false);
 assert.equal(shippedSw.includes("/assets/"), true);
-assert.equal(shippedSw.includes("solvestack-v9"), true);
+assert.equal(shippedSw.includes("solvestack-v10"), true);
 const productionOrigin = "https://solvestack-ai.app/";
 assert.equal(
   (await Bun.file("index.html").text()).includes(

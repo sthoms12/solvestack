@@ -75,8 +75,11 @@ test("portable parser accepts session exports and full backups", () => {
 
 test("portable parser rejects corrupt and future formats", () => {
   expect(() =>
-    parsePortableData({ schemaVersion: 3, sessions: [], attachments: [] }),
+    parsePortableData({ schemaVersion: 4, sessions: [], attachments: [] }),
   ).toThrow("schema version");
+  expect(
+    parsePortableData({ schemaVersion: 3, sessions: [], attachments: [] }).kind,
+  ).toBe("backup");
   expect(() =>
     parsePortableData({
       schemaVersion: 1,
