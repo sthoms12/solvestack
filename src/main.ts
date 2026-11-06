@@ -392,7 +392,7 @@ const refreshStorageEstimate = async () => {
 };
 const active = () => store.sessions.find((s) => s.id === activeId);
 const statusPill = (status: string) =>
-  `<span class="status ${status}">${status}</span>`;
+  `<span class="status ${escapeHtml(status)}">${escapeHtml(status)}</span>`;
 const icon = (name: string) =>
   (
     ({
@@ -447,7 +447,7 @@ function render() {
   bind();
 }
 function sessionCard(s: Session) {
-  return `<button class="session-card" data-open="${s.id}"><div class="card-top"><span class="session-id">${s.id}</span>${statusPill(s.status)}</div><h3>${escapeHtml(s.title)}</h3><p>${escapeHtml(s.problem)}</p><div class="card-meta"><span>${escapeHtml(s.system || "Unspecified")}</span><span>${s.entries.length} entries</span><span>${dateLabel(s.updatedAt)}</span></div><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></button>`;
+  return `<button class="session-card" data-open="${escapeHtml(s.id)}"><div class="card-top"><span class="session-id">${escapeHtml(s.id)}</span>${statusPill(s.status)}</div><h3>${escapeHtml(s.title)}</h3><p>${escapeHtml(s.problem)}</p><div class="card-meta"><span>${escapeHtml(s.system || "Unspecified")}</span><span>${s.entries.length} entries</span><span>${dateLabel(s.updatedAt)}</span></div><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></button>`;
 }
 function dashboard() {
   const activeSessions = store.sessions.filter((s) => s.status === "active");
@@ -484,7 +484,7 @@ function patternDesk() {
                       .slice(0, 4)
                       .map(
                         (id) =>
-                          `<button class="text-button" data-open="${id}">Open ${escapeHtml(id)}</button>`,
+                          `<button class="text-button" data-open="${escapeHtml(id)}">Open ${escapeHtml(id)}</button>`,
                       )
                       .join("")}</div></article>`,
                 )
@@ -510,7 +510,7 @@ function searchResults() {
     ? found
         .map(
           ({ session, reasons }) =>
-            `<button class="search-result" data-open="${session.id}"><strong>${escapeHtml(session.title)}</strong><small>${reasons.join(" · ")}</small></button>`,
+            `<button class="search-result" data-open="${escapeHtml(session.id)}"><strong>${escapeHtml(session.title)}</strong><small>${reasons.join(" · ")}</small></button>`,
         )
         .join("")
     : `<p class="search-hint">No investigations matched “${escapeHtml(search)}”.</p>`;
@@ -522,9 +522,9 @@ function entryView(e: Entry) {
   const copy = ["Command", "Command output", "Log", "Error"].includes(
     e.technicalType,
   )
-    ? `<button data-copy-entry="${e.id}" aria-label="Copy ${e.technicalType}">Copy</button>`
+    ? `<button data-copy-entry="${escapeHtml(e.id)}" aria-label="Copy ${escapeHtml(e.technicalType)}">Copy</button>`
     : "";
-  return `<article class="entry ${e.starred ? "starred" : ""}"><div class="entry-rail"><span class="entry-dot ${e.type.toLowerCase()}"></span><span class="entry-line"></span></div><div class="entry-body"><div class="entry-meta"><span class="entry-type">${e.type}${e.technicalType ? ` · ${e.technicalType}` : ""}</span><time>${dateLabel(e.timestamp)}</time><div class="entry-actions">${copy}<button data-edit-entry="${e.id}" aria-label="Edit entry">Edit</button><button data-star="${e.id}" aria-label="Star entry">${e.starred ? icon("star") : "☆"}</button><button data-delete="${e.id}" aria-label="Delete entry">×</button></div></div><pre class="entry-content ${e.technicalType ? "technical" : ""}">${escapeHtml(e.content)}</pre>${attachments.map((a) => `<div class="attachment-line"><span>📎 ${escapeHtml(a.filename)}${a.description ? ` — ${escapeHtml(a.description)}` : ""}</span><button class="attachment-remove" data-remove-attachment="${a.id}" aria-label="Remove ${escapeHtml(a.filename)}">Remove evidence</button></div>`).join("")}</div></article>`;
+  return `<article class="entry ${e.starred ? "starred" : ""}"><div class="entry-rail"><span class="entry-dot ${escapeHtml(e.type.toLowerCase())}"></span><span class="entry-line"></span></div><div class="entry-body"><div class="entry-meta"><span class="entry-type">${escapeHtml(e.type)}${e.technicalType ? ` · ${escapeHtml(e.technicalType)}` : ""}</span><time>${dateLabel(e.timestamp)}</time><div class="entry-actions">${copy}<button data-edit-entry="${escapeHtml(e.id)}" aria-label="Edit entry">Edit</button><button data-star="${escapeHtml(e.id)}" aria-label="Star entry">${e.starred ? icon("star") : "☆"}</button><button data-delete="${escapeHtml(e.id)}" aria-label="Delete entry">×</button></div></div><pre class="entry-content ${e.technicalType ? "technical" : ""}">${escapeHtml(e.content)}</pre>${attachments.map((a) => `<div class="attachment-line"><span>📎 ${escapeHtml(a.filename)}${a.description ? ` — ${escapeHtml(a.description)}` : ""}</span><button class="attachment-remove" data-remove-attachment="${escapeHtml(a.id)}" aria-label="Remove ${escapeHtml(a.filename)}">Remove evidence</button></div>`).join("")}</div></article>`;
 }
 function workspace() {
   const s = active();
@@ -532,7 +532,7 @@ function workspace() {
   const methodId =
     typeof s.metadata?.blueprint === "string" ? s.metadata.blueprint : "";
   const method = methodId ? blueprintById(methodId) : null;
-  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${s.id} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
+  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
     s.entries
       .slice()
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
@@ -544,10 +544,10 @@ function focusView(s: Session) {
   return `<section class="context-block focus-block"><div class="block-heading"><span class="section-kicker">CURRENT FOCUS</span><button id="edit-focus">Edit</button></div><p>${escapeHtml(s.currentFocus || "Set a focus to keep the investigation pointed.")}</p></section>`;
 }
 function hypothesesView(s: Session) {
-  return `<section class="context-block"><div class="block-heading"><span class="section-kicker">HYPOTHESES <b>${s.hypotheses.length}</b></span><button id="add-hyp" aria-label="Add hypothesis">${icon("plus")}</button></div>${s.hypotheses.map((h) => `<div class="hypothesis"><div class="hyp-top"><span class="hyp-status ${h.status.toLowerCase().replace(" ", "-")}"></span><strong>${escapeHtml(h.text)}</strong><select aria-label="Status for ${escapeHtml(h.text)}" data-hyp="${h.id}">${["Investigating", "Likely", "Confirmed", "Ruled Out"].map((st) => `<option ${st === h.status ? "selected" : ""}>${st}</option>`).join("")}</select></div>${h.reasoning ? `<p>${escapeHtml(h.reasoning)}</p>` : ""}</div>`).join("")}</section>`;
+  return `<section class="context-block"><div class="block-heading"><span class="section-kicker">HYPOTHESES <b>${s.hypotheses.length}</b></span><button id="add-hyp" aria-label="Add hypothesis">${icon("plus")}</button></div>${s.hypotheses.map((h) => `<div class="hypothesis"><div class="hyp-top"><span class="hyp-status ${escapeHtml(h.status.toLowerCase().replace(" ", "-"))}"></span><strong>${escapeHtml(h.text)}</strong><select aria-label="Status for ${escapeHtml(h.text)}" data-hyp="${escapeHtml(h.id)}">${["Investigating", "Likely", "Confirmed", "Ruled Out"].map((st) => `<option ${st === h.status ? "selected" : ""}>${st}</option>`).join("")}</select></div>${h.reasoning ? `<p>${escapeHtml(h.reasoning)}</p>` : ""}</div>`).join("")}</section>`;
 }
 function tasksView(s: Session) {
-  return `<section class="context-block"><div class="block-heading"><span class="section-kicker">NEXT STEPS <b>${s.tasks.filter((t) => !t.completed).length}</b></span><button id="add-task" aria-label="Add next step">${icon("plus")}</button></div>${s.tasks.map((t) => `<label class="task ${t.completed ? "done" : ""}"><input type="checkbox" aria-label="${escapeHtml(t.text)}" data-task="${t.id}" ${t.completed ? "checked" : ""}/><span>${escapeHtml(t.text)}</span></label>`).join("")}</section>`;
+  return `<section class="context-block"><div class="block-heading"><span class="section-kicker">NEXT STEPS <b>${s.tasks.filter((t) => !t.completed).length}</b></span><button id="add-task" aria-label="Add next step">${icon("plus")}</button></div>${s.tasks.map((t) => `<label class="task ${t.completed ? "done" : ""}"><input type="checkbox" aria-label="${escapeHtml(t.text)}" data-task="${escapeHtml(t.id)}" ${t.completed ? "checked" : ""}/><span>${escapeHtml(t.text)}</span></label>`).join("")}</section>`;
 }
 function scratchpadView(s: Session) {
   return `<section class="context-block scratch"><div class="block-heading"><span class="section-kicker">SCRATCHPAD</span><span class="autosave">autosaves</span></div><label class="sr-only" for="scratchpad">Scratchpad notes</label><textarea id="scratchpad" aria-label="Scratchpad notes" placeholder="Think out loud…">${escapeHtml(s.scratchpad)}</textarea><div class="button-row"><button class="text-button" id="scratch-to-entry">Convert selection to entry</button><button class="text-button" id="redact-selection">Redact selected text</button></div></section>`;
@@ -555,7 +555,7 @@ function scratchpadView(s: Session) {
 function relatedView(s: Session) {
   const matches = relatedSessions(s, store.sessions);
   return matches.length
-    ? `<section class="context-block"><div class="block-heading"><span class="section-kicker">RELATED INVESTIGATIONS</span></div>${matches.map(({ session, reasons }) => `<button class="related-link" data-related="${session.id}"><span>${escapeHtml(session.title)}</span><small>${reasons.join(" · ")}</small></button>`).join("")}</section>`
+    ? `<section class="context-block"><div class="block-heading"><span class="section-kicker">RELATED INVESTIGATIONS</span></div>${matches.map(({ session, reasons }) => `<button class="related-link" data-related="${escapeHtml(session.id)}"><span>${escapeHtml(session.title)}</span><small>${reasons.join(" · ")}</small></button>`).join("")}</section>`
     : "";
 }
 function reuseDialog() {
@@ -646,6 +646,7 @@ async function standaloneHtml(s: Session) {
       const lines = part.split("\n");
       const title = i === 0 ? lines.shift()! : lines.shift()!;
       return `${i === 0 ? "<h1>" : "<h2>"}${escapeHtml(title.replace(/^# /, ""))}${i === 0 ? "</h1>" : "</h2>"}<div>${lines
+        .map((line) => escapeHtml(line))
         .join("\n")
         .replace(/^- (.*)$/gm, "<p>• $1</p>")
         .replace(/\n/g, "<br>")}</div>`;
@@ -658,7 +659,7 @@ async function standaloneHtml(s: Session) {
     if (attachment.mimeType.startsWith("image/")) {
       const src = await attachmentDataUrl(attachment);
       evidenceParts.push(
-        `<figure><img src="${src}" alt="${escapeHtml(attachment.description || attachment.filename)}"><figcaption>${escapeHtml(attachment.filename)}${attachment.description ? ` — ${escapeHtml(attachment.description)}` : ""}</figcaption></figure>`,
+        `<figure><img src="${escapeHtml(src)}" alt="${escapeHtml(attachment.description || attachment.filename)}"><figcaption>${escapeHtml(attachment.filename)}${attachment.description ? ` — ${escapeHtml(attachment.description)}` : ""}</figcaption></figure>`,
       );
     } else {
       evidenceParts.push(
@@ -768,6 +769,25 @@ function zipBytes(files: { name: string; data: Uint8Array }[]) {
   ]);
 }
 
+/**
+ * ZIP entry name for an evidence file (security audit run 1:
+ * zip-evidence-filename-path-traversal mitigation). Attachment filenames
+ * can arrive via imported JSON, so they are reduced to a basename:
+ * path separators end the name, control characters are replaced, and
+ * leading dots are stripped so an entry can never traverse out of the
+ * extraction directory.
+ */
+function evidenceEntryName(filename: string) {
+  const base = (filename.split(/[\\/]/).pop() ?? "")
+    .split("")
+    .map((ch) => {
+      const code = ch.charCodeAt(0);
+      return code < 32 || code === 127 ? "_" : ch;
+    })
+    .join("")
+    .replace(/^\.+/, "");
+  return `evidence/${base || "evidence-file"}`;
+}
 async function makeZip(s: Session) {
   const encoder = new TextEncoder();
   const files = [
@@ -800,7 +820,7 @@ async function makeZip(s: Session) {
       ? bytesFromDataUrl(dataUrl)
       : new Uint8Array();
     files.push({
-      name: `evidence/${a.filename}`,
+      name: evidenceEntryName(a.filename),
       data: bytes,
     });
   }

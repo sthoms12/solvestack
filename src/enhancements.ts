@@ -3,6 +3,18 @@ import { redactSelection, relatedSessions } from "./domain";
 import { showToast } from "./data-safety";
 import { classifyPaste } from "./smart-paste";
 
+const escapeHtml = (value: string) =>
+  value.replace(
+    /[&<>"']/g,
+    (ch) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      })[ch]!,
+  );
 const getData = () => readWorkspace<any>();
 const putData = (data: any) => writeWorkspace(data);
 const id = () =>
@@ -103,7 +115,7 @@ const wire = () => {
       const section = document.createElement("section");
       section.id = "related-investigations";
       section.className = "context-block";
-      section.innerHTML = `<div class="block-heading"><span class="section-kicker">RELATED INVESTIGATIONS</span></div>${matches.map(({ session, reasons }: any) => `<button class="related-link" data-related="${session.id}"><span>${session.title}</span><small>${reasons.join(" · ")}</small></button>`).join("")}`;
+      section.innerHTML = `<div class="block-heading"><span class="section-kicker">RELATED INVESTIGATIONS</span></div>${matches.map(({ session, reasons }: any) => `<button class="related-link" data-related="${escapeHtml(session.id)}"><span>${escapeHtml(session.title)}</span><small>${reasons.join(" · ")}</small></button>`).join("")}`;
       context.append(section);
       section.querySelectorAll<HTMLElement>("[data-related]").forEach(
         (link) =>
