@@ -29,7 +29,8 @@ import {
   encryptVault,
   isVaultEnvelope,
 } from "./vault";
-import { buildAgentPackFiles } from "./agent-pack";
+import { buildAgentPackFiles, buildPastePack } from "./agent-pack";
+import { AGENT_TASKS, agentTaskById } from "./agent-tasks";
 import {
   bytesFromDataUrl,
   canUseOpfs,
@@ -827,20 +828,62 @@ async function makeZip(s: Session) {
   download(`${s.id}-knowledge-package.zip`, zipBytes(files), "application/zip");
 }
 async function makeAgentPack(s: Session) {
+  // One dialog up front: what should the AI do with the pack, and in which
+  // format? Dismissing it falls back to the plain pack, exactly as before
+  // tasks existed.
+  const values = await collectFields("Export an agent pack", [
+    {
+      name: "task",
+      label:
+        "What should the AI do? (Works with ChatGPT, Claude, Copilot, and Gemini.)",
+      value: "review",
+      options: AGENT_TASKS.map((task) => ({
+        value: task.id,
+        label: `${task.label} — ${task.description}`,
+      })),
+    },
+    {
+      name: "format",
+      label: "Format",
+      value: "zip",
+      options: [
+        { value: "zip", label: "ZIP pack — files to upload" },
+        { value: "paste", label: "Single Markdown file — paste into a chat" },
+      ],
+    },
+  ]);
   const encoder = new TextEncoder();
+  const attachments = store.attachments
+    .filter((a) => a.sessionId === s.id)
+    .map(({ id, filename, mimeType, size, description }) => ({
+      id,
+      filename,
+      mimeType,
+      size,
+      description,
+    }));
+  if (values?.format === "paste") {
+    download(
+      `${s.id}-ai-pack.md`,
+      encoder.encode(
+        buildPastePack({
+          session: s,
+          knowledgeMarkdown: knowledgeMarkdown(s),
+          attachments,
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          taskId: agentTaskById(values.task).id,
+        }),
+      ),
+      "text/markdown",
+    );
+    return;
+  }
   const pack = buildAgentPackFiles({
     session: s,
     knowledgeMarkdown: knowledgeMarkdown(s),
-    attachments: store.attachments
-      .filter((a) => a.sessionId === s.id)
-      .map(({ id, filename, mimeType, size, description }) => ({
-        id,
-        filename,
-        mimeType,
-        size,
-        description,
-      })),
+    attachments,
     schemaVersion: CURRENT_SCHEMA_VERSION,
+    taskId: values ? agentTaskById(values.task).id : undefined,
   });
   download(
     `${s.id}-agent-pack.zip`,
@@ -1407,8 +1450,9 @@ function bind() {
       setTimeout(openDataGuide, 150);
     });
   document.querySelector("#export-agent")?.addEventListener("click", () => {
+    // No data-guide popup here: makeAgentPack opens its own dialog, and a
+    // second modal stacked on top of it would fight the export flow.
     void makeAgentPack(active()!);
-    setTimeout(openDataGuide, 150);
   });
   document.querySelector("#resolve")?.addEventListener("click", async () => {
     const s = active()!;
