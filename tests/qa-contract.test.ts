@@ -20,7 +20,10 @@ assert.match(source, /readFile\(file\)/);
 assert.match(source, /attachmentDataUrl/);
 assert.match(source, /bytesFromDataUrl/);
 assert.match(source, /putEvidenceBlob/);
-assert.match(source, /evidence\/\$\{a\.filename\}/);
+// ZIP evidence entries go through the basename sanitizer (audit run 1:
+// zip-evidence-filename-path-traversal) instead of the verbatim filename.
+assert.match(source, /evidenceEntryName\(a\.filename\)/);
+assert.match(source, /evidence\/\$\{base/);
 assert.match(source, /aria-label="Edit entry"/);
 assert.match(source, /aria-label="Delete entry"/);
 assert.match(source, /aria-label="Add hypothesis"/);

@@ -48,6 +48,25 @@ assert.match(
   /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(\)/,
 );
 assert.equal(policyLine.length <= 2000, true, "Workers _headers lines are limited to 2000 characters");
+// The document policy must allow every external origin index.html actually
+// loads. The Dataflare analytics script was added to index.html without a
+// matching CSP entry, so the browser silently blocked it (audit run 1).
+const indexHtml = await Bun.file("index.html").text();
+assert.equal(
+  indexHtml.includes("https://glass-portfolio.sthoms105.workers.dev/s.js"),
+  true,
+  "index.html should load the Dataflare analytics script",
+);
+assert.equal(
+  directives.get("script-src")?.includes("https://glass-portfolio.sthoms105.workers.dev"),
+  true,
+  "script-src must allow the Dataflare origin index.html loads",
+);
+assert.equal(
+  directives.get("connect-src")?.includes("https://glass-portfolio.sthoms105.workers.dev"),
+  true,
+  "connect-src must allow Dataflare ingest beacons",
+);
 const workerPolicy =
   headers
     .split("\n")
