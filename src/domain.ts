@@ -296,3 +296,8 @@ export function relatedSessions(
     )
     .slice(0, 3);
 }
+
+/** Escape Markdown-significant characters in a plain-text field. Shared by
+ * the Knowledge/RCA exporters in main.ts and the runbook builder. */
+export const escapeMd = (value: string) =>
+  value.replace(/[\\`*_{}\[\]()#+\-.!|>]/g, "\\$&");

@@ -1,5 +1,6 @@
 import "./style.css";
 import {
+  escapeMd,
   mergeBackup,
   parsePortableData,
   redactSelection,
@@ -36,6 +37,7 @@ import {
 } from "./agent-pack";
 import { AGENT_TASKS, agentTaskById, buildAgentPrompt } from "./agent-tasks";
 import { aiHandoffById, buildHandoffUrl } from "./ai-handoff";
+import { buildRunbook } from "./runbook";
 import {
   bytesFromDataUrl,
   canUseOpfs,
@@ -161,8 +163,6 @@ const escapeHtml = (value: string) =>
         "'": "&#039;",
       })[ch]!,
   );
-const escapeMd = (value: string) =>
-  value.replace(/[\\`*_{}\[\]()#+\-.!|>]/g, "\\$&");
 const blankResolution = (): Resolution => ({
   rootCause: "",
   fix: "",
@@ -538,7 +538,7 @@ function workspace() {
   const methodId =
     typeof s.metadata?.blueprint === "string" ? s.metadata.blueprint : "";
   const method = methodId ? blueprintById(methodId) : null;
-  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
+  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-runbook">Runbook MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
     s.entries
       .slice()
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
@@ -1479,6 +1479,20 @@ function bind() {
   document.querySelector("#export-rca")?.addEventListener("click", () => {
     const s = active()!;
     download(`${s.id}-rca.md`, rcaMarkdown(s), "text/markdown");
+    setTimeout(openDataGuide, 150);
+  });
+  document.querySelector("#export-runbook")?.addEventListener("click", () => {
+    const s = active()!;
+    const evidenceNames = s.entries
+      .flatMap((e) =>
+        e.attachmentIds.map((id) => attachmentFor(id)?.filename),
+      )
+      .filter((name): name is string => Boolean(name));
+    download(
+      `${s.id}-runbook.md`,
+      buildRunbook(s, evidenceNames),
+      "text/markdown",
+    );
     setTimeout(openDataGuide, 150);
   });
   document.querySelector("#export-json")?.addEventListener("click", () => {
