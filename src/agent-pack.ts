@@ -192,6 +192,7 @@ export function redactSessionForAgent(session: AgentPackSession): AgentPackSessi
 export function agentPackReadme(
   session: AgentPackSession,
   taskLabel?: string,
+  deltaSince?: string,
 ): string {
   const taskSection = taskLabel
     ? `
@@ -226,7 +227,7 @@ ${taskSection}
 - \`evidence-manifest.json\` — filenames and MIME types only (no file bodies)
 
 Session: ${session.id}
-Generated: ${new Date().toISOString()}
+Generated: ${new Date().toISOString()}${deltaSince ? `\nPack scope: delta — only entries added and hypotheses changed since ${deltaSince}.` : ""}
 `;
 }
 
@@ -235,7 +236,43 @@ type AgentPackInput = {
   knowledgeMarkdown: string;
   attachments: AgentPackAttachmentMeta[];
   schemaVersion: number;
+  /** When set, the pack is a delta: the session passed in is already
+   * filtered to changes since this ISO timestamp (buildDeltaSession). */
+  deltaSince?: string;
 };
+
+/** Marker recorded after each successful pack export (kept device-local
+ * by the caller — deliberately not part of the session schema). */
+export type PackMarker = {
+  at: string;
+  hypothesisStates: Record<string, string>;
+  /** Change-detection key for the resolution text (not a security hash). */
+  resolutionKey?: string;
+};
+
+/**
+ * Filter a session to what changed since a pack marker: entries created
+ * after it, and hypotheses whose status differs from the snapshot (new
+ * hypotheses included). Everything else on the session carries over, so
+ * the result feeds the normal pack builders — and the same redaction
+ * path — unchanged.
+ */
+export function buildDeltaSession<T extends AgentPackSession>(
+  session: T,
+  marker: PackMarker,
+): { session: T; changedEntries: number; changedHypotheses: number } {
+  const entries = session.entries.filter(
+    (entry) => entry.timestamp > marker.at,
+  );
+  const hypotheses = session.hypotheses.filter(
+    (hypothesis) => marker.hypothesisStates[hypothesis.text] !== hypothesis.status,
+  );
+  return {
+    session: { ...session, entries, hypotheses },
+    changedEntries: entries.length,
+    changedHypotheses: hypotheses.length,
+  };
+}
 
 function redactedAttachments(input: AgentPackInput) {
   return input.attachments.map((attachment) => ({
@@ -266,12 +303,12 @@ export function buildAgentPackFiles(
   const knowledge = redactText(input.knowledgeMarkdown);
   const task = input.taskId ? agentTaskById(input.taskId) : undefined;
   const files: { name: string; text: string }[] = [
-    { name: "AGENT.md", text: agentPackReadme(redacted, task?.label) },
+    { name: "AGENT.md", text: agentPackReadme(redacted, task?.label, input.deltaSince) },
   ];
   if (task)
     files.push({
       name: "PROMPT.md",
-      text: `${buildAgentPrompt(redacted, task)}\n`,
+      text: `${buildAgentPrompt(redacted, task, "files", input.deltaSince)}\n`,
     });
   files.push(
     { name: "knowledge.md", text: knowledge },
@@ -310,7 +347,7 @@ export function buildPastePack(
   const task = agentTaskById(input.taskId);
   const manifest = redactedAttachments(input);
   return [
-    buildAgentPrompt(redacted, task),
+    buildAgentPrompt(redacted, task, "files", input.deltaSince),
     "",
     "---",
     "",

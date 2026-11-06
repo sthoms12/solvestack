@@ -148,6 +148,7 @@ export function buildAgentPrompt(
   session: AgentPackSession,
   task: AgentTask,
   closing: AgentPromptClosing = "files",
+  deltaSince?: string,
 ): string {
   const starred = session.entries.filter((entry) => entry.starred).length;
   const tasksDone = session.tasks.filter((item) => item.completed).length;
@@ -166,6 +167,11 @@ export function buildAgentPrompt(
     `- Problem: ${session.problem}`,
     `- System: ${session.system || "Not specified"}`,
     `- Status: ${session.status}`,
+    ...(deltaSince
+      ? [
+          `- Pack scope: DELTA — only entries added and hypotheses changed since ${deltaSince} are included below. Earlier record is not shown; do not treat missing history as missing evidence.`,
+        ]
+      : []),
     `- Entries: ${session.entries.length} (${starred} starred)`,
     `- Hypotheses: ${session.hypotheses.length} (${hypothesisSummary(session)})`,
     `- Tasks: ${tasksDone}/${session.tasks.length} completed`,

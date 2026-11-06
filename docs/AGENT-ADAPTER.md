@@ -32,6 +32,18 @@ in `src/ai-reply.ts`; the contract text in `src/agent-tasks.ts`
 (`buildReplyContract`) is the single source both the prompts and the
 skill kit are generated from.
 
+## Delta packs
+
+After any successful pack export, SolveStack remembers (device-locally,
+in `localStorage` — deliberately not in the session schema) when the pack
+left and the hypothesis states at that moment. The next export dialog
+then offers **Changes since last pack**: entries created after the
+marker plus hypotheses whose status changed, through the same redaction
+path, with the prompt and `AGENT.md` marked as a delta so the model
+knows earlier record is not shown. If nothing changed, the app says so
+instead of building an empty pack. The evidence manifest still lists all
+of the session's attachments (metadata only, as always).
+
 ## The skill kit
 
 **Settings → Portability → AI skill kit** downloads a ZIP generated from
