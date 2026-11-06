@@ -39,6 +39,11 @@ import { AGENT_TASKS, agentTaskById, buildAgentPrompt } from "./agent-tasks";
 import { aiHandoffById, buildHandoffUrl } from "./ai-handoff";
 import { buildRunbook } from "./runbook";
 import {
+  filterKnowledgeArticles,
+  knowledgeSystems,
+  knowledgeTags,
+} from "./knowledge";
+import {
   bytesFromDataUrl,
   canUseOpfs,
   dataUrlFromBlobRef,
@@ -249,10 +254,13 @@ let store: Store = {
 let activeId = location.hash.startsWith("#method=")
   ? ""
   : location.hash.slice(1);
-let view: "dashboard" | "session" | "settings" | "patterns" = activeId
-  ? "session"
-  : "dashboard";
+let view: "dashboard" | "session" | "settings" | "patterns" | "knowledge" =
+  activeId ? "session" : "dashboard";
 let search = "";
+let knowledgeSearch = "";
+let knowledgeSystem = "";
+let knowledgeTag = "";
+let knowledgeArticleId: string | null = null;
 let entryType: EntryType = "Note";
 let technicalType: TechnicalType = "";
 let savedState = "Loading…";
@@ -447,9 +455,11 @@ function render() {
         ? settings()
         : view === "patterns"
           ? patternDesk()
-          : workspace();
+          : view === "knowledge"
+            ? knowledgeView()
+            : workspace();
   document.querySelector<HTMLDivElement>("#app")!.innerHTML =
-    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "patterns" ? "selected" : ""}" data-nav="patterns" aria-label="Pattern desk"><span aria-hidden="true">◈</span><b>Patterns</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button><button class="nav-item" id="open-guide" aria-label="How SolveStack works"><span aria-hidden="true">?</span><b>How it works</b></button><button class="nav-item" id="open-data-guide" aria-label="Ways to use exported troubleshooting data"><span aria-hidden="true">↗</span><b>Use your data</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${main}</main></div>${guideDialog()}${useDataDialog()}`;
+    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "patterns" ? "selected" : ""}" data-nav="patterns" aria-label="Pattern desk"><span aria-hidden="true">◈</span><b>Patterns</b></button><button class="nav-item ${view === "knowledge" ? "selected" : ""}" data-nav="knowledge" aria-label="Knowledge base"><span aria-hidden="true">▤</span><b>Knowledge</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button><button class="nav-item" id="open-guide" aria-label="How SolveStack works"><span aria-hidden="true">?</span><b>How it works</b></button><button class="nav-item" id="open-data-guide" aria-label="Ways to use exported troubleshooting data"><span aria-hidden="true">↗</span><b>Use your data</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${main}</main></div>${guideDialog()}${useDataDialog()}`;
   bind();
 }
 function sessionCard(s: Session) {
@@ -499,6 +509,45 @@ function patternDesk() {
           .join("")
       : `<div class="empty"><span>◈</span><h3>Not enough history yet</h3><p>Patterns appear after at least two investigations share a system, tag, root cause, or ruled-out theory.</p></div>`
   }</section>`;
+}
+function knowledgeView() {
+  if (knowledgeArticleId) {
+    const s = store.sessions.find((x) => x.id === knowledgeArticleId);
+    if (s && s.status === "resolved") return knowledgeArticleView(s);
+    knowledgeArticleId = null;
+  }
+  const resolvedCount = store.sessions.filter(
+    (s) => s.status === "resolved",
+  ).length;
+  const articles = filterKnowledgeArticles(store.sessions, {
+    query: knowledgeSearch,
+    system: knowledgeSystem,
+    tag: knowledgeTag,
+  });
+  const systems = knowledgeSystems(store.sessions);
+  const tags = knowledgeTags(store.sessions);
+  const controls =
+    resolvedCount > 0
+      ? `<div class="knowledge-controls"><div class="search-input"><span>${icon("search")}</span><input id="knowledge-search" value="${escapeHtml(knowledgeSearch)}" placeholder="Search root causes, systems, entries…" /></div><select id="knowledge-system" aria-label="Filter by system"><option value="">All systems</option>${systems.map((system) => `<option value="${escapeHtml(system)}" ${system === knowledgeSystem ? "selected" : ""}>${escapeHtml(system)}</option>`).join("")}</select></div>${tags.length ? `<div class="tag-filter-row"><button class="method-chip ${knowledgeTag ? "quiet" : "selected"}" data-kb-tag="">All tags</button>${tags.map((tag) => `<button class="method-chip ${tag === knowledgeTag ? "selected" : "quiet"}" data-kb-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join("")}</div>` : ""}`
+      : "";
+  const body =
+    resolvedCount === 0
+      ? `<div class="empty"><span>▤</span><h3>No resolved sessions yet</h3><p>When you resolve an investigation, it becomes an article here.</p></div>`
+      : articles.length
+        ? `<div class="article-grid">${articles.map((a) => `<button class="session-card" data-article="${escapeHtml(a.id)}"><div class="card-top"><span class="session-id">${escapeHtml(a.id)}</span><span>${dateLabel(a.resolvedAt)}</span></div><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.rootCause || "Root cause not recorded")}</p><div class="card-meta"><span>${escapeHtml(a.system || "Unspecified")}</span><span>${a.entryCount} entries</span></div><div class="tags">${a.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></button>`).join("")}</div>`
+        : `<div class="empty"><span>▤</span><h3>Nothing matches those filters</h3><p>Clear the search or filters to see the whole library.</p></div>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / KNOWLEDGE</div><h1>What you've already solved.</h1><p class="lede">Resolved investigations, kept as searchable knowledge — computed on this device. Nothing uploaded.</p></div></header>${controls}<section>${body}</section>`;
+}
+function knowledgeArticleView(s: Session) {
+  const para = (label: string, value: string) =>
+    `<section class="article-section"><span class="section-kicker">${label}</span><p>${escapeHtml(value || "Not recorded")}</p></section>`;
+  const starred = s.entries.filter((e) => e.starred);
+  const ruledOut = s.hypotheses.filter((h) => h.status === "Ruled Out");
+  const timeline = s.entries
+    .slice()
+    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  const related = relatedSessions(s, store.sessions);
+  return `<header class="workspace-header"><button class="back-button" id="kb-back">${icon("back")} Knowledge</button><div class="workspace-actions"><button class="secondary" data-open="${escapeHtml(s.id)}">Open session</button><button class="secondary" id="kb-export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="kb-export-runbook">Runbook MD</button><button class="secondary" id="kb-export-agent" title="Redacted pack for approved AI tools">Agent pack</button></div></header><div class="knowledge-article"><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")} <span class="slash">/</span> RESOLVED ${dateLabel(s.resolvedAt || s.updatedAt)}</div><h1>${escapeHtml(s.title)}</h1><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div>${para("PROBLEM", s.problem)}${starred.length ? `<section class="article-section"><span class="section-kicker">KEY FINDINGS</span><ul>${starred.map((e) => `<li>${escapeHtml(e.content)}</li>`).join("")}</ul></section>` : ""}${para("ROOT CAUSE", s.resolution.rootCause)}${para("RESOLUTION", s.resolution.fix)}${para("VALIDATION", s.resolution.validation)}${para("PREVENTION", s.resolution.prevention)}${ruledOut.length ? `<section class="article-section"><span class="section-kicker">RULED OUT</span><ul>${ruledOut.map((h) => `<li><strong>${escapeHtml(h.text)}</strong>${h.reasoning ? ` — ${escapeHtml(h.reasoning)}` : ""}</li>`).join("")}</ul></section>` : ""}${timeline.length ? `<section class="article-section"><span class="section-kicker">TIMELINE</span><ul>${timeline.map((e) => `<li><time>${dateLabel(e.timestamp)}</time> <strong>${escapeHtml(e.type)}</strong> — ${escapeHtml(e.content)}</li>`).join("")}</ul></section>` : ""}${related.length ? `<section class="article-section"><span class="section-kicker">RELATED INVESTIGATIONS</span><div class="related-list">${related.map(({ session, reasons }) => `<button class="search-result" ${session.status === "resolved" ? `data-article="${escapeHtml(session.id)}"` : `data-open="${escapeHtml(session.id)}"`}><strong>${escapeHtml(session.title)}</strong><small>${reasons.join(" · ")}</small></button>`).join("")}</div></section>` : ""}</div>`;
 }
 function welcomePanel() {
   return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Keep the investigation understandable while you solve it.</h2><p>Capture what you observe, try, rule out, and resolve. SolveStack keeps the working record on this device, then turns it into portable troubleshooting knowledge.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
@@ -1064,6 +1113,7 @@ function bind() {
   document.querySelectorAll<HTMLElement>("[data-nav]").forEach(
     (el) =>
       (el.onclick = () => {
+        if (el.dataset.nav === "knowledge") knowledgeArticleId = null;
         view = el.dataset.nav as typeof view;
         render();
       }),
@@ -1074,6 +1124,14 @@ function bind() {
         activeId = el.dataset.open!;
         view = "session";
         history.replaceState(null, "", `#${activeId}`);
+        render();
+      }),
+  );
+  document.querySelectorAll<HTMLElement>("[data-article]").forEach(
+    (el) =>
+      (el.onclick = () => {
+        knowledgeArticleId = el.dataset.article!;
+        view = "knowledge";
         render();
       }),
   );
@@ -1173,6 +1231,56 @@ function bind() {
       render();
       document.querySelector<HTMLInputElement>("#search")?.focus();
     });
+  document
+    .querySelector<HTMLInputElement>("#knowledge-search")
+    ?.addEventListener("input", (e) => {
+      knowledgeSearch = (e.target as HTMLInputElement).value;
+      render();
+      document.querySelector<HTMLInputElement>("#knowledge-search")?.focus();
+    });
+  document
+    .querySelector<HTMLSelectElement>("#knowledge-system")
+    ?.addEventListener("change", (e) => {
+      knowledgeSystem = (e.target as HTMLSelectElement).value;
+      render();
+    });
+  document.querySelectorAll<HTMLElement>("[data-kb-tag]").forEach(
+    (el) =>
+      (el.onclick = () => {
+        knowledgeTag = el.dataset.kbTag || "";
+        render();
+      }),
+  );
+  document.querySelector("#kb-back")?.addEventListener("click", () => {
+    knowledgeArticleId = null;
+    render();
+  });
+  const articleSession = () =>
+    store.sessions.find((x) => x.id === knowledgeArticleId);
+  document.querySelector("#kb-export-md")?.addEventListener("click", () => {
+    const s = articleSession();
+    if (s) download(`${s.id}-knowledge.md`, knowledgeMarkdown(s), "text/markdown");
+  });
+  document
+    .querySelector("#kb-export-runbook")
+    ?.addEventListener("click", () => {
+      const s = articleSession();
+      if (!s) return;
+      const evidenceNames = s.entries
+        .flatMap((e) =>
+          e.attachmentIds.map((id) => attachmentFor(id)?.filename),
+        )
+        .filter((name): name is string => Boolean(name));
+      download(
+        `${s.id}-runbook.md`,
+        buildRunbook(s, evidenceNames),
+        "text/markdown",
+      );
+    });
+  document.querySelector("#kb-export-agent")?.addEventListener("click", () => {
+    const s = articleSession();
+    if (s) void makeAgentPack(s);
+  });
   document.querySelector("#back")?.addEventListener("click", () => {
     view = "dashboard";
     render();

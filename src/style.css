@@ -1690,3 +1690,57 @@ h2 em {
   border-radius: 8px;
   padding: 10px 12px;
 }
+
+/* Knowledge view (F5) */
+.knowledge-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 20px 0 10px;
+}
+.knowledge-controls .search-input {
+  flex: 1 1 280px;
+}
+.knowledge-controls select {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 9px 12px;
+}
+.tag-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 20px;
+}
+.method-chip.selected {
+  border-color: var(--accent2);
+  color: var(--accent);
+}
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.knowledge-article {
+  max-width: 860px;
+}
+.article-section {
+  margin: 24px 0;
+}
+.article-section p {
+  white-space: pre-wrap;
+  margin-top: 8px;
+}
+.article-section ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+.related-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
