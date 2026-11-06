@@ -3,6 +3,15 @@
   "private": true,
   "version": "0.2.0",
   "type": "module",
-  "scripts": { "dev": "vite", "build": "vite build && node scripts/generate-md-mirrors.mjs && node scripts/generate-sw-precache.mjs && node scripts/reject-analytics-host.mjs", "preview": "vite preview", "test": "bun test tests" },
-  "devDependencies": { "vite": "^7.1.2", "typescript": "^5.9.2" }
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/generate-md-mirrors.mjs && node scripts/generate-sw-precache.mjs && node scripts/reject-analytics-host.mjs",
+    "preview": "vite preview",
+    "test": "bun test tests"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vite": "^7.1.2",
+    "wrangler": "4.158.0"
+  }
 }

@@ -7,21 +7,18 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
+    // Exact `/path/` entries are redundant with `/path/*` under current
+    // wrangler validation and fail Workers Builds deploy.
     "run_worker_first": [
       "/key.php",
       "/",
-      "/incident-report-template/",
       "/incident-report-template/*",
-      "/5-whys-template/",
       "/5-whys-template/*",
-      "/fishbone-diagram-template/",
       "/fishbone-diagram-template/*",
-      "/rca-template/",
       "/rca-template/*",
-      "/use-your-data/",
       "/use-your-data/*",
-      "/onenote-vs-solvestack/",
-      "/onenote-vs-solvestack/*"
+      "/onenote-vs-solvestack/*",
+      "/agent-adapter/*"
     ]
   },
   "observability": {
