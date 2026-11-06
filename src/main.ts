@@ -29,8 +29,13 @@ import {
   encryptVault,
   isVaultEnvelope,
 } from "./vault";
-import { buildAgentPackFiles, buildPastePack } from "./agent-pack";
-import { AGENT_TASKS, agentTaskById } from "./agent-tasks";
+import {
+  buildAgentPackFiles,
+  buildPastePack,
+  redactSessionForAgent,
+} from "./agent-pack";
+import { AGENT_TASKS, agentTaskById, buildAgentPrompt } from "./agent-tasks";
+import { aiHandoffById, buildHandoffUrl } from "./ai-handoff";
 import {
   bytesFromDataUrl,
   canUseOpfs,
@@ -849,6 +854,14 @@ async function makeAgentPack(s: Session) {
       options: [
         { value: "zip", label: "ZIP pack — files to upload" },
         { value: "paste", label: "Single Markdown file — paste into a chat" },
+        {
+          value: "chatgpt",
+          label: "Open in ChatGPT — prompt prefilled, pack copied",
+        },
+        {
+          value: "claude",
+          label: "Open in Claude — prompt prefilled, pack copied",
+        },
       ],
     },
   ]);
@@ -862,6 +875,55 @@ async function makeAgentPack(s: Session) {
       size,
       description,
     }));
+  const handoff = values ? aiHandoffById(values.format) : undefined;
+  if (values && handoff) {
+    // Clipboard first — it is the reliable channel, inside the dialog's
+    // user-activation window. The prefilled URL is a bonus on top: if the
+    // vendor's ?q= convention fails, the user lands in an empty chat with
+    // the pack already copied. See src/ai-handoff.ts.
+    const task = agentTaskById(values.task);
+    const pastePack = buildPastePack({
+      session: s,
+      knowledgeMarkdown: knowledgeMarkdown(s),
+      attachments,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      taskId: task.id,
+    });
+    const prompt = buildAgentPrompt(
+      redactSessionForAgent(s),
+      task,
+      "handoff",
+    );
+    let copied = true;
+    try {
+      await navigator.clipboard.writeText(pastePack);
+    } catch {
+      copied = false;
+    }
+    if (!copied)
+      download(`${s.id}-ai-pack.md`, encoder.encode(pastePack), "text/markdown");
+    const prefilled = buildHandoffUrl(handoff, prompt);
+    const opened = window.open(prefilled ?? handoff.chatUrl, "_blank", "noopener");
+    if (!opened)
+      showToast(
+        copied
+          ? `${handoff.label} didn't open (popup blocked). The pack is copied — open ${handoff.label} and paste.`
+          : `${handoff.label} didn't open (popup blocked). The pack downloaded as a file instead.`,
+      );
+    else if (!copied)
+      showToast(
+        `Clipboard unavailable, so the pack downloaded as a file. Upload or paste it into ${handoff.label}.`,
+      );
+    else if (!prefilled)
+      showToast(
+        `Pack copied — paste it into ${handoff.label} and send. (The prompt was too long to prefill.)`,
+      );
+    else
+      showToast(
+        `Pack copied — if the prompt isn't filled in, paste into ${handoff.label} and send.`,
+      );
+    return;
+  }
   if (values?.format === "paste") {
     download(
       `${s.id}-ai-pack.md`,
