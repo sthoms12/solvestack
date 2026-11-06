@@ -1560,6 +1560,31 @@ h2 em {
   line-height: 1.5;
   color: var(--muted);
 }
+.reply-preview {
+  display: grid;
+  gap: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-height: 46vh;
+  overflow: auto;
+  margin-bottom: 16px;
+}
+.reply-preview h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin: 0 0 5px;
+}
+.reply-preview p {
+  margin: 0;
+}
+.reply-preview ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
 .form-dialog label {
   display: grid;
   gap: 6px;

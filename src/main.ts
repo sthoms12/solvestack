@@ -37,6 +37,8 @@ import {
 } from "./agent-pack";
 import { AGENT_TASKS, agentTaskById, buildAgentPrompt } from "./agent-tasks";
 import { aiHandoffById, buildHandoffUrl } from "./ai-handoff";
+import { planCounts, planReply, type ReplyPlan } from "./ai-reply";
+import { buildSkillKitFiles } from "./skill-kit";
 import { buildRunbook } from "./runbook";
 import {
   filterKnowledgeArticles,
@@ -598,7 +600,7 @@ function workspace() {
   const methodId =
     typeof s.metadata?.blueprint === "string" ? s.metadata.blueprint : "";
   const method = methodId ? blueprintById(methodId) : null;
-  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-runbook">Runbook MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
+  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-runbook">Runbook MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="secondary" id="apply-ai-reply" title="Paste an AI answer that ends with a solvestack-reply block">Apply AI reply</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
     s.entries
       .slice()
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
@@ -640,7 +642,7 @@ function settings() {
     bytes,
   );
   const backup = backupStatus(store.lastBackupAt);
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /></div><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups or an encrypted vault periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /><button class="secondary" id="skill-kit">${icon("download")} AI skill kit</button></div><p><small>Teach your AI tool the SolveStack contract once: the skill kit bundles the adapter, the five tasks, and the reply format.</small></p><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups or an encrypted vault periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
 }
 
 function knowledgeMarkdown(s: Session) {
@@ -1017,6 +1019,157 @@ async function makeAgentPack(s: Session) {
     ),
     "application/zip",
   );
+}
+
+/** Itemized preview of an AI reply plan; resolves true only on Apply. */
+function confirmReplyPlan(plan: ReplyPlan): Promise<boolean> {
+  return new Promise((resolve) => {
+    const excerpt = (text: string, cap = 110) =>
+      escapeHtml(text.length > cap ? `${text.slice(0, cap)}…` : text);
+    const sections: string[] = [];
+    if (plan.summary)
+      sections.push(
+        `<div><h3>Summary</h3><p>${escapeHtml(plan.summary)}</p></div>`,
+      );
+    if (plan.entries.length)
+      sections.push(
+        `<div><h3>Entries to add (${plan.entries.length})</h3><ul>${plan.entries.map((e) => `<li><b>${escapeHtml(e.type)}</b> — ${excerpt(e.content)}</li>`).join("")}</ul></div>`,
+      );
+    if (plan.hypothesisUpdates.length)
+      sections.push(
+        `<div><h3>Hypotheses to update (${plan.hypothesisUpdates.length})</h3><ul>${plan.hypothesisUpdates.map((u) => `<li>${excerpt(u.matchText, 70)} — ${escapeHtml(u.currentStatus)} → <b>${escapeHtml(u.status)}</b>${u.reasoning ? `<br><small>${excerpt(u.reasoning, 140)}</small>` : ""}</li>`).join("")}</ul></div>`,
+      );
+    if (plan.tasks.length)
+      sections.push(
+        `<div><h3>Next steps to add (${plan.tasks.length})</h3><ul>${plan.tasks.map((t) => `<li>${excerpt(t)}</li>`).join("")}</ul></div>`,
+      );
+    if (plan.resolutionDraft) {
+      const fields = (
+        [
+          ["Root cause", plan.resolutionDraft.rootCause],
+          ["Fix", plan.resolutionDraft.fix],
+          ["Validation", plan.resolutionDraft.validation],
+          ["Prevention", plan.resolutionDraft.prevention],
+        ] as [string, string | undefined][]
+      )
+        .filter(([, v]) => v)
+        .map(([k, v]) => `<li><b>${k}</b> — ${excerpt(v!)}</li>`)
+        .join("");
+      sections.push(
+        `<div><h3>Resolution draft</h3><ul>${fields}</ul><p><small>Fills the Resolve form — the session stays active until you resolve it.</small></p></div>`,
+      );
+    }
+    if (plan.unmatched.length)
+      sections.push(
+        `<div><h3>Not applied (${plan.unmatched.length})</h3><ul>${plan.unmatched.map((u) => `<li>${excerpt(u.matchText, 70)} — ${escapeHtml(u.reason)}</li>`).join("")}</ul></div>`,
+      );
+    const dialog = document.createElement("dialog");
+    dialog.className = "form-dialog";
+    dialog.innerHTML = `<form method="dialog"><span class="section-kicker">SOLVESTACK · AI REPLY</span><h2>Apply this AI reply?</h2><div class="reply-preview">${sections.join("")}</div><div class="button-row"><button value="cancel" class="secondary" formnovalidate>Cancel</button><button value="confirm" class="primary">Apply changes</button></div></form>`;
+    document.body.append(dialog);
+    dialog.addEventListener("close", () => {
+      dialog.remove();
+      resolve(dialog.returnValue === "confirm");
+    });
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) {
+        dialog.returnValue = "cancel";
+        dialog.close();
+      }
+    });
+    dialog.showModal();
+  });
+}
+
+/**
+ * The return trip of the agent-pack flow: paste an AI answer, parse its
+ * solvestack-reply block (untrusted — see ai-reply.ts), preview the plan,
+ * and only then mutate the session. A Decision entry records what the
+ * model proposed and the user accepted.
+ */
+async function applyAiReply(s: Session) {
+  const values = await collectFields(
+    "Apply an AI reply",
+    [
+      {
+        name: "reply",
+        label:
+          "Paste the AI's answer — SolveStack finds the solvestack-reply block in it",
+        multiline: true,
+        required: true,
+      },
+    ],
+    { confirmLabel: "Review reply" },
+  );
+  if (!values) return;
+  const result = planReply(values.reply, s);
+  if (!result.ok) {
+    showToast(result.message, { durationMs: 9000 });
+    return;
+  }
+  const plan = result.plan;
+  const applicable =
+    plan.entries.length +
+    plan.hypothesisUpdates.length +
+    plan.tasks.length +
+    (plan.resolutionDraft ? 1 : 0);
+  if (applicable === 0) {
+    showToast(
+      plan.unmatched.length
+        ? `Nothing in that reply could be applied — first problem: ${plan.unmatched[0].reason}.`
+        : "That reply block is valid but contains nothing to apply.",
+      { durationMs: 9000 },
+    );
+    return;
+  }
+  if (!(await confirmReplyPlan(plan))) return;
+  const stamp = now();
+  for (const entry of plan.entries)
+    s.entries.push({
+      id: uid("entry"),
+      type: entry.type,
+      technicalType: "",
+      content: entry.content,
+      timestamp: stamp,
+      createdAt: stamp,
+      updatedAt: stamp,
+      starred: false,
+      attachmentIds: [],
+    });
+  for (const update of plan.hypothesisUpdates) {
+    const hypothesis = s.hypotheses.find((h) => h.text === update.matchText);
+    if (!hypothesis) continue;
+    hypothesis.status = update.status;
+    if (update.reasoning) hypothesis.reasoning = update.reasoning;
+    hypothesis.updatedAt = stamp;
+  }
+  for (const text of plan.tasks)
+    s.tasks.push({ id: uid("task"), text, completed: false, createdAt: stamp });
+  if (plan.resolutionDraft) {
+    if (plan.resolutionDraft.rootCause)
+      s.resolution.rootCause = plan.resolutionDraft.rootCause;
+    if (plan.resolutionDraft.fix) s.resolution.fix = plan.resolutionDraft.fix;
+    if (plan.resolutionDraft.validation)
+      s.resolution.validation = plan.resolutionDraft.validation;
+    if (plan.resolutionDraft.prevention)
+      s.resolution.prevention = plan.resolutionDraft.prevention;
+  }
+  const applied = planCounts(plan).filter((c) => !c.endsWith("not applied"));
+  s.entries.push({
+    id: uid("entry"),
+    type: "Decision",
+    technicalType: "",
+    content: `AI reply applied (${plan.task}): ${applied.join(", ")}.`,
+    timestamp: stamp,
+    createdAt: stamp,
+    updatedAt: stamp,
+    starred: false,
+    attachmentIds: [],
+  });
+  s.updatedAt = stamp;
+  await persist();
+  render();
+  showToast(`AI reply applied — ${applied.join(", ")}.`);
 }
 function redact(value: string) {
   const selected = window.getSelection()?.toString();
@@ -1669,6 +1822,11 @@ function bind() {
     // second modal stacked on top of it would fight the export flow.
     void makeAgentPack(active()!);
   });
+  document
+    .querySelector("#apply-ai-reply")
+    ?.addEventListener("click", () => {
+      void applyAiReply(active()!);
+    });
   document.querySelector("#resolve")?.addEventListener("click", async () => {
     const s = active()!;
     const values = await collectFields("Resolve session", [
@@ -1741,6 +1899,20 @@ function bind() {
     ?.addEventListener("click", () =>
       document.querySelector<HTMLInputElement>("#restore-file")?.click(),
     );
+  document.querySelector("#skill-kit")?.addEventListener("click", () => {
+    const encoder = new TextEncoder();
+    download(
+      "solvestack-skill-kit.zip",
+      zipBytes(
+        buildSkillKitFiles().map((file) => ({
+          name: file.name,
+          data: encoder.encode(file.text),
+        })),
+      ),
+      "application/zip",
+    );
+    showToast("Skill kit downloaded — its README has per-tool install notes.");
+  });
   const mergeIncoming = async (
     sessions: Session[],
     attachments: Attachment[],

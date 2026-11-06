@@ -198,6 +198,8 @@ export function agentPackReadme(
 ## Requested task
 
 **${taskLabel}** — the full prompt is in \`PROMPT.md\`. Follow it within the rules above.
+
+Reply contract: **solvestack-reply v1** — end the reply with the fenced block \`PROMPT.md\` describes, so the user can apply it in SolveStack with one paste (they preview it first; nothing applies automatically).
 `
     : "";
   const promptLine = taskLabel
