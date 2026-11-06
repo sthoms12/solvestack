@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta
+      name="description"
+      content="SolveStack agent adapter: export a redaction-first agent pack for organization-approved AI tools. No hosted model. No upload."
+    />
+    <link rel="canonical" href="https://solvestack-ai.app/agent-adapter/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/agent-adapter/" />
+    <meta property="og:title" content="SolveStack agent adapter" />
+    <meta
+      property="og:description"
+      content="Bring your own approved AI tool. SolveStack exports a redacted agent pack; it never hosts a model or uploads your investigations."
+    />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <title>SolveStack agent adapter | Local BYO AI handoff</title>
+    <link rel="stylesheet" href="/use-your-data/guide.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "SolveStack agent adapter",
+        "description": "How to review a SolveStack investigation with an organization-approved AI tool using a redaction-first agent pack.",
+        "url": "https://solvestack-ai.app/agent-adapter/",
+        "publisher": { "@type": "Organization", "name": "SolveStack" }
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Guide navigation">
+        <a href="#pack">Agent pack</a>
+        <a href="#rules">Rules</a>
+        <a href="/use-your-data/">Use your data</a>
+        <a class="launch" href="/">Open SolveStack</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero">
+        <p>BRING YOUR OWN AGENT</p>
+        <h1>SolveStack is the evidence plane. Your approved tool is the reviewer.</h1>
+        <p>
+          SolveStack does not include an AI service. From any session, export an
+          <strong>Agent pack</strong> — a ZIP with redacted Markdown and JSON —
+          then open it in an organization-approved assistant.
+        </p>
+        <div class="hero-actions">
+          <a class="primary" href="#pack">See the pack layout</a>
+          <a class="secondary" href="/">Open the workspace</a>
+        </div>
+      </section>
+
+      <section id="pack">
+        <p>01 / PACK CONTENTS</p>
+        <h2>What the agent pack includes</h2>
+        <ul>
+          <li><code>AGENT.md</code> — instructions that forbid inventing missing facts</li>
+          <li><code>knowledge.md</code> — redacted human-readable investigation summary</li>
+          <li><code>session.redacted.json</code> — structured session without attachment binaries</li>
+          <li><code>evidence-manifest.json</code> — filenames and MIME types only</li>
+        </ul>
+        <p>
+          Credential-like strings, bearer tokens, emails, and raw IPv4 addresses
+          are replaced with <code>[REDACTED]</code> before export. Review the pack
+          yourself before sharing it with any external tool.
+        </p>
+      </section>
+
+      <section id="rules">
+        <p>02 / LOCAL PROTOCOL</p>
+        <h2>Adapter rules</h2>
+        <ol>
+          <li>Keep the investigation in SolveStack (or an encrypted vault) on devices you control.</li>
+          <li>Export the agent pack only after you are ready to share a redacted record.</li>
+          <li>Point an approved tool at <code>AGENT.md</code> + <code>session.redacted.json</code>.</li>
+          <li>Treat suggestions as provisional until a human validates them against evidence.</li>
+        </ol>
+        <p>
+          Optional local helper: <code>bun scripts/agent-pack-inspect.mjs path/to/pack.zip</code>
+          lists pack files and checks that <code>AGENT.md</code> is present.
+        </p>
+      </section>
+
+      <section class="privacy">
+        <p>BOUNDARIES</p>
+        <h2>Still local-first</h2>
+        <p>
+          No SolveStack account. No cloud database. No hosted model. Encrypted vaults
+          and agent packs are files you move deliberately.
+        </p>
+        <a href="/">Open your workspace →</a>
+      </section>
+    </main>
+    <footer>
+      <span>SolveStack</span>
+      <p>Capture locally. Export deliberately. Reuse responsibly.</p>
+      <a href="/">Back to the application</a>
+    </footer>
+  </body>
+</html>

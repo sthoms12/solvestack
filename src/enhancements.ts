@@ -1,6 +1,7 @@
 import { readWorkspace, writeWorkspace } from "./local-store";
 import { redactSelection, relatedSessions } from "./domain";
 import { showToast } from "./data-safety";
+import { classifyPaste } from "./smart-paste";
 
 const getData = () => readWorkspace<any>();
 const putData = (data: any) => writeWorkspace(data);
@@ -52,10 +53,13 @@ const wire = () => {
         return;
       }
       const text = event.clipboardData?.getData("text") || "";
-      if (/^https?:\/\/\S+$/i.test(text) && tech) {
+      const classified = classifyPaste(text);
+      if (classified && tech) {
         event.preventDefault();
-        tech.value = "URL/reference";
-        capture.value = text;
+        tech.value = classified.technicalType;
+        capture.value = classified.content;
+        capture.placeholder = `${classified.note} — edit if needed, then Capture`;
+        tech.dispatchEvent(new Event("change", { bubbles: true }));
       }
     });
     input?.addEventListener("change", () => {

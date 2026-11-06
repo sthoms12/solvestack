@@ -44,6 +44,11 @@ const PAGES = [
     out: "onenote-vs-solvestack.md",
     path: "/onenote-vs-solvestack/",
   },
+  {
+    source: "public/agent-adapter/index.html",
+    out: "agent-adapter.md",
+    path: "/agent-adapter/",
+  },
 ];
 
 const NAMED_ENTITIES = {

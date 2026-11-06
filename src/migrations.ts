@@ -1,4 +1,4 @@
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export function migrateWorkspace<T extends Record<string, any>>(input: T): T {
   if (
@@ -13,7 +13,7 @@ export function migrateWorkspace<T extends Record<string, any>>(input: T): T {
   if ((output.schemaVersion || 1) === 1) {
     output.sessions = output.sessions.map((session: any) => ({
       ...session,
-      schemaVersion: CURRENT_SCHEMA_VERSION,
+      schemaVersion: 2,
       metadata: session.metadata || {},
       entries: (session.entries || []).map((entry: any) => ({
         ...entry,
@@ -26,6 +26,18 @@ export function migrateWorkspace<T extends Record<string, any>>(input: T): T {
         updatedAt:
           hypothesis.updatedAt || session.updatedAt || session.createdAt,
       })),
+    }));
+    output.schemaVersion = 2;
+  }
+  if ((output.schemaVersion || 1) === 2) {
+    output.attachments = (output.attachments || []).map((attachment: any) => ({
+      ...attachment,
+      blobRef: attachment.blobRef || undefined,
+    }));
+    output.sessions = output.sessions.map((session: any) => ({
+      ...session,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      metadata: session.metadata || {},
     }));
     output.schemaVersion = CURRENT_SCHEMA_VERSION;
   }

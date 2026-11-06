@@ -17,6 +17,26 @@ import {
   UNDO_WINDOW_MS,
 } from "./data-safety";
 import { collectFields } from "./dialogs";
+import {
+  BLUEPRINTS,
+  blueprintById,
+  parseMethodParam,
+  type BlueprintId,
+} from "./blueprints";
+import { buildPatterns, patternKindLabel } from "./patterns";
+import {
+  decryptVault,
+  encryptVault,
+  isVaultEnvelope,
+} from "./vault";
+import { buildAgentPackFiles } from "./agent-pack";
+import {
+  bytesFromDataUrl,
+  canUseOpfs,
+  dataUrlFromBlobRef,
+  deleteEvidenceBlob,
+  putEvidenceBlob,
+} from "./opfs-store";
 
 type EntryType =
   | "Note"
@@ -99,7 +119,9 @@ type Attachment = {
   size: number;
   createdAt: string;
   description: string;
+  /** data: URL when kept inline; empty when body lives in OPFS via blobRef. */
   data: string;
+  blobRef?: string;
 };
 type Store = {
   schemaVersion: number;
@@ -218,8 +240,10 @@ let store: Store = {
   sessions: [seed],
   attachments: [],
 };
-let activeId = location.hash.slice(1);
-let view: "dashboard" | "session" | "settings" = activeId
+let activeId = location.hash.startsWith("#method=")
+  ? ""
+  : location.hash.slice(1);
+let view: "dashboard" | "session" | "settings" | "patterns" = activeId
   ? "session"
   : "dashboard";
 let search = "";
@@ -234,6 +258,7 @@ let attachmentListenerReady = false;
 let swListenerReady = false;
 let welcomeDismissed =
   localStorage.getItem("solvestack-welcome-dismissed") === "true";
+let pendingMethod: BlueprintId | null = parseMethodParam();
 let db: IDBDatabase;
 const openDb = () =>
   new Promise<IDBDatabase>((resolve, reject) => {
@@ -275,6 +300,15 @@ const load = async () => {
   }
   render();
   void refreshStorageEstimate();
+  if (pendingMethod) {
+    const method = pendingMethod;
+    // Defer so bind() has attached the new-session flow.
+    setTimeout(() => {
+      document
+        .querySelector<HTMLElement>(`[data-method="${method}"]`)
+        ?.click();
+    }, 0);
+  }
 };
 const updateSaveStatus = () => {
   document.querySelectorAll<HTMLElement>(".save-status").forEach((el) => {
@@ -387,10 +421,29 @@ const readFile = (file: File) =>
   });
 const attachmentFor = (id: string) =>
   store.attachments.find((a) => a.id === id);
+async function attachmentDataUrl(attachment: Attachment) {
+  if (attachment.data?.startsWith("data:")) return attachment.data;
+  if (attachment.blobRef) {
+    const fromOpfs = await dataUrlFromBlobRef(
+      attachment.blobRef,
+      attachment.mimeType,
+    );
+    if (fromOpfs) return fromOpfs;
+  }
+  return attachment.data || "";
+}
 
 function render() {
+  const main =
+    view === "dashboard"
+      ? dashboard()
+      : view === "settings"
+        ? settings()
+        : view === "patterns"
+          ? patternDesk()
+          : workspace();
   document.querySelector<HTMLDivElement>("#app")!.innerHTML =
-    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button><button class="nav-item" id="open-guide" aria-label="How SolveStack works"><span aria-hidden="true">?</span><b>How it works</b></button><button class="nav-item" id="open-data-guide" aria-label="Ways to use exported troubleshooting data"><span aria-hidden="true">↗</span><b>Use your data</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${view === "dashboard" ? dashboard() : view === "settings" ? settings() : workspace()}</main></div>${guideDialog()}${useDataDialog()}`;
+    `<div class="app-shell"><aside class="rail"><div class="brand"><span class="brand-mark">S</span><div><strong>SolveStack</strong><small>FIELD NOTEBOOK</small></div></div><nav aria-label="Primary navigation"><button class="nav-item ${view === "dashboard" ? "selected" : ""}" data-nav="dashboard" aria-label="Dashboard"><span aria-hidden="true">⌂</span><b>Dashboard</b></button><button class="nav-item ${view === "patterns" ? "selected" : ""}" data-nav="patterns" aria-label="Pattern desk"><span aria-hidden="true">◈</span><b>Patterns</b></button><button class="nav-item ${view === "settings" ? "selected" : ""}" data-nav="settings" aria-label="Settings"><span aria-hidden="true">${icon("settings")}</span><b>Settings</b></button><button class="nav-item" id="open-guide" aria-label="How SolveStack works"><span aria-hidden="true">?</span><b>How it works</b></button><button class="nav-item" id="open-data-guide" aria-label="Ways to use exported troubleshooting data"><span aria-hidden="true">↗</span><b>Use your data</b></button></nav><div class="rail-bottom"><div class="privacy-dot"></div><span>Local only</span><button class="icon-button" id="theme-toggle" aria-label="Toggle theme">◐</button></div></aside><main class="main">${main}</main></div>${guideDialog()}${useDataDialog()}`;
   bind();
 }
 function sessionCard(s: Session) {
@@ -406,7 +459,40 @@ function dashboard() {
   const backupBanner = backup.needsBackup
     ? `<section class="backup-banner" role="status"><span><strong>${escapeHtml(backup.label)}.</strong> Your investigations live only in this browser — clearing site data removes them.</span><button class="secondary small-button" id="backup-now">Back up now</button></section>`
     : "";
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">Good morning, engineer. Pick up where the evidence left off.</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}<section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div><div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">Good morning, engineer. Pick up where the evidence left off.</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div><div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
+}
+function patternDesk() {
+  const patterns = buildPatterns(store.sessions);
+  const grouped = (
+    ["system", "tag", "root-cause", "ruled-out", "technical-type"] as const
+  )
+    .map((kind) => ({
+      kind,
+      label: patternKindLabel(kind),
+      cards: patterns.filter((card) => card.kind === kind),
+    }))
+    .filter((group) => group.cards.length);
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / PATTERN DESK</div><h1>Local pattern intelligence.</h1><p class="lede">Recurring systems, tags, root causes, and ruled-outs — computed on this device. No upload. No model.</p></div><button class="secondary" id="new-session">${icon("plus")} New session</button></header><section class="pattern-desk">${
+    grouped.length
+      ? grouped
+          .map(
+            (group) =>
+              `<div class="pattern-group"><span class="section-kicker">${escapeHtml(group.label)}</span><div class="pattern-grid">${group.cards
+                .map(
+                  (card) =>
+                    `<article class="pattern-card"><div class="pattern-top"><strong>${escapeHtml(card.label)}</strong><em>${card.count}</em></div><p>${escapeHtml(card.hint)}</p><small>${card.sampleTitles.map(escapeHtml).join(" · ")}</small><div class="button-row">${card.sessionIds
+                      .slice(0, 4)
+                      .map(
+                        (id) =>
+                          `<button class="text-button" data-open="${id}">Open ${escapeHtml(id)}</button>`,
+                      )
+                      .join("")}</div></article>`,
+                )
+                .join("")}</div></div>`,
+          )
+          .join("")
+      : `<div class="empty"><span>◈</span><h3>Not enough history yet</h3><p>Patterns appear after at least two investigations share a system, tag, root cause, or ruled-out theory.</p></div>`
+  }</section>`;
 }
 function welcomePanel() {
   return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Keep the investigation understandable while you solve it.</h2><p>Capture what you observe, try, rule out, and resolve. SolveStack keeps the working record on this device, then turns it into portable troubleshooting knowledge.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
@@ -416,7 +502,7 @@ function guideDialog() {
 }
 
 function useDataDialog() {
-  return `<dialog id="data-guide-dialog" class="guide-dialog data-guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / PORTABLE KNOWLEDGE</span><h2>What can your exports become?</h2><p>Move completed investigations into the systems your organization already trusts.</p></div><button class="guide-close" value="close" aria-label="Close use your data guide">×</button></header><div class="data-format-grid"><article><b>Markdown</b><span>Searchable knowledge, documentation, version control, and approved AI review.</span></article><article><b>HTML</b><span>A readable, standalone handoff for another engineer or stakeholder.</span></article><article><b>JSON</b><span>A lossless SolveStack record for re-import, backup, or custom processing.</span></article><article><b>ZIP</b><span>The complete report and original evidence in one durable archive.</span></article></div><section class="data-possibilities"><span class="section-kicker">POSSIBILITIES</span><ul><li>Build a searchable troubleshooting library.</li><li>Create knowledge articles, runbooks, and training material.</li><li>Compare resolved cases for recurring symptoms and root causes.</li><li>Ask an organization-approved AI tool to review one or more Markdown exports.</li></ul></section><section class="guide-guardrail"><strong>Move knowledge deliberately.</strong><p>SolveStack does not upload or analyze exports. Redact credentials, personal data, tenant details, and confidential evidence before sharing. External storage and AI tools have their own privacy and retention policies.</p></section><footer><a class="secondary guide-page-link" href="/use-your-data/">Open the complete possibilities guide</a><button class="primary" value="close">Done</button></footer></form></dialog>`;
+  return `<dialog id="data-guide-dialog" class="guide-dialog data-guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / PORTABLE KNOWLEDGE</span><h2>What can your exports become?</h2><p>Move completed investigations into the systems your organization already trusts.</p></div><button class="guide-close" value="close" aria-label="Close use your data guide">×</button></header><div class="data-format-grid"><article><b>Markdown</b><span>Searchable knowledge, documentation, version control, and approved AI review.</span></article><article><b>HTML</b><span>A readable, standalone handoff for another engineer or stakeholder.</span></article><article><b>JSON / vault</b><span>Lossless backup, re-import, or passphrase-encrypted multi-device continuity.</span></article><article><b>ZIP / agent pack</b><span>Full evidence archive, or a redacted pack for approved AI tools.</span></article></div><section class="data-possibilities"><span class="section-kicker">POSSIBILITIES</span><ul><li>Build a searchable troubleshooting library.</li><li>Create knowledge articles, runbooks, and training material.</li><li>Use the Pattern Desk for recurring symptoms and root causes.</li><li>Ask an organization-approved AI tool to review an agent pack or Markdown export.</li></ul></section><section class="guide-guardrail"><strong>Move knowledge deliberately.</strong><p>SolveStack does not upload or analyze exports. Redact credentials, personal data, tenant details, and confidential evidence before sharing. External storage and AI tools have their own privacy and retention policies.</p></section><footer><a class="secondary guide-page-link" href="/use-your-data/">Open the complete possibilities guide</a><a class="secondary guide-page-link" href="/agent-adapter/">Agent adapter</a><button class="primary" value="close">Done</button></footer></form></dialog>`;
 }
 function searchResults() {
   const found = searchSessions(store.sessions, search).slice(0, 8);
@@ -443,7 +529,10 @@ function entryView(e: Entry) {
 function workspace() {
   const s = active();
   if (!s) return dashboard();
-  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${s.id} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
+  const methodId =
+    typeof s.metadata?.blueprint === "string" ? s.metadata.blueprint : "";
+  const method = methodId ? blueprintById(methodId) : null;
+  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${s.id} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
     s.entries
       .slice()
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
@@ -485,7 +574,7 @@ function settings() {
     bytes,
   );
   const backup = backupStatus(store.lastBackupAt);
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json" aria-label="Import SolveStack JSON" hidden /></div><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /></div><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups or an encrypted vault periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
 }
 
 function knowledgeMarkdown(s: Session) {
@@ -547,7 +636,7 @@ function rcaMarkdown(s: Session) {
       .join("\n") || "Not recorded"
   }\n\n## Hypotheses Investigated\n${s.hypotheses.map((hypothesis) => `- **${escapeMd(hypothesis.text)}** — ${hypothesis.status}`).join("\n") || "Not recorded"}\n\n## Ruled Out\n${ruledOut || "Not recorded"}\n\n## Root Cause\n${s.resolution.rootCause || "Not recorded"}\n\n## Resolution\n${s.resolution.fix || "Not recorded"}\n\n## Validation\n${s.resolution.validation || "Not recorded"}\n\n## Preventative Actions\n${s.resolution.prevention || "Not recorded"}\n`;
 }
-function standaloneHtml(s: Session) {
+async function standaloneHtml(s: Session) {
   const sections = knowledgeMarkdown(s)
     .replace(/^---[\s\S]*?---/, "")
     .trim()
@@ -562,22 +651,33 @@ function standaloneHtml(s: Session) {
         .replace(/\n/g, "<br>")}</div>`;
     })
     .join("");
-  const evidence = store.attachments
-    .filter((attachment) => attachment.sessionId === s.id)
-    .map((attachment) =>
-      attachment.mimeType.startsWith("image/")
-        ? `<figure><img src="${attachment.data}" alt="${escapeHtml(attachment.description || attachment.filename)}"><figcaption>${escapeHtml(attachment.filename)}${attachment.description ? ` — ${escapeHtml(attachment.description)}` : ""}</figcaption></figure>`
-        : `<p>📎 ${escapeHtml(attachment.filename)}${attachment.description ? ` — ${escapeHtml(attachment.description)}` : ""}</p>`,
-    )
-    .join("");
+  const evidenceParts: string[] = [];
+  for (const attachment of store.attachments.filter(
+    (item) => item.sessionId === s.id,
+  )) {
+    if (attachment.mimeType.startsWith("image/")) {
+      const src = await attachmentDataUrl(attachment);
+      evidenceParts.push(
+        `<figure><img src="${src}" alt="${escapeHtml(attachment.description || attachment.filename)}"><figcaption>${escapeHtml(attachment.filename)}${attachment.description ? ` — ${escapeHtml(attachment.description)}` : ""}</figcaption></figure>`,
+      );
+    } else {
+      evidenceParts.push(
+        `<p>📎 ${escapeHtml(attachment.filename)}${attachment.description ? ` — ${escapeHtml(attachment.description)}` : ""}</p>`,
+      );
+    }
+  }
+  const evidence = evidenceParts.join("");
   return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(s.title)}</title><style>body{max-width:850px;margin:50px auto;font:16px system-ui;color:#20251f;line-height:1.6;padding:0 24px}h1{font-size:38px;line-height:1.1;border-bottom:2px solid #c9f269;padding-bottom:20px}h2{margin-top:32px;color:#526d2c}p{margin:6px 0;white-space:pre-wrap}img{display:block;max-width:100%;height:auto;border:1px solid #ccd2c7;border-radius:6px}figure{margin:20px 0}figcaption{font-size:13px;color:#596357;margin-top:6px}</style></head><body>${body}${evidence ? `<h2>Evidence files</h2>${evidence}` : ""}</body></html>`;
 }
-function packageHtml(s: Session) {
+async function packageHtml(s: Session) {
   const attachmentLinks = store.attachments
     .filter((a) => a.sessionId === s.id)
     .map((a) => `<p>📎 ${escapeHtml(a.filename)}</p>`)
     .join("");
-  return standaloneHtml(s).replace("</body>", `${attachmentLinks}</body>`);
+  return (await standaloneHtml(s)).replace(
+    "</body>",
+    `${attachmentLinks}</body>`,
+  );
 }
 function crc32(bytes: Uint8Array) {
   let crc = 0xffffffff;
@@ -673,7 +773,10 @@ async function makeZip(s: Session) {
   const files = [
     { name: "README.md", data: encoder.encode(knowledgeMarkdown(s)) },
     { name: "RCA.md", data: encoder.encode(rcaMarkdown(s)) },
-    { name: "session.html", data: encoder.encode(packageHtml(s)) },
+    {
+      name: "session.html",
+      data: encoder.encode(await packageHtml(s)),
+    },
     {
       name: "session.json",
       data: encoder.encode(
@@ -692,13 +795,43 @@ async function makeZip(s: Session) {
     },
   ];
   for (const a of store.attachments.filter((a) => a.sessionId === s.id)) {
-    const raw = atob(a.data.split(",")[1] || "");
+    const dataUrl = await attachmentDataUrl(a);
+    const bytes = dataUrl
+      ? bytesFromDataUrl(dataUrl)
+      : new Uint8Array();
     files.push({
       name: `evidence/${a.filename}`,
-      data: Uint8Array.from(raw, (ch) => ch.charCodeAt(0)),
+      data: bytes,
     });
   }
   download(`${s.id}-knowledge-package.zip`, zipBytes(files), "application/zip");
+}
+async function makeAgentPack(s: Session) {
+  const encoder = new TextEncoder();
+  const pack = buildAgentPackFiles({
+    session: s,
+    knowledgeMarkdown: knowledgeMarkdown(s),
+    attachments: store.attachments
+      .filter((a) => a.sessionId === s.id)
+      .map(({ id, filename, mimeType, size, description }) => ({
+        id,
+        filename,
+        mimeType,
+        size,
+        description,
+      })),
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+  });
+  download(
+    `${s.id}-agent-pack.zip`,
+    zipBytes(
+      pack.map((file) => ({
+        name: file.name,
+        data: encoder.encode(file.text),
+      })),
+    ),
+    "application/zip",
+  );
 }
 function redact(value: string) {
   const selected = window.getSelection()?.toString();
@@ -769,6 +902,13 @@ function bind() {
             onAction: () => void restore(),
             durationMs: UNDO_WINDOW_MS,
           });
+          // Delay OPFS deletion past the undo window so Undo can still work
+          // for in-memory restore; orphaned OPFS blobs are acceptable.
+          if (attachment.blobRef)
+            setTimeout(
+              () => void deleteEvidenceBlob(attachment.blobRef!),
+              UNDO_WINDOW_MS + 1000,
+            );
         })();
       },
     );
@@ -808,50 +948,99 @@ function bind() {
       (el.onclick = () => {
         activeId = el.dataset.open!;
         view = "session";
+        history.replaceState(null, "", `#${activeId}`);
         render();
       }),
   );
+  const startSession = async (presetMethod?: BlueprintId | null) => {
+    const preferred = presetMethod || pendingMethod || "blank";
+    pendingMethod = null;
+    if (location.search.includes("method=") || location.hash.startsWith("#method="))
+      history.replaceState(null, "", "/");
+    const values = await collectFields("Start a troubleshooting session", [
+      {
+        name: "method",
+        label: "Investigation method",
+        value: preferred,
+        options: BLUEPRINTS.map((blueprint) => ({
+          value: blueprint.id,
+          label: `${blueprint.label} — ${blueprint.description}`,
+        })),
+      },
+      {
+        name: "problem",
+        label: "What’s happening?",
+        multiline: true,
+        required: true,
+      },
+      { name: "system", label: "System / product (optional)" },
+      { name: "tags", label: "Tags, separated by commas (optional)" },
+    ]);
+    if (!values?.problem.trim()) return;
+    const blueprint = blueprintById(values.method);
+    const stamp = now();
+    const userTags = values.tags
+      .split(",")
+      .map((x) => x.trim())
+      .filter(Boolean);
+    const s: Session = {
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      id: `SS-${stamp.slice(0, 10).replaceAll("-", "")}-${String(store.sessions.length + 1).padStart(3, "0")}`,
+      title: values.problem.trim().slice(0, 72),
+      problem: values.problem.trim(),
+      system: values.system.trim(),
+      tags: [...new Set([...blueprint.tags, ...userTags])],
+      status: "active",
+      createdAt: stamp,
+      updatedAt: stamp,
+      currentFocus: blueprint.currentFocus,
+      scratchpad: blueprint.scratchpad,
+      entries: blueprint.entries.map((entry) => ({
+        id: uid("entry"),
+        type: entry.type,
+        technicalType: entry.technicalType || "",
+        content: entry.content,
+        timestamp: stamp,
+        createdAt: stamp,
+        updatedAt: stamp,
+        starred: false,
+        attachmentIds: [],
+      })),
+      hypotheses: blueprint.hypotheses.map((text) => ({
+        id: uid("hyp"),
+        text,
+        status: "Investigating" as const,
+        reasoning: "",
+        evidenceIds: [],
+        createdAt: stamp,
+        updatedAt: stamp,
+      })),
+      tasks: blueprint.tasks.map((text) => ({
+        id: uid("task"),
+        text,
+        completed: false,
+        createdAt: stamp,
+      })),
+      resolution: blankResolution(),
+      metadata: { blueprint: blueprint.id },
+    };
+    store.sessions.unshift(s);
+    activeId = s.id;
+    view = "session";
+    history.replaceState(null, "", `#${s.id}`);
+    await persist();
+    render();
+    if (blueprint.id !== "blank")
+      showToast(`Started with ${blueprint.shortLabel} method structure.`);
+  };
   document
     .querySelector("#new-session")
-    ?.addEventListener("click", async () => {
-      const values = await collectFields("Start a troubleshooting session", [
-        {
-          name: "problem",
-          label: "What’s happening?",
-          multiline: true,
-          required: true,
-        },
-        { name: "system", label: "System / product (optional)" },
-        { name: "tags", label: "Tags, separated by commas (optional)" },
-      ]);
-      if (!values?.problem.trim()) return;
-      const s: Session = {
-        schemaVersion: CURRENT_SCHEMA_VERSION,
-        id: `SS-${now().slice(0, 10).replaceAll("-", "")}-${String(store.sessions.length + 1).padStart(3, "0")}`,
-        title: values.problem.trim().slice(0, 72),
-        problem: values.problem.trim(),
-        system: values.system.trim(),
-        tags: values.tags
-          .split(",")
-          .map((x) => x.trim())
-          .filter(Boolean),
-        status: "active",
-        createdAt: now(),
-        updatedAt: now(),
-        currentFocus: "",
-        scratchpad: "",
-        entries: [],
-        hypotheses: [],
-        tasks: [],
-        resolution: blankResolution(),
-        metadata: {},
-      };
-      store.sessions.unshift(s);
-      activeId = s.id;
-      view = "session";
-      await persist();
-      render();
-    });
+    ?.addEventListener("click", () => void startSession());
+  document.querySelectorAll<HTMLElement>("[data-method]").forEach(
+    (el) =>
+      (el.onclick = () =>
+        void startSession(el.dataset.method as BlueprintId)),
+  );
   document
     .querySelector<HTMLInputElement>("#search")
     ?.addEventListener("input", (e) => {
@@ -904,8 +1093,16 @@ function bind() {
         continue;
       }
       try {
+        const id = uid("file");
+        let data = "";
+        let blobRef: string | undefined;
+        if (canUseOpfs() && file.size > 64_000) {
+          blobRef = await putEvidenceBlob(id, file);
+        } else {
+          data = await readFile(file);
+        }
         const a: Attachment = {
-          id: uid("file"),
+          id,
           sessionId: s.id,
           entryId: e.id,
           filename: file.name,
@@ -918,7 +1115,8 @@ function bind() {
                 `[data-attachment-description="${CSS.escape(file.name)}"]`,
               )
               ?.value.trim() || "",
-          data: await readFile(file),
+          data,
+          blobRef,
         };
         store.attachments.push(a);
         e.attachmentIds.push(a.id);
@@ -1012,6 +1210,12 @@ function bind() {
           onAction: () => void restore(),
           durationMs: UNDO_WINDOW_MS,
         });
+        for (const attachment of removedAttachments)
+          if (attachment.blobRef)
+            setTimeout(
+              () => void deleteEvidenceBlob(attachment.blobRef!),
+              UNDO_WINDOW_MS + 1000,
+            );
       }),
   );
   document
@@ -1170,16 +1374,22 @@ function bind() {
     setTimeout(openDataGuide, 150);
   });
   document.querySelector("#export-html")?.addEventListener("click", () => {
-    const s = active()!;
-    download(`${s.id}.html`, standaloneHtml(s), "text/html");
-    setTimeout(openDataGuide, 150);
+    void (async () => {
+      const s = active()!;
+      download(`${s.id}.html`, await standaloneHtml(s), "text/html");
+      setTimeout(openDataGuide, 150);
+    })();
   });
   document
     .querySelector("#export-package")
     ?.addEventListener("click", () => {
-      makeZip(active()!);
+      void makeZip(active()!);
       setTimeout(openDataGuide, 150);
     });
+  document.querySelector("#export-agent")?.addEventListener("click", () => {
+    void makeAgentPack(active()!);
+    setTimeout(openDataGuide, 150);
+  });
   document.querySelector("#resolve")?.addEventListener("click", async () => {
     const s = active()!;
     const values = await collectFields("Resolve session", [
@@ -1248,6 +1458,28 @@ function bind() {
     ?.addEventListener("click", () =>
       document.querySelector<HTMLInputElement>("#restore-file")?.click(),
     );
+  const mergeIncoming = async (
+    sessions: Session[],
+    attachments: Attachment[],
+    kindLabel: string,
+  ) => {
+    const conflicts = sessions.filter((session) =>
+      store.sessions.some((existing) => existing.id === session.id),
+    );
+    if (
+      conflicts.length &&
+      !confirm(
+        `${conflicts.length} session ID conflict${conflicts.length === 1 ? "" : "s"} found. Keep existing records and skip conflicts?`,
+      )
+    )
+      return;
+    store.sessions = mergeBackup(store.sessions, sessions);
+    store.attachments = mergeBackup(store.attachments, attachments);
+    store.lastBackupAt = now();
+    await persist();
+    render();
+    showToast(`${kindLabel}. Existing records were preserved.`);
+  };
   document
     .querySelector<HTMLInputElement>("#restore-file")
     ?.addEventListener("change", async (e) => {
@@ -1255,28 +1487,91 @@ function bind() {
       if (!f) return;
       try {
         const incoming = parsePortableData(JSON.parse(await f.text()));
-        const sessions = incoming.sessions as Session[];
-        const attachments = incoming.attachments as Attachment[];
-        const conflicts = sessions.filter((session) =>
-          store.sessions.some((existing) => existing.id === session.id),
-        );
-        if (
-          conflicts.length &&
-          !confirm(
-            `${conflicts.length} session ID conflict${conflicts.length === 1 ? "" : "s"} found. Keep existing records and skip conflicts?`,
-          )
-        )
-          return;
-        store.sessions = mergeBackup(store.sessions, sessions);
-        store.attachments = mergeBackup(store.attachments, attachments);
-        store.lastBackupAt = now();
-        await persist();
-        render();
-        showToast(
-          `${incoming.kind === "session" ? "Session imported" : "Backup restored"}. Existing records were preserved.`,
+        await mergeIncoming(
+          incoming.sessions as Session[],
+          incoming.attachments as Attachment[],
+          incoming.kind === "session" ? "Session imported" : "Backup restored",
         );
       } catch (err) {
         showToast(`Restore failed: ${(err as Error).message}`, {
+          durationMs: 8000,
+        });
+      }
+    });
+  document.querySelector("#vault-export")?.addEventListener("click", () => {
+    void (async () => {
+      const values = await collectFields("Export encrypted vault", [
+        {
+          name: "passphrase",
+          label: "Passphrase (min 8 characters) — stored only in your head",
+          required: true,
+          secret: true,
+        },
+        {
+          name: "confirm",
+          label: "Confirm passphrase",
+          required: true,
+          secret: true,
+        },
+      ]);
+      if (!values) return;
+      if (values.passphrase !== values.confirm) {
+        showToast("Passphrases did not match.");
+        return;
+      }
+      try {
+        const envelope = await encryptVault(
+          { ...store, exportedAt: now() },
+          values.passphrase,
+        );
+        store.lastBackupAt = now();
+        download(
+          "solvestack-vault.json",
+          JSON.stringify(envelope, null, 2),
+          "application/json",
+        );
+        await persist();
+        render();
+        showToast("Encrypted vault downloaded. Keep the passphrase offline.");
+      } catch (err) {
+        showToast(`Vault export failed: ${(err as Error).message}`, {
+          durationMs: 8000,
+        });
+      }
+    })();
+  });
+  document
+    .querySelector("#vault-import")
+    ?.addEventListener("click", () =>
+      document.querySelector<HTMLInputElement>("#vault-file")?.click(),
+    );
+  document
+    .querySelector<HTMLInputElement>("#vault-file")
+    ?.addEventListener("change", async (e) => {
+      const f = (e.target as HTMLInputElement).files?.[0];
+      if (!f) return;
+      try {
+        const parsed = JSON.parse(await f.text());
+        if (!isVaultEnvelope(parsed))
+          throw new Error("File is not a SolveStack vault.");
+        const values = await collectFields("Unlock encrypted vault", [
+          {
+            name: "passphrase",
+            label: "Passphrase",
+            required: true,
+            secret: true,
+          },
+        ]);
+        if (!values) return;
+        const unlocked = await decryptVault(parsed, values.passphrase);
+        const incoming = parsePortableData(unlocked);
+        await mergeIncoming(
+          incoming.sessions as Session[],
+          incoming.attachments as Attachment[],
+          "Vault imported",
+        );
+      } catch (err) {
+        showToast(`Vault import failed: ${(err as Error).message}`, {
           durationMs: 8000,
         });
       }

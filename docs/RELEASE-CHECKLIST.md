@@ -21,6 +21,10 @@
 - Verify corrupt backup rejection and merge restore behavior.
 - Verify individual session JSON import and conflict confirmation.
 - Verify separate knowledge Markdown and RCA Markdown exports.
+- Verify Agent pack ZIP contains AGENT.md and redacted JSON without evidence binaries.
+- Verify method deep link `/?method=rca` opens a new-session dialog with RCA selected.
+- Verify Pattern Desk lists recurring systems after two similar sessions exist.
+- Verify encrypted vault export/import with a passphrase round-trips a backup merge.
 - Verify quota failure guidance does not silently discard the working entry.
 - Verify the backup banner appears with no backup on file and clears after a backup download; Settings shows the last-backup date.
 - Verify deleting an entry or an evidence attachment offers Undo for 30 seconds and restores it; verify no `alert()` remains for delete/restore flows.

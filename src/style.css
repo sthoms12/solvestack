@@ -1608,3 +1608,85 @@ h2 em {
   font-size: 16px;
   line-height: 1;
 }
+
+.method-strip {
+  margin: 8px 0 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.method-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.method-chip {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.method-chip:hover,
+.method-chip:focus-visible {
+  border-color: var(--accent2);
+  color: var(--accent);
+}
+.method-chip.quiet {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.pattern-desk {
+  display: grid;
+  gap: 28px;
+}
+.pattern-group {
+  display: grid;
+  gap: 12px;
+}
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.pattern-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+}
+.pattern-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+.pattern-top em {
+  font-style: normal;
+  font-family: "DM Mono", monospace;
+  color: var(--accent);
+  font-size: 18px;
+}
+.pattern-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.pattern-card small {
+  color: var(--muted);
+}
+.form-dialog select {
+  width: 100%;
+  margin-top: 6px;
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+}

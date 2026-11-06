@@ -29,11 +29,11 @@ The Worker asset runtime is defined in `wrangler.jsonc`. It uses `not_found_hand
 
 ## Boundaries
 
-No account, backend, cloud database, AI, or network service is required. The MVP stores sessions and evidence in IndexedDB and provides deterministic Markdown, standalone HTML, JSON, backup, and ZIP knowledge-package export. The service worker precaches every page, the fonts, and the built assets, so the whole site works offline on a first visit; fonts are self-hosted in `public/fonts` and no request goes to Google Fonts. When a new service worker takes over, the app prompts to reload instead of swapping silently.
+No account, backend, cloud database, hosted AI, or network service is required. The MVP stores sessions and evidence in IndexedDB (large evidence prefers OPFS when available) and provides deterministic Markdown, standalone HTML, JSON, backup, ZIP knowledge-package, encrypted vault, and redacted agent-pack export. Method deep links (`/?method=rca`, `5-whys`, `fishbone`, `incident-report`) seed structured investigations. The Pattern Desk surfaces recurring systems, tags, root causes, and ruled-outs on-device. The service worker precaches every page, the fonts, and the built assets, so the whole site works offline on a first visit; fonts are self-hosted in `public/fonts` and no request goes to Google Fonts. When a new service worker takes over, the app prompts to reload instead of swapping silently.
 
 The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.
 
-The data format is versioned (`schemaVersion: 2`) with an executable version-1 migration. JSON import accepts individual session exports and full backups, reports ID conflicts, and preserves existing investigations.
+The data format is versioned (`schemaVersion: 3`) with executable migrations from versions 1 and 2. JSON import accepts individual session exports and full backups, reports ID conflicts, and preserves existing investigations. Encrypted vault import uses the same merge policy after local passphrase decrypt.
 
 The persistence boundary and migration policy are documented in `docs/DATA-MODEL.md`. Use `docs/RELEASE-CHECKLIST.md` for repeatable static releases.
 

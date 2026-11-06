@@ -11,7 +11,7 @@ const activate = source.slice(
 );
 const fetchHandler = source.slice(source.indexOf('addEventListener("fetch"'));
 
-assert.match(source, /const CACHE = "solvestack-v9"/);
+assert.match(source, /const CACHE = "solvestack-v10"/);
 assert.match(install, /event\.waitUntil/);
 assert.match(install, /self\.skipWaiting\(\)/);
 // One missing precache file must not fail the whole install.
@@ -46,6 +46,7 @@ for (const url of [
   "/fonts/dm-mono-500.woff2",
   "/use-your-data/",
   "/use-your-data/guide.css",
+  "/agent-adapter/",
   "/rca-template/",
   "/rca-template/template.css",
   "/5-whys-template/",
