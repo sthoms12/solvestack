@@ -11,8 +11,15 @@ const markdownRoutes = new Set([
   "/5-whys-template/",
   "/fishbone-diagram-template/",
   "/rca-template/",
+  "/vpn-outage-template/",
+  "/sign-in-failure-template/",
+  "/expired-certificate-template/",
+  "/dns-failure-template/",
+  "/disk-full-template/",
+  "/email-delivery-template/",
   "/use-your-data/",
   "/onenote-vs-solvestack/",
+  "/agent-adapter/",
 ]);
 
 function appendVary(headers: Headers, value: string) {
