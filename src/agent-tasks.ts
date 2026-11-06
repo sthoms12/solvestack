@@ -99,10 +99,17 @@ function hypothesisSummary(session: AgentPackSession): string {
     .join(", ");
 }
 
-/** Build the task prompt from the redacted session (see module comment). */
+export type AgentPromptClosing = "files" | "handoff";
+
+/** Build the task prompt from the redacted session (see module comment).
+ * The closing line depends on how the record travels: attached as files
+ * (ZIP / paste pack) or pasted by the user as their next message after a
+ * one-click handoff (see ai-handoff.ts) — where the destination may even
+ * auto-submit this prompt before the record arrives. */
 export function buildAgentPrompt(
   session: AgentPackSession,
   task: AgentTask,
+  closing: AgentPromptClosing = "files",
 ): string {
   const starred = session.entries.filter((entry) => entry.starred).length;
   const tasksDone = session.tasks.filter((item) => item.completed).length;
@@ -129,6 +136,8 @@ export function buildAgentPrompt(
     "## Your task",
     task.instructions,
     "",
-    "The full redacted session record accompanies this prompt (knowledge.md and session.redacted.json in the ZIP pack, or the sections below in a paste pack).",
+    closing === "handoff"
+      ? "I will paste the full session record in my next message. Wait for it, then carry out the task above using only that record."
+      : "The full redacted session record accompanies this prompt (knowledge.md and session.redacted.json in the ZIP pack, or the sections below in a paste pack).",
   ].join("\n");
 }
