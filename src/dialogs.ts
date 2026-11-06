@@ -8,6 +8,15 @@ export type DialogField = {
   secret?: boolean;
   /** When set, renders a <select> instead of an input. */
   options?: { value: string; label: string }[];
+  /** Grey placeholder example inside a text input/textarea. */
+  placeholder?: string;
+  /** Per-option help line rendered under a <select>, updated on change. */
+  optionHints?: Record<string, string>;
+};
+
+export type CollectOptions = {
+  /** Confirm button label (default "Save"). */
+  confirmLabel?: string;
 };
 const escape = (value: string) =>
   value.replace(
@@ -24,21 +33,24 @@ const escape = (value: string) =>
 
 function fieldMarkup(field: DialogField) {
   if (field.options?.length) {
+    const initial = field.value || field.options[0].value;
+    const hint = field.optionHints?.[initial];
     return `<label><span>${escape(field.label)}</span><select name="${field.name}" ${field.required ? "required" : ""}>${field.options
       .map(
         (option) =>
           `<option value="${escape(option.value)}" ${option.value === (field.value || "") ? "selected" : ""}>${escape(option.label)}</option>`,
       )
-      .join("")}</select></label>`;
+      .join("")}</select>${hint ? `<p class="field-hint" data-hint-for="${field.name}">${escape(hint)}</p>` : ""}</label>`;
   }
   if (field.multiline)
-    return `<label><span>${escape(field.label)}</span><textarea name="${field.name}" ${field.required ? "required" : ""}>${escape(field.value || "")}</textarea></label>`;
-  return `<label><span>${escape(field.label)}</span><input name="${field.name}" type="${field.secret ? "password" : "text"}" value="${escape(field.value || "")}" ${field.required ? "required" : ""} autocomplete="${field.secret ? "new-password" : "off"}"></label>`;
+    return `<label><span>${escape(field.label)}</span><textarea name="${field.name}" ${field.required ? "required" : ""} ${field.placeholder ? `placeholder="${escape(field.placeholder)}"` : ""}>${escape(field.value || "")}</textarea></label>`;
+  return `<label><span>${escape(field.label)}</span><input name="${field.name}" type="${field.secret ? "password" : "text"}" value="${escape(field.value || "")}" ${field.required ? "required" : ""} ${field.placeholder ? `placeholder="${escape(field.placeholder)}"` : ""} autocomplete="${field.secret ? "new-password" : "off"}"></label>`;
 }
 
 export function collectFields(
   title: string,
   fields: DialogField[],
+  options?: CollectOptions,
 ): Promise<Record<string, string> | null> {
   return new Promise((resolve) => {
     const dialog = document.createElement("dialog");
@@ -47,7 +59,7 @@ export function collectFields(
     // method="dialog" form it would otherwise run native validation, and a
     // single empty required field would make Cancel unclickable — on a
     // phone, with no Esc key, the dialog becomes a trap.
-    dialog.innerHTML = `<form method="dialog"><span class="section-kicker">SOLVESTACK</span><h2>${escape(title)}</h2>${fields.map(fieldMarkup).join("")}<div class="button-row"><button value="cancel" class="secondary" formnovalidate>Cancel</button><button value="confirm" class="primary">Save</button></div></form>`;
+    dialog.innerHTML = `<form method="dialog"><span class="section-kicker">SOLVESTACK</span><h2>${escape(title)}</h2>${fields.map(fieldMarkup).join("")}<div class="button-row"><button value="cancel" class="secondary" formnovalidate>Cancel</button><button value="confirm" class="primary">${escape(options?.confirmLabel || "Save")}</button></div></form>`;
     document.body.append(dialog);
     dialog.addEventListener("close", () => {
       const result =
@@ -68,6 +80,20 @@ export function collectFields(
       }
     });
     dialog.showModal();
+    // Selects with per-option hints keep the hint line in sync.
+    for (const field of fields) {
+      if (!field.optionHints) continue;
+      const select = dialog.querySelector<HTMLSelectElement>(
+        `select[name="${field.name}"]`,
+      );
+      const hintEl = dialog.querySelector<HTMLElement>(
+        `[data-hint-for="${field.name}"]`,
+      );
+      if (!select || !hintEl) continue;
+      select.addEventListener("change", () => {
+        hintEl.textContent = field.optionHints![select.value] || "";
+      });
+    }
     // Autofocus is a desktop speed-up; on touch devices it summons the
     // keyboard before the user has decided to type anything.
     if (window.matchMedia("(pointer: fine)").matches)

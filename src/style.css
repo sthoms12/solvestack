@@ -370,6 +370,19 @@ h2 em {
   background: #263036;
   color: var(--blue);
 }
+.card-pills {
+  display: inline-flex;
+  gap: 6px;
+}
+.status.example {
+  background: #37331c;
+  color: #ecd06a;
+}
+.example-note {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 12px;
+}
 .session-card h3 {
   font-size: 17px;
   margin: 13px 0 7px;
@@ -1540,6 +1553,12 @@ h2 em {
 }
 .form-dialog h2 {
   margin: 8px 0 18px;
+}
+.form-dialog .field-hint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
 }
 .form-dialog label {
   display: grid;
