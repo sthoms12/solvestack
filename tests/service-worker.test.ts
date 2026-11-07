@@ -11,7 +11,7 @@ const activate = source.slice(
 );
 const fetchHandler = source.slice(source.indexOf('addEventListener("fetch"'));
 
-assert.match(source, /const CACHE = "solvestack-v11"/);
+assert.match(source, /const CACHE = "solvestack-v12"/);
 assert.match(install, /event\.waitUntil/);
 assert.match(install, /self\.skipWaiting\(\)/);
 // One missing precache file must not fail the whole install.

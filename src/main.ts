@@ -2148,10 +2148,14 @@ function bind() {
         // controller, so no toast on a first visit.
         navigator.serviceWorker.addEventListener("controllerchange", () => {
           if (!hadController) return;
+          // Sticky: an update notice the user can miss for 15 seconds is
+          // how a phone stays on a stale layout for days. It stays until
+          // Reload (or an explicit dismiss) — the × still lets a user
+          // postpone, and the next launch re-checks anyway.
           showToast("SolveStack updated — reload for the latest version.", {
             actionLabel: "Reload",
             onAction: () => location.reload(),
-            durationMs: 15000,
+            durationMs: 0,
           });
         });
       })

@@ -134,7 +134,7 @@ export class UndoHistory<T> {
 export type ToastOptions = {
   actionLabel?: string;
   onAction?: () => void;
-  /** Default 5s; undo toasts pass 30s. */
+  /** Default 5s; undo toasts pass 30s; 0 = sticky (no auto-dismiss). */
   durationMs?: number;
 };
 
@@ -174,5 +174,6 @@ export function showToast(message: string, options: ToastOptions = {}): void {
   dismiss.addEventListener("click", remove);
   toast.append(dismiss);
   region.append(toast);
-  window.setTimeout(remove, options.durationMs ?? 5000);
+  if (options.durationMs !== 0)
+    window.setTimeout(remove, options.durationMs ?? 5000);
 }
