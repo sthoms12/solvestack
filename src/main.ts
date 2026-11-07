@@ -29,7 +29,21 @@ import {
   decryptVault,
   encryptVault,
   isVaultEnvelope,
+  type VaultEnvelope,
 } from "./vault";
+import {
+  clearFolderHandle,
+  folderPermission,
+  folderSyncSupported,
+  folderVaultIsNewer,
+  loadFolderHandle,
+  openFolderVault,
+  pickFolder,
+  readFolderVault,
+  saveFolderHandle,
+  writeFolderVault,
+  type FolderDirHandle,
+} from "./vault-folder";
 import {
   buildAgentPackFiles,
   buildDeltaSession,
@@ -319,6 +333,7 @@ const load = async () => {
   }
   render();
   void refreshStorageEstimate();
+  void checkFolderVaultOnLoad();
   if (pendingMethod) {
     const method = pendingMethod;
     // Defer so bind() has attached the new-session flow.
@@ -375,6 +390,7 @@ const persist = () => {
   );
   return task.finally(() => {
     pendingPersistCount = Math.max(0, pendingPersistCount - 1);
+    scheduleFolderSync();
   });
 };
 // Scratchpad keystrokes coalesce into one write after the user pauses.
@@ -480,6 +496,9 @@ function dashboard() {
   const backupBanner = backup.needsBackup
     ? `<section class="backup-banner" role="status"><span><strong>${escapeHtml(backup.label)}.</strong> Your investigations live only in this browser — clearing site data removes them.</span><button class="secondary small-button" id="backup-now">Back up now</button></section>`
     : "";
+  const folderBanner = folderWaitingEnvelope
+    ? `<section class="backup-banner" role="status"><span><strong>A newer vault is in your sync folder</strong> (written ${escapeHtml(dateLabel(folderWaitingEnvelope.createdAt))}). Review it to merge sessions from your other machine — syncing is paused until you do.</span><button class="secondary small-button" id="folder-review-banner">Review &amp; merge</button></section>`
+    : "";
   // First-run state (panel up, no real sessions yet): lead with the
   // proposition instead of a greeting that presumes a returning user.
   const firstRun = !welcomeDismissed && realSessions.length === 0;
@@ -490,7 +509,7 @@ function dashboard() {
     realSessions.length === 0 && activeSessions.length
       ? '<p class="example-note">The session below is a worked example — open it to see how a finished investigation reads.</p>'
       : "";
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}${folderBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
 }
 function patternDesk() {
   const patterns = buildPatterns(store.sessions);
@@ -644,7 +663,7 @@ function settings() {
     bytes,
   );
   const backup = backupStatus(store.lastBackupAt);
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /><button class="secondary" id="skill-kit">${icon("download")} AI skill kit</button></div><p><small>Teach your AI tool the SolveStack contract once: the skill kit bundles the adapter, the five tasks, and the reply format.</small></p><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups or an encrypted vault periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /><button class="secondary" id="skill-kit">${icon("download")} AI skill kit</button></div><p><small>Teach your AI tool the SolveStack contract once: the skill kit bundles the adapter, the five tasks, and the reply format.</small></p><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div><div class="vault-sync" id="vault-sync-row"><p><small><strong>Sync folder:</strong> checking…</small></p></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups or an encrypted vault periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
 }
 
 function knowledgeMarkdown(s: Session) {
@@ -937,6 +956,302 @@ function writePackMarker(s: Session) {
     );
   } catch {
     // Storage full/blocked: delta packs simply stop being offered.
+  }
+}
+
+/* ---- Vault folder sync (V1) ------------------------------------------
+ * Keeps the encrypted vault file current inside a user-picked folder
+ * (typically OneDrive/Drive-synced). The passphrase lives in memory for
+ * the browser session only — never persisted — so sync visibly pauses
+ * while locked instead of storing a secret. While a newer folder vault
+ * is waiting for review, writes pause too: syncing must never clobber
+ * the other machine's newer work. */
+type FolderMeta = {
+  folderName: string;
+  seenCreatedAt: string;
+  lastWriteAt: string;
+};
+const FOLDER_META_KEY = "solvestack-folder-meta";
+let folderHandle: FolderDirHandle | null = null;
+let folderHandleLoaded = false;
+let syncPassphrase: string | null = null;
+let folderWaitingEnvelope: VaultEnvelope | null = null;
+let folderWaitingPayload: unknown = null;
+let folderSyncError = "";
+let folderSyncTimer: ReturnType<typeof setTimeout> | undefined;
+let folderErrorToastShown = false;
+let lastFolderRowEl: HTMLElement | null = null;
+let lastFolderRowHtml = "";
+/** bind() owns mergeIncoming; the reference lets module-level folder
+ * flows reuse the exact import-merge semantics. */
+let mergeIncomingRef:
+  | ((
+      sessions: Session[],
+      attachments: Attachment[],
+      kindLabel: string,
+    ) => Promise<void>)
+  | null = null;
+
+function readFolderMeta(): FolderMeta {
+  try {
+    const parsed = JSON.parse(
+      localStorage.getItem(FOLDER_META_KEY) ?? "{}",
+    ) as Partial<FolderMeta>;
+    return {
+      folderName: typeof parsed.folderName === "string" ? parsed.folderName : "",
+      seenCreatedAt:
+        typeof parsed.seenCreatedAt === "string" ? parsed.seenCreatedAt : "",
+      lastWriteAt:
+        typeof parsed.lastWriteAt === "string" ? parsed.lastWriteAt : "",
+    };
+  } catch {
+    return { folderName: "", seenCreatedAt: "", lastWriteAt: "" };
+  }
+}
+function saveFolderMeta(meta: FolderMeta) {
+  try {
+    localStorage.setItem(FOLDER_META_KEY, JSON.stringify(meta));
+  } catch {
+    // Meta is bookkeeping; sync still works without it.
+  }
+}
+async function ensureFolderHandle(): Promise<FolderDirHandle | null> {
+  if (!folderHandleLoaded) {
+    folderHandleLoaded = true;
+    folderHandle = await loadFolderHandle();
+  }
+  return folderHandle;
+}
+
+function scheduleFolderSync() {
+  if (!folderSyncSupported() || !syncPassphrase || folderWaitingEnvelope)
+    return;
+  if (folderSyncTimer) return;
+  folderSyncTimer = setTimeout(() => {
+    folderSyncTimer = undefined;
+    void syncVaultToFolder();
+  }, 4000);
+}
+
+async function syncVaultToFolder() {
+  const handle = await ensureFolderHandle();
+  if (!handle || !syncPassphrase || folderWaitingEnvelope) return;
+  if ((await folderPermission(handle)) !== "granted") {
+    folderSyncError = "folder permission needed — reconnect from Settings";
+    void refreshFolderSyncUi();
+    return;
+  }
+  try {
+    const envelope = await writeFolderVault(
+      handle,
+      { ...store, exportedAt: now() },
+      syncPassphrase,
+    );
+    const meta = readFolderMeta();
+    meta.folderName = handle.name;
+    meta.seenCreatedAt = envelope.createdAt;
+    meta.lastWriteAt = envelope.createdAt;
+    saveFolderMeta(meta);
+    folderSyncError = "";
+    folderErrorToastShown = false;
+    void refreshFolderSyncUi();
+  } catch (err) {
+    folderSyncError = (err as Error).message;
+    if (!folderErrorToastShown) {
+      folderErrorToastShown = true;
+      showToast(`Vault folder sync paused: ${folderSyncError}`, {
+        durationMs: 8000,
+      });
+    }
+    void refreshFolderSyncUi();
+  }
+}
+
+/** Boot check: surface a newer folder vault written by another machine. */
+async function checkFolderVaultOnLoad() {
+  if (!folderSyncSupported()) return;
+  const handle = await ensureFolderHandle();
+  if (!handle) return;
+  try {
+    const found = await readFolderVault(handle);
+    if (!found) return;
+    if (
+      folderVaultIsNewer(found.envelope.createdAt, readFolderMeta().seenCreatedAt)
+    ) {
+      folderWaitingEnvelope = found.envelope;
+      render();
+    }
+  } catch {
+    // An unavailable folder at boot is a Settings-row state, not an error.
+  }
+}
+
+async function unlockFolderSync(): Promise<boolean> {
+  const handle = await ensureFolderHandle();
+  if (!handle) return false;
+  const values = await collectFields("Unlock vault folder sync", [
+    {
+      name: "passphrase",
+      label:
+        "Vault passphrase — held in memory for this browser session only, never stored",
+      required: true,
+      secret: true,
+    },
+  ]);
+  if (!values) return false;
+  try {
+    const found = await readFolderVault(handle);
+    if (found) {
+      const payload = await openFolderVault(found.envelope, values.passphrase);
+      syncPassphrase = values.passphrase;
+      const meta = readFolderMeta();
+      if (folderVaultIsNewer(found.envelope.createdAt, meta.seenCreatedAt)) {
+        folderWaitingEnvelope = found.envelope;
+        folderWaitingPayload = payload;
+        showToast(
+          "A newer vault is in your sync folder — review it before syncing resumes, so nothing is overwritten.",
+          { durationMs: 9000 },
+        );
+        render();
+        void refreshFolderSyncUi();
+        return true;
+      }
+      meta.seenCreatedAt = found.envelope.createdAt;
+      saveFolderMeta(meta);
+    } else {
+      // First vault in this folder: this passphrase defines it.
+      syncPassphrase = values.passphrase;
+    }
+  } catch {
+    showToast("That passphrase doesn't open the vault in this folder.", {
+      durationMs: 8000,
+    });
+    return false;
+  }
+  showToast("Vault folder sync unlocked for this session.");
+  void syncVaultToFolder();
+  void refreshFolderSyncUi();
+  return true;
+}
+
+async function connectFolder() {
+  const handle = await pickFolder();
+  if (!handle) return;
+  try {
+    await saveFolderHandle(handle);
+  } catch {
+    showToast(
+      "Couldn't remember that folder — sync needs IndexedDB available.",
+      { durationMs: 8000 },
+    );
+    return;
+  }
+  folderHandle = handle;
+  folderHandleLoaded = true;
+  const meta = readFolderMeta();
+  meta.folderName = handle.name;
+  saveFolderMeta(meta);
+  await unlockFolderSync();
+  void refreshFolderSyncUi();
+}
+
+async function disconnectFolder() {
+  await clearFolderHandle();
+  folderHandle = null;
+  folderHandleLoaded = true;
+  syncPassphrase = null;
+  folderWaitingEnvelope = null;
+  folderWaitingPayload = null;
+  folderSyncError = "";
+  saveFolderMeta({ folderName: "", seenCreatedAt: "", lastWriteAt: "" });
+  showToast(
+    "Sync folder disconnected. The vault files in the folder were left as they are.",
+  );
+  render();
+}
+
+async function reviewFolderVault() {
+  if (!folderWaitingEnvelope) {
+    showToast("No newer vault is waiting in the sync folder.");
+    return;
+  }
+  if (folderWaitingPayload == null) {
+    const ok = await unlockFolderSync();
+    if (!ok || folderWaitingPayload == null) return;
+  }
+  if (!mergeIncomingRef) return;
+  const createdAt = folderWaitingEnvelope.createdAt;
+  const incoming = parsePortableData(folderWaitingPayload);
+  await mergeIncomingRef(
+    incoming.sessions as Session[],
+    incoming.attachments as Attachment[],
+    "Sync folder vault merged",
+  );
+  const meta = readFolderMeta();
+  meta.seenCreatedAt = createdAt;
+  saveFolderMeta(meta);
+  folderWaitingEnvelope = null;
+  folderWaitingPayload = null;
+  render();
+  // Local now holds the merged state — write it back so the folder is
+  // current and the other machine sees the merge next.
+  void syncVaultToFolder();
+}
+
+/** Renders the sync row inside the Settings vault card, per state. */
+async function refreshFolderSyncUi() {
+  const row = document.querySelector<HTMLElement>("#vault-sync-row");
+  if (!row) return;
+  let html: string;
+  let bindRow: (() => void) | null = null;
+  const on = (id: string, fn: () => void) =>
+    row.querySelector(`#${id}`)?.addEventListener("click", fn);
+  if (!folderSyncSupported()) {
+    html = `<p><small><strong>Sync folder:</strong> needs Chrome or Edge on desktop — the manual vault above works everywhere.</small></p>`;
+  } else {
+    const handle = await ensureFolderHandle();
+    if (!handle) {
+      html = `<p><small><strong>Sync folder:</strong> keep this vault current in a OneDrive or Drive folder you choose. The file stays encrypted; your drive app does the syncing.</small></p><div class="button-row"><button class="secondary" id="folder-connect">Connect sync folder</button></div>`;
+      bindRow = () => on("folder-connect", () => void connectFolder());
+    } else {
+      const permission = await folderPermission(handle);
+      const meta = readFolderMeta();
+      const name = escapeHtml(handle.name || meta.folderName || "folder");
+      if (permission !== "granted") {
+        html = `<p><small><strong>Sync folder:</strong> ${name} — permission needed again (browsers ask each session).</small></p><div class="button-row"><button class="secondary" id="folder-reconnect">Reconnect folder</button><button class="secondary" id="folder-disconnect">Disconnect</button></div>`;
+        bindRow = () => {
+          on("folder-reconnect", () => {
+            void (async () => {
+              await folderPermission(handle, true);
+              void refreshFolderSyncUi();
+              if (syncPassphrase) void syncVaultToFolder();
+            })();
+          });
+          on("folder-disconnect", () => void disconnectFolder());
+        };
+      } else if (folderWaitingEnvelope) {
+        html = `<p><small><strong>Sync folder:</strong> ${name} — <strong>a newer vault is waiting</strong> (written ${escapeHtml(dateLabel(folderWaitingEnvelope.createdAt))}). Syncing is paused so it isn't overwritten.</small></p><div class="button-row"><button class="secondary" id="folder-review">Review &amp; merge</button><button class="secondary" id="folder-disconnect">Disconnect</button></div>`;
+        bindRow = () => {
+          on("folder-review", () => void reviewFolderVault());
+          on("folder-disconnect", () => void disconnectFolder());
+        };
+      } else if (!syncPassphrase) {
+        html = `<p><small><strong>Sync folder:</strong> ${name} — paused. Sync unlocks per browser session; your passphrase is never stored.</small></p><div class="button-row"><button class="secondary" id="folder-unlock">Unlock sync</button><button class="secondary" id="folder-disconnect">Disconnect</button></div>`;
+        bindRow = () => {
+          on("folder-unlock", () => void unlockFolderSync());
+          on("folder-disconnect", () => void disconnectFolder());
+        };
+      } else {
+        html = `<p><small><strong>Sync folder:</strong> ${name} — syncing${meta.lastWriteAt ? ` · last written ${escapeHtml(dateLabel(meta.lastWriteAt))}` : ""}.${folderSyncError ? ` Last attempt failed: ${escapeHtml(folderSyncError)}` : ""}</small></p><div class="button-row"><button class="secondary" id="folder-disconnect">Disconnect</button></div>`;
+        bindRow = () => on("folder-disconnect", () => void disconnectFolder());
+      }
+    }
+  }
+  if (row !== lastFolderRowEl || html !== lastFolderRowHtml) {
+    row.innerHTML = html;
+    lastFolderRowEl = row;
+    lastFolderRowHtml = html;
+    bindRow?.();
   }
 }
 
@@ -1291,6 +1606,10 @@ function bind() {
   document
     .querySelector("#backup-now")
     ?.addEventListener("click", () => void doBackup());
+  document
+    .querySelector("#folder-review-banner")
+    ?.addEventListener("click", () => void reviewFolderVault());
+  void refreshFolderSyncUi();
   if (!attachmentListenerReady) {
     attachmentListenerReady = true;
     window.addEventListener(
@@ -2029,6 +2348,7 @@ function bind() {
     render();
     showToast(`${kindLabel}. Existing records were preserved.`);
   };
+  mergeIncomingRef = mergeIncoming;
   document
     .querySelector<HTMLInputElement>("#restore-file")
     ?.addEventListener("change", async (e) => {
