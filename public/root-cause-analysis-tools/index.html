@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Root cause analysis tools for choosing a method: 5 Whys, fishbone, Pareto, FMEA, fault tree, and the SolveStack template when one exists." />
+    <link rel="canonical" href="https://solvestack-ai.app/root-cause-analysis-tools/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/root-cause-analysis-tools/" />
+    <meta property="og:title" content="Root Cause Analysis Tools" />
+    <meta property="og:description" content="When to use 5 Whys, a fishbone diagram, a Pareto chart, FMEA, or a fault tree, and which SolveStack templates match." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Root Cause Analysis Tools" />
+    <meta name="twitter:description" content="Choose 5 Whys, fishbone, Pareto, FMEA, or a fault tree. Links to SolveStack templates where they exist." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/root-cause-analysis-tools/template.css" />
+    <title>Root Cause Analysis Tools | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Root Cause Analysis Tools",
+        "description": "A guide to root cause analysis tools: 5 Whys, fishbone, Pareto, FMEA, fault tree, change analysis, barrier analysis, and events and causal factors charting, with links to SolveStack templates where they exist.",
+        "url": "https://solvestack-ai.app/root-cause-analysis-tools/",
+        "author": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+        "publisher": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+        "about": ["root cause analysis tools", "5 whys", "fishbone diagram", "Pareto chart", "FMEA", "fault tree analysis"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What are root cause analysis tools?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Root cause analysis tools are methods for moving from an effect to a cause you can change. A tool sorts evidence or candidates. It does not, by itself, prove the cause. Proof is a later check that the effect stays gone after that cause is removed or controlled. This page covers the 5 Whys, the fishbone diagram, the Pareto chart, FMEA, fault tree analysis, change analysis, barrier analysis, and events and causal factors charting, and it links to a SolveStack template where one exists." }
+          },
+          {
+            "@type": "Question",
+            "name": "When should I use the 5 Whys?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Use the 5 Whys when you have one effect and a chain you can follow, and you can write evidence beside each answer. Five is the usual length, not a quota. Stop on a cause the team can change. If a second cause does not depend on the first, start a second chain. The 5 whys template is the worksheet for that chain." }
+          },
+          {
+            "@type": "Question",
+            "name": "When should I use a fishbone diagram?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Use a fishbone diagram when several kinds of cause are still plausible and you need them on one chart before you choose a branch to test. The finished chart is a sorted list of candidates, not a finding. Manufacturing work often uses the 6M categories. Service work often uses the 4Ps or the 4Ss. The fishbone diagram template has those sets, a worksheet, and a blank CSV." }
+          },
+          {
+            "@type": "Question",
+            "name": "When is a Pareto chart the right tool?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Use a Pareto chart when the same kinds of event keep recurring and you can count them in one unit, such as occurrences or minutes of impact. The chart ranks categories so you can see which ones account for most of the total. Do not use it for a single incident. Do not expect a fixed split such as 80/20. The share is whatever your counts show. SolveStack does not publish a Pareto template. After the chart selects a category, continue with the 5 whys or the root cause analysis template." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do FMEA and fault tree analysis differ?",
+            "acceptedAnswer": { "@type": "Answer", "text": "FMEA starts from a design or a process step and asks how that piece can fail and what the effect would be. It is usually done before the failure, or when you are about to change the design. Fault tree analysis starts from an undesired top event and uses logic gates to show which combinations of faults are enough to cause it. An OR gate means any one input is enough. An AND gate means every input is required. SolveStack does not publish an FMEA page or a fault tree template." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which of these tools have a SolveStack template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "SolveStack publishes a 5 whys template, a fishbone diagram template, a root cause analysis template for the full record, an incident report template, and a corrective action plan template for the actions after a confirmed cause. Pareto charts, FMEA worksheets, and fault trees are explained on this page and are not separate pages." }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Guide navigation"><a href="#choose">Choose</a><a href="#methods">Methods</a><a href="#template">Note</a><a href="/corrective-action-plan-template/">Action plan</a><a class="launch" href="/?method=rca">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / RCA TOOLS</div>
+        <p class="overline">EFFECT → A METHOD THAT FITS → A CAUSE YOU CAN CHANGE</p>
+        <h1>Root Cause Analysis <em>Tools</em></h1>
+        <p class="intro">Root cause analysis tools do not share one job. The <a href="/5-whys-template/">5 Whys</a> follows a single chain. A <a href="/fishbone-diagram-template/">fishbone diagram</a> sorts candidate causes into categories. A Pareto chart ranks recurring categories by a count. FMEA looks forward, at how a design or a process could fail. A fault tree shows which combinations of faults are enough to cause one defined event. A tool produces candidates or a ranking. It does not prove the cause. Proof is a later check: the effect stays gone after you remove or control that cause. SolveStack publishes a worksheet where one exists, and says so where it does not.</p>
+        <div class="hero-actions"><a class="primary" href="#choose">Choose a method</a><a class="secondary" href="/rca-template/">Open the RCA template</a></div>
+        <aside><strong>Local-first boundary</strong><span>This page is a guide. Nothing you read here is stored. SolveStack keeps an investigation in IndexedDB in your browser. No account, no cloud database, no built-in AI.</span></aside>
+      </section>
+
+      <section class="template" id="choose" aria-labelledby="choose-title">
+        <div class="section-label"><span>01</span><div><p>CHOOSE</p><h2 id="choose-title">Match the tool to the evidence you already have.</h2></div></div>
+        <p class="lede">Start from the effect, not from a favorite diagram. If the method needs a kind of evidence you do not have, pick a different method or go collect that evidence. Stopping at human error, or at the component that broke, names a place. Ask what in the system allowed that action or that failure, and write the evidence for the answer.</p>
+        <div class="step-list">
+          <article><span class="number">STEP 01</span><div><h3>Name the effect</h3><p>Write what was observed, when, including the timezone, and the extent, with the measurements you actually have. Adjectives are not a problem statement. If other people need that record while the incident is still open, put it on the <a href="/incident-report-template/">incident report template</a>. The report is the account of what happened. The analysis is the account of why.</p></div></article>
+          <article><span class="number">STEP 02</span><div><h3>Separate one case from a recurring set</h3><p>A Pareto chart needs categories you can count in one unit, across many events. One incident is not a distribution. Skip the chart and study the case in front of you. If the same category keeps returning, the chart is how you choose which category to investigate first, and it still does not explain why that category happens.</p></div></article>
+          <article><span class="number">STEP 03</span><div><h3>See whether one chain is already visible</h3><p>Several kinds of cause still plausible: draw a fishbone and pick one branch to test. One chain you can already follow: use the 5 Whys, and put evidence beside each answer. Two causes that do not depend on each other are two chains. Forcing them into one list hides one of them.</p></div></article>
+          <article><span class="number">STEP 04</span><div><h3>Ask whether faults have to combine</h3><p>If the event happens only when several faults are true together, or if any one of several faults is enough, a fault tree makes that logic visible. If one fault was enough and the evidence shows it, you do not need the tree. An OR gate means any one input is enough. An AND gate means every listed input is required.</p></div></article>
+          <article><span class="number">STEP 05</span><div><h3>Keep the forward look separate</h3><p>The investigation explains the failure you had. FMEA asks how a design or a process step could fail, including failures you did not just watch. Do the investigation first. Use an FMEA when you change the design so the same mode is harder to repeat. Do not file the FMEA as the incident write-up. SolveStack does not publish an FMEA page.</p></div></article>
+          <article><span class="number">STEP 06</span><div><h3>File the record, then the actions</h3><p>The timeline, the chain, the contributing factors, and the check that the fix held go on the <a href="/rca-template/">root cause analysis template</a>. Owners, dates, and the effectiveness check go on the <a href="/corrective-action-plan-template/">corrective action plan template</a>. A diagram with no record, and a record with no checked action, are both unfinished.</p></div></article>
+        </div>
+      </section>
+
+      <section class="template" id="methods" aria-labelledby="methods-title">
+        <div class="section-label"><span>02</span><div><p>THE METHODS</p><h2 id="methods-title">What each tool can and cannot tell you.</h2></div></div>
+        <p class="lede">The table is the choice. The notes under it are the mechanic: how the tool is filled in, and the way it usually goes wrong.</p>
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>Choose a root cause analysis tool from the evidence you have. Template links are the worksheets SolveStack publishes.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Tool</th>
+                <th scope="col">Use it when</th>
+                <th scope="col">A poor fit when</th>
+                <th scope="col">On SolveStack</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">5 Whys</th>
+                <td>One effect, and a chain you can support with evidence at each step.</td>
+                <td>Several independent causes, or an answer you cannot check.</td>
+                <td><a href="/5-whys-template/">5 whys template</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Fishbone diagram</th>
+                <td>Several kinds of cause are still open and you need them sorted before a test.</td>
+                <td>You already have one chain, or you need proof rather than candidates.</td>
+                <td><a href="/fishbone-diagram-template/">Fishbone diagram template</a></td>
+              </tr>
+              <tr>
+                <th scope="row">Pareto chart</th>
+                <td>Recurring events in comparable categories, counted in one unit.</td>
+                <td>A single incident, or categories that do not share a unit.</td>
+                <td>No template on this site. Rank the categories in a spreadsheet, then continue with the 5 Whys or the RCA template.</td>
+              </tr>
+              <tr>
+                <th scope="row">FMEA</th>
+                <td>A design or a process you can still change, before that failure happens, or while you are changing it.</td>
+                <td>Explaining one failure that already happened.</td>
+                <td>No template on this site, and no FMEA page. The investigation belongs on the RCA template.</td>
+              </tr>
+              <tr>
+                <th scope="row">Fault tree</th>
+                <td>An undesired event that can come from combinations of faults you can draw.</td>
+                <td>You cannot yet say how the system fails, or one observed fault is already enough.</td>
+                <td>No template on this site. Record the top event and the evidence on the RCA template.</td>
+              </tr>
+              <tr>
+                <th scope="row">Change analysis</th>
+                <td>Something that worked now fails, and a working comparison exists.</td>
+                <td>There is no working case to contrast with the failing one.</td>
+                <td>No separate page. Put the is / is not contrast in the RCA problem statement and timeline.</td>
+              </tr>
+              <tr>
+                <th scope="row">Barrier analysis</th>
+                <td>Named controls, such as alarms, approvals, tests, or permissions, should have stopped the outcome.</td>
+                <td>You would be inventing a control the system never had.</td>
+                <td>No separate page. Missing or failed controls belong with contributing factors on the RCA template.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="step-list">
+          <article><span class="number">5 WHYS</span><div><h3>One chain, with evidence on every step</h3><p>The 5 Whys is the questioning chain used in the Toyota Production System. You state the effect, ask why it happened, and let that answer become the next question. Five is a usual length, not a rule: stop when you reach a cause the team can change, and stop earlier if the next answer would be a guess. Write the evidence beside each why. A step with no evidence is a hypothesis, and the chain stays a hypothesis until the corrective action is checked. The worksheet is the <a href="/5-whys-template/">5 whys template</a>.</p></div></article>
+          <article><span class="number">FISHBONE</span><div><h3>Categories first, then one branch to test</h3><p>A fishbone diagram, also called an Ishikawa diagram or a cause-and-effect diagram, puts one effect at the head and hangs possible causes on category bones. The usual manufacturing set is the 6Ms: Methods, Machines, Materials, Manpower (People), Measurement, and Mother Nature (Environment). Service work often uses the 4Ps, Policies, Procedures, People, and Plant/Technology, or the 4Ss, Surroundings, Suppliers, Systems, and Skills. The people bone is for skills, staffing, and handoffs. A colleague's name is not a cause. An empty category is a prompt to look again, not an order to invent a cause. The chart does not say which branch is true. Test one branch, and leave the others on the chart so they are not forgotten. The <a href="/fishbone-diagram-template/">fishbone diagram template</a> includes the category sets and a blank CSV.</p></div></article>
+          <article><span class="number">PARETO</span><div><h3>A ranking of categories, not a cause</h3><p>A Pareto chart is a bar chart of categories in descending order, often with a line for the cumulative share. In quality work this ranking is called a Pareto analysis: look at the few categories that account for most of the total you chose to count. The count has to be one unit. Mixing incidents, minutes, and cost on one axis makes the order meaningless. A handful of events can change the order when the next week arrives. If adding or removing a few events would change which category is first, treat the chart as a hint and look at the next category too. People sometimes quote the Pareto principle as 80/20. That ratio is an illustration, not a result you should expect. Read the share off your own counts. SolveStack does not publish a Pareto template.</p></div></article>
+          <article><span class="number">FMEA</span><div><h3>How it could fail, before it does</h3><p>Failure mode and effects analysis, set out for equipment in the 1949 US military procedure MIL-P-1629, walks a design or a process step and asks how that piece can fail, what the effect is, and how bad the effect is. A design FMEA looks at the design. A process FMEA looks at the steps that build or run it. Worksheets often score severity, occurrence, and detection on a short scale. Multiplying those scores produces a risk priority number on sheets that still use one. That product is a sort key, not a probability, and a higher product is not automatically the mode to work on first when another mode is more severe. The 2019 AIAG-VDA FMEA Handbook ranks the need for action with an Action Priority of high, medium, or low, so severity is not washed out by the multiplication. FMEA is the wrong write-up for an incident you just had. SolveStack does not publish an FMEA worksheet or an FMEA page.</p></div></article>
+          <article><span class="number">FAULT TREE</span><div><h3>Which combinations are enough</h3><p>Fault tree analysis was developed at Bell Laboratories in 1962 for the Minuteman program. You name one undesired top event, then show the faults that can cause it. An OR gate means any one input is enough. An AND gate means every input is required. Other gates exist. IEC 61025 is the international standard that describes the method. Qualitative analysis is the shape of the tree: it is useful without failure rates. Quantitative analysis needs rates you actually have. Do not invent a rate to make the arithmetic work. Basic events are the faults where you stop decomposing, because you can observe them or because that is the level you will change. If you cannot yet draw the system, you are not ready for the tree. There is no fault tree template on this site. The top event and the evidence belong on the <a href="/rca-template/">root cause analysis template</a>.</p></div></article>
+          <article><span class="number">OTHERS</span><div><h3>Change, barriers, and a long timeline</h3><p>Change analysis compares the failing case with a working one along what, where, when, and extent: an is / is not list. The differences are places to investigate, not yet causes. Use it when something that worked has started to fail and you can name a comparison that still works. Barrier analysis lists the controls that should have stopped the outcome, such as an alarm, an approval, a test, or a permission, and marks which were missing, weak, or bypassed. A control you wish had existed is a recommendation, not a finding that it failed. Events and causal factors charting, used in some energy-industry investigations, draws the timeline and hangs the conditions that shaped each event on that line. It earns its keep when the story is long. A short single chain does not need it. Eight Disciplines (8D) and DMAIC are sequences for when to contain, when to analyze, and when to check. They are not cause-finding tools. Inside them, a team still uses a chart, a chain, or a tree from this page.</p></div></article>
+        </div>
+      </section>
+
+      <section class="tool" id="example" aria-labelledby="example-title">
+        <div class="section-label"><span>03</span><div><p>ONE CASE</p><h2 id="example-title">The same facts, and the tool they justify.</h2></div></div>
+        <div class="tool-grid">
+          <div>
+            <p>A method choice is a claim about the evidence. Write the claim down, including the tools you did not use and why.</p>
+            <div class="tool-actions"><a class="primary" href="/corrective-action-plan-template/">See the action plan for this case</a><a class="secondary" href="/5-whys-template/">5 whys template</a></div>
+          </div>
+          <div>
+            <div>
+              <p class="lede">CI jobs against an internal package registry returned HTTP 401 for 26 minutes on 2026-10-08, from 09:40 to 10:06 UTC. Merge builds in two product groups failed. No production runtime was affected. That is one incident, so a Pareto chart has nothing to rank. One chain was already visible: the jobs failed because a robot credential was rejected, and the credential had expired that morning. The team used the 5 Whys rather than a fishbone. They did not draw a fault tree, because one expired credential was enough on its own. An FMEA of the rotation process would be a forward look after the cause is known, not the investigation of this outage. The chain belongs on the 5 whys template, inside the <a href="/rca-template/">root cause analysis template</a>. The actions for this same fictional case are on the <a href="/corrective-action-plan-template/">corrective action plan template</a>. Not a real incident.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>04</span><div><p>THE NOTE</p><h2 id="template-title">Paste the choice into the record.</h2></div></div>
+        <p class="lede">Fill this in when you pick a method. A later reader should see why this tool, and why not the others, without reconstructing the meeting.</p>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — METHOD CHOICE</p>
+          <pre>WHICH RCA TOOL
+==============
+Effect (what was observed, when, timezone, extent):
+Measurements you actually have:
+Single incident, or a recurring set with counts:
+Working comparison available (is / is not):
+Cause categories still open:
+One chain already visible, with evidence for each step:
+Combinations of faults plausible (AND / OR):
+Design or process change planned after the cause is known:
+Controls that should have caught this:
+
+Tool chosen:
+Why this tool:
+Why not the others:
+SolveStack page used, or "no template on this site":
+What new evidence would change the choice:</pre>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>05</span><div><p>QUESTIONS</p><h2 id="faqs-title">Tools, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What are root cause analysis tools?</h3><p>Root cause analysis tools are methods for moving from an effect to a cause you can change. A tool sorts evidence or candidates. It does not, by itself, prove the cause. Proof is a later check that the effect stays gone after that cause is removed or controlled. This page covers the 5 Whys, the fishbone diagram, the Pareto chart, FMEA, fault tree analysis, change analysis, barrier analysis, and events and causal factors charting, and it links to a SolveStack template where one exists.</p></article>
+          <article><h3>When should I use the 5 Whys?</h3><p>Use the 5 Whys when you have one effect and a chain you can follow, and you can write evidence beside each answer. Five is the usual length, not a quota. Stop on a cause the team can change. If a second cause does not depend on the first, start a second chain. The <a href="/5-whys-template/">5 whys template</a> is the worksheet for that chain.</p></article>
+          <article><h3>When should I use a fishbone diagram?</h3><p>Use a fishbone diagram when several kinds of cause are still plausible and you need them on one chart before you choose a branch to test. The finished chart is a sorted list of candidates, not a finding. Manufacturing work often uses the 6M categories. Service work often uses the 4Ps or the 4Ss. The <a href="/fishbone-diagram-template/">fishbone diagram template</a> has those sets, a worksheet, and a blank CSV.</p></article>
+          <article><h3>When is a Pareto chart the right tool?</h3><p>Use a Pareto chart when the same kinds of event keep recurring and you can count them in one unit, such as occurrences or minutes of impact. The chart ranks categories so you can see which ones account for most of the total. Do not use it for a single incident. Do not expect a fixed split such as 80/20. The share is whatever your counts show. SolveStack does not publish a Pareto template. After the chart selects a category, continue with the <a href="/5-whys-template/">5 whys</a> or the <a href="/rca-template/">root cause analysis template.</a></p></article>
+          <article><h3>How do FMEA and fault tree analysis differ?</h3><p>FMEA starts from a design or a process step and asks how that piece can fail and what the effect would be. It is usually done before the failure, or when you are about to change the design. Fault tree analysis starts from an undesired top event and uses logic gates to show which combinations of faults are enough to cause it. An OR gate means any one input is enough. An AND gate means every input is required. SolveStack does not publish an FMEA page or a fault tree template.</p></article>
+          <article><h3>Which of these tools have a SolveStack template?</h3><p>SolveStack publishes a <a href="/5-whys-template/">5 whys template,</a> a <a href="/fishbone-diagram-template/">fishbone diagram template,</a> a <a href="/rca-template/">root cause analysis template</a> for the full record, an <a href="/incident-report-template/">incident report template,</a> and a <a href="/corrective-action-plan-template/">corrective action plan template</a> for the actions after a confirmed cause. Pareto charts, FMEA worksheets, and fault trees are explained on this page and are not separate pages.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>06</span><div><p>KEEP GOING</p><h2 id="related-title">The worksheet, when one exists.</h2></div></div>
+        <div class="related-cards">
+          <a href="/5-whys-template/"><b>5 WHYS</b><span>5 whys template</span><p>One cause chain, evidence on each step, and a copyable worksheet.</p></a>
+          <a href="/fishbone-diagram-template/"><b>FISHBONE</b><span>Fishbone diagram template</span><p>The 6Ms, the 4Ps, and the 4Ss, plus a worksheet and a blank CSV.</p></a>
+          <a href="/rca-template/"><b>FULL RECORD</b><span>Root cause analysis template</span><p>Problem statement, timeline, 5 whys, contributing factors, actions, and follow-ups.</p></a>
+          <a href="/corrective-action-plan-template/"><b>ACTIONS</b><span>Corrective action plan template</span><p>Correction, corrective action, and preventive action, with owners, dates, and a check.</p></a>
+          <a href="/incident-report-template/"><b>DURING</b><span>Incident report template</span><p>What happened, while it is happening. The analysis comes after.</p></a>
+          <a href="/?method=rca"><b>WORKSPACE</b><span>Open an RCA in SolveStack</span><p>Capture the timeline and the evidence in this browser. Export Markdown, HTML, JSON, or ZIP.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

@@ -30,6 +30,16 @@ const PAGES = [
     path: "/fishbone-diagram-template/",
   },
   {
+    source: "public/root-cause-analysis-tools/index.html",
+    out: "root-cause-analysis-tools.md",
+    path: "/root-cause-analysis-tools/",
+  },
+  {
+    source: "public/corrective-action-plan-template/index.html",
+    out: "corrective-action-plan-template.md",
+    path: "/corrective-action-plan-template/",
+  },
+  {
     source: "public/rca-template/index.html",
     out: "rca-template.md",
     path: "/rca-template/",

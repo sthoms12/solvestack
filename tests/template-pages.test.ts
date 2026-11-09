@@ -292,4 +292,72 @@ for (const page of incidentTemplatePages) {
   assert.equal(built, html, page.path);
 }
 
+const home = await Bun.file("index.html").text();
+assert.equal(home.includes('href="/root-cause-analysis-tools/"'), true);
+assert.equal(home.includes('href="/corrective-action-plan-template/"'), true);
+
+const addedPages: Array<{
+  path: string;
+  title: string;
+  heading: string;
+  descriptionPhrase: string;
+  templateMarker: string;
+}> = [
+  {
+    path: "root-cause-analysis-tools/",
+    title: "Root Cause Analysis Tools",
+    heading: "Root Cause Analysis Tools",
+    descriptionPhrase: "Root cause analysis tools",
+    templateMarker: "WHICH RCA TOOL",
+  },
+  {
+    path: "corrective-action-plan-template/",
+    title: "Corrective Action Plan Template",
+    heading: "Corrective Action Plan Template",
+    descriptionPhrase: "corrective action plan template",
+    templateMarker: "CORRECTIVE ACTION PLAN",
+  },
+];
+for (const page of addedPages) {
+  const html = await Bun.file(`public/${page.path}index.html`).text();
+  assertStaticTemplatePage(html, page);
+  assert.equal(html.includes('href="/rca-template/"'), true, page.path);
+  assert.equal(html.includes('href="/"'), true, page.path);
+  assert.match(html, /Not a real incident/);
+  assert.equal(
+    html.includes(
+      '"author": { "@type": "Organization", "name": "SolveStack"',
+    ),
+    true,
+    page.path,
+  );
+  assert.equal(html.includes('"@type": "Person"'), false, page.path);
+  assert.equal(html.toLowerCase().includes("steve"), false, page.path);
+  assert.equal(/href="[^"]*fmea/i.test(html), false, page.path);
+  assert.equal(
+    sitemap.includes(`<loc>${productionOrigin}${page.path}</loc>`),
+    true,
+    page.path,
+  );
+  assert.equal(
+    llms.includes(`${productionOrigin}${page.path}`),
+    true,
+    page.path,
+  );
+  const built = await Bun.file(`dist/${page.path}index.html`).text();
+  assert.equal(built, html, page.path);
+}
+assert.equal(
+  (await Bun.file("public/root-cause-analysis-tools/index.html").text()).includes(
+    'href="/corrective-action-plan-template/"',
+  ),
+  true,
+);
+assert.equal(
+  (await Bun.file("public/corrective-action-plan-template/index.html").text()).includes(
+    'href="/root-cause-analysis-tools/"',
+  ),
+  true,
+);
+
 console.log("SolveStack template page contract passed");
