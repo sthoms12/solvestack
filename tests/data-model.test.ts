@@ -66,14 +66,14 @@ assert.equal(
   true,
 );
 assert.equal(
-  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v12"),
+  (await Bun.file("public/service-worker.js").text()).includes("solvestack-v13"),
   true,
 );
 // The build injects the hashed assets into the shipped service worker.
 const shippedSw = await Bun.file("dist/service-worker.js").text();
 assert.equal(shippedSw.includes("__PRECACHE_ASSETS__"), false);
 assert.equal(shippedSw.includes("/assets/"), true);
-assert.equal(shippedSw.includes("solvestack-v12"), true);
+assert.equal(shippedSw.includes("solvestack-v13"), true);
 const productionOrigin = "https://solvestack-ai.app/";
 assert.equal(
   (await Bun.file("index.html").text()).includes(

@@ -103,9 +103,22 @@ assertStaticTemplatePage(fiveWhys, {
 });
 assert.equal(fiveWhys.includes('href="/rca-template/"'), true);
 assert.equal(fiveWhys.includes('href="/"'), true);
+assert.equal(fiveWhys.includes('href="/incident-report-template/"'), true);
+assert.equal(fiveWhys.includes('href="/corrective-action-plan-template/"'), true);
+assert.equal(fiveWhys.includes('href="/root-cause-analysis-tools/"'), true);
 assert.match(fiveWhys, /Not a real incident/);
+assert.match(fiveWhys, /When to switch to a deeper RCA/);
 assert.equal(fiveWhys.includes("2.9k") || fiveWhys.includes("$6.38"), false);
 assert.equal(fiveWhys.includes("$4.61") || rca.includes("$6.38"), false);
+assert.equal(fiveWhys.includes("%") || fiveWhys.includes("$"), false);
+assert.equal(
+  fiveWhys.includes(
+    '"author": { "@type": "Organization", "name": "SolveStack"',
+  ),
+  true,
+);
+assert.equal(fiveWhys.includes('"@type": "Person"'), false);
+assert.equal(fiveWhys.toLowerCase().includes("steve"), false);
 
 assertStaticTemplatePage(incidentReport, {
   path: "/incident-report-template/",
@@ -117,13 +130,35 @@ assertStaticTemplatePage(incidentReport, {
 assert.equal(incidentReport.includes('href="/rca-template/"'), true);
 assert.equal(incidentReport.includes('href="/use-your-data/"'), true);
 assert.equal(incidentReport.includes('href="/"'), true);
+assert.equal(incidentReport.includes('href="/5-whys-template/"'), true);
+assert.equal(incidentReport.includes('href="/corrective-action-plan-template/"'), true);
+assert.equal(incidentReport.includes('href="/root-cause-analysis-tools/"'), true);
 assert.match(incidentReport, /Not a real incident/);
+for (const field of [
+  "Summary",
+  "Timeline",
+  "Impact",
+  "Root cause",
+  "Corrective actions",
+  "Owners",
+]) {
+  assert.equal(incidentReport.includes(field), true, field);
+}
 assert.equal(
   incidentReport.includes("2.9k") ||
     incidentReport.includes("$6.38") ||
     incidentReport.includes("$4.61"),
   false,
 );
+assert.equal(incidentReport.includes("%") || incidentReport.includes("$"), false);
+assert.equal(
+  incidentReport.includes(
+    '"author": { "@type": "Organization", "name": "SolveStack"',
+  ),
+  true,
+);
+assert.equal(incidentReport.includes('"@type": "Person"'), false);
+assert.equal(incidentReport.toLowerCase().includes("steve"), false);
 
 assertStaticTemplatePage(fishbone, {
   path: "/fishbone-diagram-template/",
