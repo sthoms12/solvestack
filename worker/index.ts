@@ -10,6 +10,8 @@ const markdownRoutes = new Set([
   "/incident-report-template/",
   "/5-whys-template/",
   "/fishbone-diagram-template/",
+  "/root-cause-analysis-tools/",
+  "/corrective-action-plan-template/",
   "/rca-template/",
   "/vpn-outage-template/",
   "/sign-in-failure-template/",

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="A corrective action plan template with the fields, a worked IT example, and the difference between a correction, a corrective action, and a preventive action." />
+    <link rel="canonical" href="https://solvestack-ai.app/corrective-action-plan-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/corrective-action-plan-template/" />
+    <meta property="og:title" content="Corrective Action Plan Template" />
+    <meta property="og:description" content="A corrective action plan you can copy: correction, corrective action, preventive action, owners, dates, and an effectiveness check." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Corrective Action Plan Template" />
+    <meta name="twitter:description" content="Fields, a worked IT example, and a check that the action worked. Free, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/corrective-action-plan-template/template.css" />
+    <title>Corrective Action Plan Template | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Corrective Action Plan Template",
+        "description": "A corrective action plan template with fields for containment, cause, actions, and an effectiveness check, plus a worked IT example.",
+        "url": "https://solvestack-ai.app/corrective-action-plan-template/",
+        "author": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+        "publisher": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+        "about": ["corrective action plan", "corrective and preventive action", "CAPA", "root cause analysis", "incident follow-up"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a corrective action plan template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A corrective action plan template is a form for the changes that follow a confirmed cause. Each action has a type, an owner, a due date, evidence that it was completed, and a check that it worked. The plan does not replace the analysis. It records what will change because of the analysis." }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between a correction and a corrective action?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A correction stops the current instance: roll back, restore, reissue a credential, or block the failing path. A corrective action changes the cause so the same failure does not recur. A preventive action puts that control where the same cause could occur and has not failed yet. Closing the correction does not close the corrective action." }
+          },
+          {
+            "@type": "Question",
+            "name": "What fields should a corrective action plan include?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Include a problem statement, the source of the problem, the containment already in place, the cause and the method that produced it, the action list, an effectiveness check, and a note of what you considered and did not do. Each action names a role as owner, a due date, a status, and the evidence that shows it is complete." }
+          },
+          {
+            "@type": "Question",
+            "name": "How is a corrective action plan different from a root cause analysis?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A root cause analysis explains why the incident happened and keeps the timeline and the evidence. A corrective action plan starts from that cause and assigns changes. If the cause is not confirmed yet, limit the plan to containment and to the work that will confirm the cause. Do not write a permanent fix for a cause you have not established. The root cause analysis template is the record of the analysis." }
+          },
+          {
+            "@type": "Question",
+            "name": "When is a corrective action actually done?",
+            "acceptedAnswer": { "@type": "Answer", "text": "A corrective action is done when the agreed check has been recorded, not when the change is merely deployed. The check names what will be observed, the review date, the role that reviews it, and the result that counts as success. If that result is missing, leave the action open." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use this corrective action plan offline?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Copy the plain-text plan into any document, or print this page. Nothing typed into this page is saved or sent anywhere. The SolveStack app linked from this page stores an investigation in your browser and can export Markdown, HTML, JSON, and ZIP. It has no account and no cloud service." }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#types">Types</a><a href="#template">Template</a><a href="/rca-template/">RCA template</a><a href="#faqs">FAQs</a><a class="launch" href="/?method=rca">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / CORRECTIVE ACTION</div>
+        <p class="overline">CAUSE → ACTION → A CHECK THAT IT WORKED</p>
+        <h1>Corrective Action Plan <em>Template</em></h1>
+        <p class="intro">A corrective action plan template is the list of changes that follow a cause you are willing to stand behind. It is not the analysis. The analysis explains why the incident happened. The plan says what will change, which role owns it, when it is due, and what result will show that it worked. Copy the blank plan, or read the worked example. The cause itself belongs on the <a href="/rca-template/">root cause analysis template</a>.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="#example">Read the example</a></div>
+        <aside><strong>Local-first boundary</strong><span>The text on this page stays in your browser until you copy it. SolveStack stores an investigation in IndexedDB. No account, no cloud database, no built-in AI.</span></aside>
+      </section>
+
+      <section class="template" id="types" aria-labelledby="types-title">
+        <div class="section-label"><span>01</span><div><p>THREE WORDS</p><h2 id="types-title">A correction is not a corrective action.</h2></div></div>
+        <p class="lede">Teams close the incident when service is restored and call that the action plan. Restoration is the correction. The corrective action is the change that removes the cause. The preventive action is that same class of change somewhere the failure has not happened yet. Write the type on every line so a finished correction cannot hide an open cause. ISO 9001:2008 required a preventive-action procedure of its own. ISO 9001:2015 removed that separate procedure. Prevention sits in how you plan for risk, and corrective action includes asking whether the same nonconformity could happen somewhere else. The fields on this page follow that shape. They are a practical record for an IT incident, not a certificate of conformity.</p>
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>Three action types. Closing one row does not close the others.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">What it changes</th>
+                <th scope="col">Close it when</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Correction</th>
+                <td>This instance. Roll back, restore, reissue, block the bad path, or drain the queue.</td>
+                <td>The immediate impact has stopped, and the plan says whether the temporary measure is still in place.</td>
+              </tr>
+              <tr>
+                <th scope="row">Corrective action</th>
+                <td>The cause of this failure, so the same failure does not recur here.</td>
+                <td>The effectiveness check has been recorded. Deployed is not the same as checked.</td>
+              </tr>
+              <tr>
+                <th scope="row">Preventive action</th>
+                <td>The same cause in a place that has not failed yet.</td>
+                <td>That other place has the control, and a named role has looked.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="lede">An owner is a role that can change the system. A crowd is not an owner, and a colleague's name is not a substitute for the role. An action with no due date is a wish. If you cannot schedule it, write that down instead of leaving the date blank.</p>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>02</span><div><p>THE TEMPLATE</p><h2 id="template-title">Seven fields. Then a check.</h2></div></div>
+        <div class="step-list">
+          <article><span class="number">FIELD 01</span><div><h3>Identity</h3><p>A plan ID, the source (an incident, an audit, a failed change, or another record), the date, the role that owns the plan, and a status. Someone reading this later should be able to find the analysis from this block alone.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>CAP-2026-044, from incident INC-2026-044 on 2026-10-08. Plan owner: platform lead. Status: closed. Not a real incident.</span></div></article>
+          <article><span class="number">FIELD 02</span><div><h3>Problem statement</h3><p>What failed, where, when, with the timezone, and the extent. Use the measurements you have. Point at the incident report if there is one. Do not paste the whole timeline here. The <a href="/incident-report-template/">incident report template</a> is that timeline.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>CI jobs against the internal package registry returned HTTP 401 from 09:40 to 10:06 UTC. Merge builds in two product groups failed. No production runtime was affected. Not a real incident.</span></div></article>
+          <article><span class="number">FIELD 03</span><div><h3>Containment already done</h3><p>The correction: what stopped the current impact, which role did it, when, whether it is still in place, and the evidence. A rollback that is still in production is a temporary control. Say so, or the next reader will treat it as the permanent fix.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Platform on-call reissued the CI robot credential, revoked the expired one, and re-ran the failed jobs. Finished 10:06 UTC. The replacement credential is the one still in use. Auth log has no expired-token errors after that time. Not a real incident.</span></div></article>
+          <article><span class="number">FIELD 04</span><div><h3>Cause</h3><p>Name the method, from the <a href="/root-cause-analysis-tools/">root cause analysis tools</a> you actually used. State the cause as something the team can change, the evidence, and the contributing factors that are not the cause. If the cause is not confirmed, write "not confirmed" and do not invent a permanent fix. The chain and the timeline stay on the <a href="/rca-template/">root cause analysis template</a>.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Method: 5 Whys. The migration checklist covered human accounts and omitted service credentials, so the robot credential expired with no renewal job. Contributing factor: the alert watched job failure, not upcoming expiry. Not a real incident.</span></div></article>
+          <article><span class="number">FIELD 05</span><div><h3>Actions</h3><p>One line each: an ID, the type, the change, the owner role, the due date, the status, and the evidence that will show it is complete. The change should be a system, a procedure, or a control. "Be more careful" is not an action.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>CAP-2, corrective: add service credentials to the rotation checklist, and add a renewal job that runs 14 days before expiry and pages if it fails. Owner: identity engineering. Due: 2026-10-22. Evidence: the checklist diff, and a drill where a forced failure paged. Not a real incident.</span></div></article>
+          <article><span class="number">FIELD 06</span><div><h3>Effectiveness check</h3><p>Name what will be observed, the review date, the role that reviews it, and the result that closes the plan. Observe the original effect, not only the deployment. An action marked done on "merged" stays open until this result is written down.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Review on 2026-11-06 by the platform lead. Close only if CI shows no 401 from an expired robot credential after 2026-10-08, and the renewal job succeeded in the drill. Both were true. Plan closed. Not a real incident.</span></div></article>
+          <article><span class="number">FIELD 07</span><div><h3>Considered and not done</h3><p>Write down the actions you discussed and rejected, and why. Otherwise the next incident reopens them as if they were forgotten. A broader study you are not doing, including an FMEA of a whole process, belongs here when it is out of scope for this plan.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Human passwords were not rotated that day, because they were not the cause. A full FMEA of credential rotation was not required to close this plan. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock" id="example">
+          <p>COPY-PASTE VERSION — WORKED EXAMPLE</p>
+          <pre>CORRECTIVE ACTION PLAN — WORKED EXAMPLE
+Not a real incident.
+========================================
+Plan ID: CAP-2026-044
+Source: incident INC-2026-044, package registry HTTP 401, 2026-10-08
+Plan owner (role): platform lead
+Status: closed
+
+1. PROBLEM STATEMENT
+   CI jobs against the internal package registry returned HTTP 401.
+   Window: 2026-10-08, 09:40–10:06 UTC (26 minutes).
+   Extent: merge builds in two product groups failed. No production runtime was affected.
+   Detection: the CI failure alert.
+   Incident report: INC-2026-044
+
+2. CONTAINMENT (CORRECTION ALREADY DONE)
+   - Reissued the CI robot credential, revoked the expired credential, and re-ran the failed jobs.
+     Role: platform on-call. When: 2026-10-08, finished 10:06 UTC.
+     Still in place: the replacement credential is the one in use.
+     Evidence: auth log has no expired-token errors after 10:06 UTC, and the re-run jobs passed.
+
+3. CAUSE
+   Method: 5 Whys, recorded on the root cause analysis template.
+   Root cause: the registry migration checklist covered human accounts and omitted service credentials, so this robot credential had a fixed expiry and no renewal job.
+   Evidence: auth log expired-token errors from 09:40 UTC; secret metadata showing expiry that morning; checklist in the infrastructure repo with no service-credential row.
+   Contributing factor: the alert watched job failure, not upcoming credential expiry, so the first signal was failed builds. That delayed detection. It did not cause the expiry.
+   Analysis: RCA for INC-2026-044
+
+4. ACTIONS
+   - [x] CAP-1 — correction — reissue and revoke the CI robot credential, then re-run the failed jobs — platform on-call — 2026-10-08 — done — auth log clean after 10:06 UTC and passing re-runs
+   - [x] CAP-2 — corrective — add service credentials to the migration and rotation checklist, and add a renewal job that runs 14 days before expiry and pages if it fails — identity engineering — 2026-10-22 — done — checklist diff merged, and a drill where a forced job failure paged
+   - [x] CAP-3 — preventive — inventory every other robot credential that expires with no renewal job, and name a role for each one that remains — identity engineering — 2026-11-05 — done — inventory list with a role on every remaining secret
+
+5. EFFECTIVENESS CHECK
+   What was observed: CI authentication failures caused by an expired robot credential, and whether the renewal job succeeded in a drill.
+   Review date: 2026-11-06
+   Reviewer (role): platform lead
+   Result that closes the plan: no such CI 401 from 2026-10-08 through the review, and the renewal job succeeded in the drill.
+   Result recorded: both were true on 2026-11-06. Plan closed.
+
+6. CONSIDERED AND NOT DONE
+   - Rotating every human password on 2026-10-08. Human passwords were not the cause.
+   - A full FMEA of the credential-rotation process. The checklist and the renewal job address the cause this incident showed. A broader FMEA would be a later design review, not a condition for closing this plan.</pre>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — BLANK PLAN</p>
+          <pre>CORRECTIVE ACTION PLAN
+======================
+Plan ID:
+Source (incident, audit, or other) and date:
+Plan owner (role):
+Status: open | in progress | checked | closed
+
+1. PROBLEM STATEMENT
+   What failed, where, when (timezone), and the extent.
+   Measurements you actually have:
+   Incident report ID:
+
+2. CONTAINMENT (CORRECTION ALREADY DONE)
+   - Action — role — when — still in place? yes/no — evidence
+
+3. CAUSE
+   Method used (5 Whys, fishbone, other):
+   Root cause (a cause you can change), or "not confirmed":
+   Evidence:
+   Contributing factors (not the root cause):
+   Analysis ID:
+
+4. ACTIONS
+   - [ ] ID — correction | corrective | preventive — action — owner role — due date — status — evidence that completes it
+
+5. EFFECTIVENESS CHECK
+   What will be observed:
+   Review date:
+   Reviewer (role):
+   Result that closes the plan:
+   Result recorded:
+
+6. CONSIDERED AND NOT DONE
+   - Action not taken — why</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>03</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">The plan rides along with the investigation.</h2></div></div>
+        <div class="tool-grid"><div><p>SolveStack does not have a separate action-plan mode. The RCA investigation is where the timeline, the cause, and the check live. Open that mode, keep the plan next to the evidence, and export the record when you want it out of the browser.</p><div class="tool-actions"><a class="primary" href="/?method=rca">Open an RCA in SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>Problem and timeline</strong> — the statement this plan points at</li>
+            <li><strong>Evidence</strong> — the log lines and diffs named in the action rows</li>
+            <li><strong>Hypotheses</strong> — including the causes you ruled out</li>
+            <li><strong>Confirmed cause</strong> — or an explicit "not confirmed"</li>
+            <li><strong>The fix</strong> — the correction and the corrective action, kept distinct</li>
+            <li><strong>Validation</strong> — the effectiveness check, recorded after the due date</li>
+            <li><strong>Prevention</strong> — the same control where it has not failed yet</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>04</span><div><p>QUESTIONS</p><h2 id="faqs-title">Corrective actions, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What is a corrective action plan template?</h3><p>A corrective action plan template is a form for the changes that follow a confirmed cause. Each action has a type, an owner, a due date, evidence that it was completed, and a check that it worked. The plan does not replace the analysis. It records what will change because of the analysis.</p></article>
+          <article><h3>What is the difference between a correction and a corrective action?</h3><p>A correction stops the current instance: roll back, restore, reissue a credential, or block the failing path. A corrective action changes the cause so the same failure does not recur. A preventive action puts that control where the same cause could occur and has not failed yet. Closing the correction does not close the corrective action.</p></article>
+          <article><h3>What fields should a corrective action plan include?</h3><p>Include a problem statement, the source of the problem, the containment already in place, the cause and the method that produced it, the action list, an effectiveness check, and a note of what you considered and did not do. Each action names a role as owner, a due date, a status, and the evidence that shows it is complete.</p></article>
+          <article><h3>How is a corrective action plan different from a root cause analysis?</h3><p>A root cause analysis explains why the incident happened and keeps the timeline and the evidence. A corrective action plan starts from that cause and assigns changes. If the cause is not confirmed yet, limit the plan to containment and to the work that will confirm the cause. Do not write a permanent fix for a cause you have not established. The <a href="/rca-template/">root cause analysis template</a> is the record of the analysis.</p></article>
+          <article><h3>When is a corrective action actually done?</h3><p>A corrective action is done when the agreed check has been recorded, not when the change is merely deployed. The check names what will be observed, the review date, the role that reviews it, and the result that counts as success. If that result is missing, leave the action open.</p></article>
+          <article><h3>Can I use this corrective action plan offline?</h3><p>Yes. Copy the plain-text plan into any document, or print this page. Nothing typed into this page is saved or sent anywhere. The SolveStack app linked from this page stores an investigation in your browser and can export Markdown, HTML, JSON, and ZIP. It has no account and no cloud service.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>05</span><div><p>KEEP GOING</p><h2 id="related-title">The analysis that feeds the plan.</h2></div></div>
+        <div class="related-cards">
+          <a href="/rca-template/"><b>ANALYSIS</b><span>Root cause analysis template</span><p>Problem statement, timeline, 5 whys, contributing factors, and the check that the fix held.</p></a>
+          <a href="/root-cause-analysis-tools/"><b>WHICH TOOL</b><span>Root cause analysis tools</span><p>When to use 5 Whys, fishbone, Pareto, FMEA, or a fault tree, and which templates exist.</p></a>
+          <a href="/5-whys-template/"><b>5 WHYS</b><span>5 whys template</span><p>The chain behind the cause field, with evidence on each step.</p></a>
+          <a href="/incident-report-template/"><b>DURING</b><span>Incident report template</span><p>What happened, so the plan can point at a record instead of retelling it.</p></a>
+          <a href="/?method=rca"><b>WORKSPACE</b><span>Open an RCA in SolveStack</span><p>Keep the cause and the actions next to the evidence. Export when the plan should leave the browser.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
