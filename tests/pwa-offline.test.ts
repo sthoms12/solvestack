@@ -45,7 +45,7 @@ test("every sitemap page is precached by the service worker", async () => {
 test("built service worker precaches the hashed assets", async () => {
   const shipped = await Bun.file("dist/service-worker.js").text();
   expect(shipped).not.toContain("__PRECACHE_ASSETS__");
-  expect(shipped).toContain("solvestack-v12");
+  expect(shipped).toContain("solvestack-v13");
   const assets = await readdir("dist/assets");
   expect(assets.length).toBeGreaterThanOrEqual(2);
   for (const asset of assets) expect(shipped).toContain(`/assets/${asset}`);

@@ -1,4 +1,4 @@
-const CACHE = "solvestack-v12";
+const CACHE = "solvestack-v13";
 
 // Every page and static file precached on install, so the whole site works
 // offline on a first visit — not only after a page was visited once.
