@@ -26,7 +26,7 @@
 - Verify Pattern Desk lists recurring systems after two similar sessions exist.
 - Verify encrypted vault export/import with a passphrase round-trips a backup merge.
 - Verify quota failure guidance does not silently discard the working entry.
-- Verify the backup banner appears with no backup on file and clears after a backup download; Settings shows the last-backup date.
+- Verify the protect prompt appears after the first user-created investigation, Remind me later returns after the documented edit or day limit, and Settings shows the last backup or sync time plus the persistent-storage result.
 - Verify deleting an entry or an evidence attachment offers Undo for 30 seconds and restores it; verify no `alert()` remains for delete/restore flows.
 - Verify scratchpad typing keeps focus while a save is in flight and closing the tab mid-save prompts before leaving.
 - Review the accessibility tree for named controls and visible focus states.

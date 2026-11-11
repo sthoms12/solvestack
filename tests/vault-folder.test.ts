@@ -1,3 +1,6 @@
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import {
   folderVaultIsNewer,
@@ -7,6 +10,7 @@ import {
   VAULT_FILE,
   VAULT_PREV_FILE,
   type FolderDirHandle,
+  type FolderFileHandle,
 } from "../src/vault-folder";
 import { isVaultEnvelope } from "../src/vault";
 
@@ -31,6 +35,43 @@ class FakeDir implements FolderDirHandle {
         write: async (data: string) => {
           record.text = data;
           record.lastModified = Date.now();
+        },
+        close: async () => {},
+      }),
+    };
+  }
+}
+
+/** Node fs stand-in for a directory handle. Not the browser File System Access API. */
+class DiskDir implements FolderDirHandle {
+  constructor(
+    readonly name: string,
+    private root: string,
+  ) {}
+
+  async getFileHandle(
+    name: string,
+    options?: { create?: boolean },
+  ): Promise<FolderFileHandle> {
+    const path = join(this.root, name);
+    let exists = true;
+    try {
+      await stat(path);
+    } catch {
+      exists = false;
+    }
+    if (!exists) {
+      if (!options?.create) throw new DOMException("missing", "NotFoundError");
+      await writeFile(path, "");
+    }
+    return {
+      getFile: async () => ({
+        text: async () => readFile(path, "utf8"),
+        lastModified: (await stat(path)).mtimeMs,
+      }),
+      createWritable: async () => ({
+        write: async (data: string) => {
+          await writeFile(path, data);
         },
         close: async () => {},
       }),
@@ -71,6 +112,21 @@ describe("vault folder sync primitives", () => {
     await expect(
       openFolderVault(found!.envelope, "wrong passphrase"),
     ).rejects.toThrow();
+  });
+
+  test("a disk-backed handle shim round-trips the vault file in a temp directory", async () => {
+    const root = await mkdtemp(join(tmpdir(), "solvestack-vault-"));
+    try {
+      const dir = new DiskDir("TempSync", root);
+      const payload = { sessions: [{ id: "SS-DISK", title: "Branch DNS" }] };
+      await writeFolderVault(dir, payload, PASS);
+      const onDisk = JSON.parse(await readFile(join(root, VAULT_FILE), "utf8"));
+      expect(isVaultEnvelope(onDisk)).toBe(true);
+      const found = await readFolderVault(dir);
+      expect(await openFolderVault(found!.envelope, PASS)).toEqual(payload);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
   });
 
   test("newer detection compares envelope creation times", () => {

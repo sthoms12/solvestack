@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "vite build && node scripts/generate-md-mirrors.mjs && node scripts/generate-sw-precache.mjs && node scripts/reject-analytics-host.mjs",
     "preview": "vite preview",
-    "test": "bun test tests"
+    "test": "bun test tests",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.2",
     "wrangler": "4.158.0"
