@@ -44,6 +44,7 @@
             "creator": { "@id": "https://solvestack-ai.app/#organization" },
             "featureList": [
               "Local browser storage",
+              "Backup file and optional encrypted vault folder",
               "Structured troubleshooting timeline",
               "Evidence and attachment capture",
               "Hypothesis tracking",
@@ -78,7 +79,7 @@
                 "name": "Where does SolveStack store troubleshooting data?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "SolveStack stores core investigation data in IndexedDB in the current browser profile. It has no account or cloud database."
+                  "text": "SolveStack stores core investigation data in IndexedDB in the current browser profile. It has no account and no cloud database. Creating an investigation asks for a backup file or, in Chrome and Edge on desktop, a folder for an encrypted vault. Clearing site data can still remove the browser copy."
                 }
               },
               {
@@ -124,14 +125,14 @@
         <p>The result is more useful than a ticket that records only the final command.</p>
         <p>Study how real incidents were diagnosed: <a href="https://rootcausecasebook.com/">Root Cause Casebook</a> publishes evidence-grounded IT incident case studies.</p>
         <h2>How does local-first troubleshooting work?</h2>
-        <p>Core investigation data stays in IndexedDB in the current browser. SolveStack has no account, cloud database, or built-in AI service, and it keeps working offline as a progressive web app. Export to 4 portable formats: Markdown for a <a href="/use-your-data/">knowledge repository</a>, standalone HTML for a readable handoff, JSON for lossless backup or migration, or a ZIP package that keeps the record and supporting evidence together.</p>
+        <p>Core investigation data stays in IndexedDB in the current browser. SolveStack has no account, cloud database, or built-in AI service, and it keeps working offline as a progressive web app. Creating an investigation asks for a backup file or, where the browser supports it, a folder that holds an encrypted vault. Clearing site data can still remove the browser copy. Export to 4 portable formats: Markdown for a <a href="/use-your-data/">knowledge repository</a>, standalone HTML for a readable handoff, JSON for lossless backup or migration, or a ZIP package that keeps the record and supporting evidence together.</p>
         <p><a href="/use-your-data/">See practical ways to turn exported troubleshooting data into searchable knowledge, runbooks, approved AI-assisted reviews, and durable archives.</a></p>
         <p>Choosing where to keep troubleshooting notes? Read <a href="/onenote-vs-solvestack/">OneNote vs SolveStack for IT troubleshooting notes</a>.</p>
         <p>Cause-and-effect worksheets: <a href="/fishbone-diagram-template/">fishbone diagram template</a>, <a href="/5-whys-template/">5 whys template</a>, <a href="/rca-template/">root cause analysis template</a>, and <a href="/incident-report-template/">IT incident report template</a>.</p>
         <p>Choosing a method, or writing the actions that follow: <a href="/root-cause-analysis-tools/">root cause analysis tools</a> and a <a href="/corrective-action-plan-template/">corrective action plan template</a>.</p>
         <p>Incident checklists: <a href="/vpn-outage-template/">VPN outage template</a>, <a href="/sign-in-failure-template/">sign-in failure template</a>, <a href="/expired-certificate-template/">expired certificate template</a>, <a href="/dns-failure-template/">DNS failure template</a>, <a href="/disk-full-template/">disk full template</a>, and <a href="/email-delivery-template/">email delivery template</a>.</p>
         <h2>Questions about SolveStack</h2>
-        <h3>Where does SolveStack store troubleshooting data?</h3><p>Core investigation data stays in IndexedDB in the current browser profile. SolveStack has no account or cloud database.</p>
+        <h3>Where does SolveStack store troubleshooting data?</h3><p>SolveStack stores core investigation data in IndexedDB in the current browser profile. It has no account and no cloud database. Creating an investigation asks for a backup file or, in Chrome and Edge on desktop, a folder for an encrypted vault. Clearing site data can still remove the browser copy.</p>
         <h3>What can SolveStack export?</h3><p>Export Markdown, standalone HTML, JSON, complete backups, or ZIP knowledge packages that keep the record and supporting evidence together.</p>
         <h3>Does SolveStack use AI?</h3><p>No. SolveStack does not include an AI service. You can review an export in an organization-approved tool after removing credentials, personal data, and confidential evidence.</p>
         <p>Contact: <a href="mailto:hello@solvestack-ai.app">hello@solvestack-ai.app</a></p>

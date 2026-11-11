@@ -17,6 +17,16 @@ import {
   showToast,
   UNDO_WINDOW_MS,
 } from "./data-safety";
+import {
+  PROTECT_REPROMPT_AFTER_DAYS,
+  PROTECT_REPROMPT_AFTER_EDITS,
+  persistenceResultLabel,
+  latestIso,
+  protectDecision,
+  protectionStatusLabel,
+  type PersistenceGrant,
+  type ProtectSnapshot,
+} from "./protect-data";
 import { collectFields } from "./dialogs";
 import {
   BLUEPRINTS,
@@ -291,6 +301,7 @@ let attachmentListenerReady = false;
 let swListenerReady = false;
 let welcomeDismissed =
   localStorage.getItem("solvestack-welcome-dismissed") === "true";
+let persistenceGrant: PersistenceGrant = "pending";
 let pendingMethod: BlueprintId | null = parseMethodParam();
 let db: IDBDatabase;
 const openDb = () =>
@@ -312,11 +323,6 @@ const storageMessage = (error: unknown) => {
 const load = async () => {
   try {
     db = await openDb();
-    try {
-      await navigator.storage?.persist?.();
-    } catch {
-      // Persistent storage is best-effort; a refusal must not block loading.
-    }
     const tx = db.transaction(STORE, "readonly");
     const raw = await new Promise<Store | undefined>((resolve, reject) => {
       const r = tx.objectStore(STORE).get("data");
@@ -327,13 +333,14 @@ const load = async () => {
       store = migrateWorkspace(raw);
       savedState = "Saved locally";
     }
-    else await persist();
+    else await persist({ protect: "skip" });
   } catch (error) {
     savedState = `Storage unavailable: ${storageMessage(error)}`;
   }
   render();
   void refreshStorageEstimate();
   void checkFolderVaultOnLoad();
+  await requestPersistentStorage();
   if (pendingMethod) {
     const method = pendingMethod;
     // Defer so bind() has attached the new-session flow.
@@ -342,7 +349,7 @@ const load = async () => {
         .querySelector<HTMLElement>(`[data-method="${method}"]`)
         ?.click();
     }, 0);
-  }
+  } else maybeOfferProtect();
 };
 const updateSaveStatus = () => {
   document.querySelectorAll<HTMLElement>(".save-status").forEach((el) => {
@@ -379,7 +386,8 @@ const runPersist = async () => {
 // full-workspace IndexedDB transactions. The save status updates in
 // place; persist() no longer re-renders, so typing focus survives a save.
 // Callers that changed data render() after awaiting persist().
-const persist = () => {
+const persist = (options?: { protect?: "edit" | "mark-protected" | "skip" }) => {
+  const mode = options?.protect ?? "edit";
   savedState = "Saving…";
   updateSaveStatus();
   pendingPersistCount += 1;
@@ -390,7 +398,11 @@ const persist = () => {
   );
   return task.finally(() => {
     pendingPersistCount = Math.max(0, pendingPersistCount - 1);
+    const saved = savedState === "Saved locally";
+    if (saved && mode === "mark-protected") resetProtectEdits();
+    else if (saved && mode === "edit" && hasRealSessions()) noteProtectEdit();
     scheduleFolderSync();
+    if (saved && mode !== "skip") maybeOfferProtect();
   });
 };
 // Scratchpad keystrokes coalesce into one write after the user pauses.
@@ -447,6 +459,19 @@ const download = (name: string, content: BlobPart, type = "text/plain") => {
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 500);
 };
+async function downloadBackup() {
+  store.lastBackupAt = now();
+  download(
+    "solvestack-backup.json",
+    JSON.stringify({ ...store, exportedAt: now() }, null, 2),
+    "application/json",
+  );
+  await persist({ protect: "mark-protected" });
+  render();
+  showToast(
+    `Backup downloaded — ${backupStatus(store.lastBackupAt).label.toLowerCase()}.`,
+  );
+}
 const readFile = (file: File) =>
   new Promise<string>((resolve, reject) => {
     const r = new FileReader();
@@ -492,10 +517,7 @@ function dashboard() {
   const realSessions = store.sessions.filter(
     (s) => s.id !== SEED_SESSION_ID,
   );
-  const backup = backupStatus(store.lastBackupAt, new Date(), realSessions.length);
-  const backupBanner = backup.needsBackup
-    ? `<section class="backup-banner" role="status"><span><strong>${escapeHtml(backup.label)}.</strong> Your investigations live only in this browser — clearing site data removes them.</span><button class="secondary small-button" id="backup-now">Back up now</button></section>`
-    : "";
+  const protectStatus = `<p class="protect-status" role="status"><span data-protect-label>${escapeHtml(protectionStatusLabel(protectSnapshot()))}</span><button type="button" class="secondary small-button" id="protect-open">Protect data</button></p>`;
   const folderBanner = folderWaitingEnvelope
     ? `<section class="backup-banner" role="status"><span><strong>A newer vault is in your sync folder</strong> (written ${escapeHtml(dateLabel(folderWaitingEnvelope.createdAt))}). Review it to merge sessions from your other machine — syncing is paused until you do.</span><button class="secondary small-button" id="folder-review-banner">Review &amp; merge</button></section>`
     : "";
@@ -509,7 +531,7 @@ function dashboard() {
     realSessions.length === 0 && activeSessions.length
       ? '<p class="example-note">The session below is a worked example — open it to see how a finished investigation reads.</p>'
       : "";
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${backupBanner}${folderBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. Export when you want to move it.</small></div></aside></section>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${protectStatus}${folderBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. A backup file or a vault folder is what survives clearing site data.</small></div></aside></section>`;
 }
 function patternDesk() {
   const patterns = buildPatterns(store.sessions);
@@ -584,7 +606,7 @@ function knowledgeArticleView(s: Session) {
   return `<header class="workspace-header"><button class="back-button" id="kb-back">${icon("back")} Knowledge</button><div class="workspace-actions"><button class="secondary" data-open="${escapeHtml(s.id)}">Open session</button><button class="secondary" id="kb-export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="kb-export-runbook">Runbook MD</button><button class="secondary" id="kb-export-agent" title="Redacted pack for approved AI tools">Agent pack</button></div></header><div class="knowledge-article"><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")} <span class="slash">/</span> RESOLVED ${dateLabel(s.resolvedAt || s.updatedAt)}</div><h1>${escapeHtml(s.title)}</h1><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div>${para("PROBLEM", s.problem)}${starred.length ? `<section class="article-section"><span class="section-kicker">KEY FINDINGS</span><ul>${starred.map((e) => `<li>${escapeHtml(e.content)}</li>`).join("")}</ul></section>` : ""}${para("ROOT CAUSE", s.resolution.rootCause)}${para("RESOLUTION", s.resolution.fix)}${para("VALIDATION", s.resolution.validation)}${para("PREVENTION", s.resolution.prevention)}${ruledOut.length ? `<section class="article-section"><span class="section-kicker">RULED OUT</span><ul>${ruledOut.map((h) => `<li><strong>${escapeHtml(h.text)}</strong>${h.reasoning ? ` — ${escapeHtml(h.reasoning)}` : ""}</li>`).join("")}</ul></section>` : ""}${timeline.length ? `<section class="article-section"><span class="section-kicker">TIMELINE</span><ul>${timeline.map((e) => `<li><time>${dateLabel(e.timestamp)}</time> <strong>${escapeHtml(e.type)}</strong> — ${escapeHtml(e.content)}</li>`).join("")}</ul></section>` : ""}${related.length ? `<section class="article-section"><span class="section-kicker">RELATED INVESTIGATIONS</span><div class="related-list">${related.map(({ session, reasons }) => `<button class="search-result" ${session.status === "resolved" ? `data-article="${escapeHtml(session.id)}"` : `data-open="${escapeHtml(session.id)}"`}><strong>${escapeHtml(session.title)}</strong><small>${reasons.join(" · ")}</small></button>`).join("")}</div></section>` : ""}</div>`;
 }
 function welcomePanel() {
-  return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Troubleshooting, written down while it happens.</h2><p>Start a session when something breaks. Capture what you observe, what you try, and what you rule out — when it's fixed, the same session becomes a knowledge article or a runbook for next time. Everything stays in this browser.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>Free. No account. No cloud database. Export a backup before clearing browser data.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
+  return `<section class="welcome-panel" aria-labelledby="welcome-title"><div class="welcome-index" aria-hidden="true">01</div><div><span class="section-kicker">START HERE</span><h2 id="welcome-title">Troubleshooting, written down while it happens.</h2><p>Start a session when something breaks. Capture what you observe, what you try, and what you rule out — when it's fixed, the same session becomes a knowledge article or a runbook for next time. Everything stays in this browser.</p><div class="welcome-actions"><button class="primary" id="welcome-start">Start your first investigation</button><button class="secondary" id="welcome-guide">See how SolveStack works</button></div><small>Free. No account. No cloud database. The first investigation asks you to download a backup or connect a vault folder.</small></div><button class="welcome-dismiss" id="dismiss-welcome" aria-label="Dismiss welcome panel">×</button></section>`;
 }
 function guideDialog() {
   return `<dialog id="guide-dialog" class="guide-dialog"><form method="dialog"><header><div><span class="section-kicker">FIELD GUIDE / 01–06</span><h2>How SolveStack works</h2><p>Use it when a technical problem involves multiple tests, possible causes, evidence, or decisions worth preserving.</p></div><button class="guide-close" value="close" aria-label="Close guide">×</button></header><ol class="guide-steps"><li><b>Capture</b><span>Start a session as troubleshooting begins. Record observations, commands, errors, screenshots, and references as they happen.</span></li><li><b>Structure</b><span>Label entries by reasoning type so another engineer can follow what you knew and when you knew it.</span></li><li><b>Investigate</b><span>Track hypotheses, next steps, evidence, and the current focus without turning the work into a ticket form.</span></li><li><b>Rule out</b><span>Keep failed theories and explain why they were eliminated. Dead ends are valuable troubleshooting knowledge.</span></li><li><b>Resolve</b><span>Record the root cause, fix, validation, and prevention while the details are still fresh.</span></li><li><b>Reuse</b><span>Export Markdown, HTML, JSON, or a ZIP package. Store the result in your existing knowledge system.</span></li></ol><section class="guide-example"><span class="section-kicker">EXAMPLE INVESTIGATION</span><strong>Exchange Online outbound mail delay</strong><p>Capture affected users, service-health checks, message traces, connector tests, the gateway hypothesis, why other causes were ruled out, and how delivery was validated after the fix.</p></section><footer><p><strong>Built for:</strong> IT engineers, administrators, support specialists, consultants, and technical problem-solvers.</p><p><strong>Not designed as:</strong> a ticketing system, incident-management platform, cloud knowledge base, or AI assistant.</p><button class="secondary" id="guide-to-data" value="close">See what exports can become</button><button class="primary" value="close">Got it</button></footer></form></dialog>`;
@@ -621,7 +643,7 @@ function workspace() {
   const methodId =
     typeof s.metadata?.blueprint === "string" ? s.metadata.blueprint : "";
   const method = methodId ? blueprintById(methodId) : null;
-  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-runbook">Runbook MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="secondary" id="apply-ai-reply" title="Paste an AI answer that ends with a solvestack-reply block">Apply AI reply</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
+  return `<header class="workspace-header"><button class="back-button" id="back">${icon("back")} Dashboard</button><div class="workspace-actions"><span class="save-status" role="status" aria-live="polite"><i></i>${savedState}</span><span class="protect-inline"><span data-protect-label>${escapeHtml(protectionStatusLabel(protectSnapshot()))}</span><button type="button" class="text-button" id="protect-open">Protect</button></span><button class="secondary" id="export-md">${icon("download")} Knowledge MD</button><button class="secondary" id="export-rca">RCA MD</button><button class="secondary" id="export-runbook">Runbook MD</button><button class="secondary" id="export-json">JSON</button><button class="secondary" id="export-html">HTML</button><button class="secondary" id="export-package">ZIP</button><button class="secondary" id="export-agent" title="Redacted pack for approved AI tools">Agent pack</button><button class="secondary" id="apply-ai-reply" title="Paste an AI answer that ends with a solvestack-reply block">Apply AI reply</button><button class="primary" id="resolve">${s.status === "resolved" ? "Update resolution" : "Resolve session"}</button></div></header><div class="session-title"><div><div class="eyebrow">${escapeHtml(s.id)} <span class="slash">/</span> ${escapeHtml(s.system || "GENERAL")}${method && method.id !== "blank" ? ` <span class="slash">/</span> ${escapeHtml(method.shortLabel)}` : ""}</div><h1>${escapeHtml(s.title)}</h1><p>${escapeHtml(s.problem)}</p><div class="tags">${s.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></div>${statusPill(s.status)}</div><div class="workspace-grid"><section class="stream-panel"><div class="stream-heading"><div><span class="section-kicker">INVESTIGATION STREAM</span><h2>Your reasoning, in order.</h2></div><span class="entry-count">${s.entries.length} captured</span></div><div class="stream">${
     s.entries
       .slice()
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
@@ -662,8 +684,7 @@ function settings() {
     storageEstimate?.quota,
     bytes,
   );
-  const backup = backupStatus(store.lastBackupAt);
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove it.${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /><button class="secondary" id="skill-kit">${icon("download")} AI skill kit</button></div><p><small>Teach your AI tool the SolveStack contract once: the skill kit bundles the adapter, the five tasks, and the reply format.</small></p><p><small>${escapeHtml(backup.label)}${backup.needsBackup ? " — back up before clearing browser data." : "."}</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div><div class="vault-sync" id="vault-sync-row"><p><small><strong>Sync folder:</strong> checking…</small></p></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing browser data may remove it, so export backups or an encrypted vault periodically. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / SETTINGS</div><h1>Data & preferences.</h1><p class="lede">Your troubleshooting data belongs to you.</p></div></header><div class="settings-grid"><section class="settings-card"><span class="section-kicker">LOCAL STORAGE</span><h2>IndexedDB on this device</h2><p>SolveStack stores sessions and evidence in this browser. Clearing site data can remove that copy. <span data-protect-label>${escapeHtml(protectionStatusLabel(protectSnapshot()))}</span>. <span data-persistence-label>${escapeHtml(persistenceResultLabel(persistenceGrant))}</span>${canUseOpfs() ? " Large evidence files prefer the Origin Private File System when available." : ""}</p><div class="storage-bar"><span data-storage-fill="${meter.percent}"></span></div><small data-storage-label>${escapeHtml(meter.label)}</small><br><small>${store.sessions.length} sessions · ${store.sessions.reduce((n, s) => n + s.entries.length, 0)} entries · ${(bytes / 1024).toFixed(1)} KB evidence</small></section><section class="settings-card"><span class="section-kicker">PORTABILITY</span><h2>Back up or import</h2><p>Import a session export or restore a full backup. Existing records are preserved unless you explicitly approve a conflict.</p><div class="button-row"><button class="secondary" id="backup">${icon("download")} Backup all data</button><button class="secondary" id="restore">${icon("upload")} Import JSON</button><input type="file" id="restore-file" accept="application/json,.json" aria-label="Import SolveStack JSON" hidden /><button class="secondary" id="skill-kit">${icon("download")} AI skill kit</button></div><p><small>Teach your AI tool the SolveStack contract once: the skill kit bundles the adapter, the five tasks, and the reply format.</small></p><p><small data-protect-label>${escapeHtml(protectionStatusLabel(protectSnapshot()))}. Import JSON restores a backup file in this browser, including Firefox and Safari.</small></p></section><section class="settings-card"><span class="section-kicker">ENCRYPTED VAULT</span><h2>User-held passphrase sync</h2><p>Export an AES-GCM vault file you can move to another browser or machine. SolveStack never sees the passphrase and does not host the vault.</p><div class="button-row"><button class="secondary" id="vault-export">${icon("download")} Export vault</button><button class="secondary" id="vault-import">${icon("upload")} Import vault</button><input type="file" id="vault-file" accept="application/json,.json" aria-label="Import SolveStack vault" hidden /></div><div class="vault-sync" id="vault-sync-row"><p><small><strong>Sync folder:</strong> checking…</small></p></div></section><section class="settings-card"><span class="section-kicker">APPEARANCE</span><h2>Calm by default</h2><p>Dark technical workspace is the default. Your preference is saved locally.</p><button class="secondary" id="theme-settings">Toggle light / dark</button></section><section class="settings-card settings-about"><span class="section-kicker">ABOUT SOLVESTACK</span><h2>A working notebook for technical investigations</h2><p>Use SolveStack when a problem lasts longer than a quick fix or involves several tests, possible causes, and pieces of evidence. It is built for the person actively solving the problem.</p><ul><li>Capture reasoning and evidence during the investigation.</li><li>Preserve what was ruled out and why.</li><li>Turn the finished work into portable organizational knowledge.</li><li>Export a redacted agent pack for organization-approved AI review.</li></ul><p><strong>Local privacy:</strong> no account is required and core troubleshooting data is not uploaded to a SolveStack server. Clearing site data can remove the browser copy. SolveStack asks for a backup file or a vault folder (Chrome or Edge on desktop) when you create an investigation, and again after unbacked-up changes. The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.</p><p>Completed Markdown can live in SharePoint, OneDrive, GitHub, file shares, documentation systems, or AI-searchable repositories. See the <a href="/agent-adapter/">agent adapter</a> for local tooling.</p><button class="secondary" id="settings-guide">Open the field guide</button></section></div>`;
 }
 
 function knowledgeMarkdown(s: Session) {
@@ -1054,6 +1075,8 @@ async function syncVaultToFolder() {
     saveFolderMeta(meta);
     folderSyncError = "";
     folderErrorToastShown = false;
+    resetProtectEdits();
+    refreshProtectLabels();
     void refreshFolderSyncUi();
   } catch (err) {
     folderSyncError = (err as Error).message;
@@ -1129,7 +1152,7 @@ async function unlockFolderSync(): Promise<boolean> {
     return false;
   }
   showToast("Vault folder sync unlocked for this session.");
-  void syncVaultToFolder();
+  await syncVaultToFolder();
   void refreshFolderSyncUi();
   return true;
 }
@@ -1585,27 +1608,182 @@ function redact(value: string) {
   if (!selected) return value;
   return value.replaceAll(selected, "[REDACTED]");
 }
+
+const PROTECT_STATE_KEY = "solvestack-protect";
+let protectDialog: HTMLDialogElement | null = null;
+
+function hasRealSessions() {
+  return store.sessions.some((session) => session.id !== SEED_SESSION_ID);
+}
+
+function readProtectLocal(): { snoozedAt?: string; editsSinceAnchor: number } {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PROTECT_STATE_KEY) ?? "{}") as {
+      snoozedAt?: unknown;
+      editsSinceAnchor?: unknown;
+    };
+    return {
+      snoozedAt: typeof parsed.snoozedAt === "string" ? parsed.snoozedAt : undefined,
+      editsSinceAnchor:
+        typeof parsed.editsSinceAnchor === "number" && parsed.editsSinceAnchor > 0
+          ? Math.floor(parsed.editsSinceAnchor)
+          : 0,
+    };
+  } catch {
+    return { editsSinceAnchor: 0 };
+  }
+}
+
+function writeProtectLocal(state: { snoozedAt?: string; editsSinceAnchor: number }) {
+  try {
+    localStorage.setItem(PROTECT_STATE_KEY, JSON.stringify(state));
+  } catch {
+    // A failed write means the next visit asks again. That is the safe direction.
+  }
+}
+
+function noteProtectEdit() {
+  const state = readProtectLocal();
+  state.editsSinceAnchor += 1;
+  writeProtectLocal(state);
+}
+
+function resetProtectEdits() {
+  const state = readProtectLocal();
+  state.editsSinceAnchor = 0;
+  writeProtectLocal(state);
+}
+
+function snoozeProtect() {
+  writeProtectLocal({ snoozedAt: now(), editsSinceAnchor: 0 });
+}
+
+function protectSnapshot(): ProtectSnapshot {
+  const local = readProtectLocal();
+  const meta = readFolderMeta();
+  const lastBackupAt = store.lastBackupAt ?? null;
+  const lastSyncAt = meta.lastWriteAt || null;
+  const protectedAt = latestIso(lastSyncAt, lastBackupAt);
+  return {
+    hasRealWork: hasRealSessions(),
+    lastBackupAt,
+    lastSyncAt,
+    snoozedAt: local.snoozedAt ?? null,
+    editsSinceAnchor: local.editsSinceAnchor,
+    changedSinceProtection: protectedAt
+      ? store.sessions.some(
+          (session) =>
+            session.id !== SEED_SESSION_ID && session.updatedAt > protectedAt,
+        )
+      : false,
+  };
+}
+
+function refreshProtectLabels() {
+  const label = protectionStatusLabel(protectSnapshot());
+  document.querySelectorAll<HTMLElement>("[data-protect-label]").forEach((el) => {
+    el.textContent = label;
+  });
+  const persistence = persistenceResultLabel(persistenceGrant);
+  document.querySelectorAll<HTMLElement>("[data-persistence-label]").forEach((el) => {
+    el.textContent = persistence;
+  });
+}
+
+async function requestPersistentStorage() {
+  const storage = navigator.storage;
+  if (!storage || typeof storage.persist !== "function") {
+    persistenceGrant = "unsupported";
+  } else {
+    try {
+      const already =
+        typeof storage.persisted === "function" ? await storage.persisted() : false;
+      persistenceGrant =
+        already || (await storage.persist()) ? "granted" : "denied";
+    } catch {
+      persistenceGrant = "denied";
+    }
+  }
+  refreshProtectLabels();
+  const line = document.querySelector("#protect-persistence");
+  if (line) line.textContent = persistenceResultLabel(persistenceGrant);
+}
+
+function maybeOfferProtect() {
+  openProtectDialog();
+}
+
+function openProtectDialog(options?: { force?: boolean }) {
+  if (protectDialog?.open) return;
+  if (document.querySelector("dialog[open]")) return;
+  if (!options?.force && !protectDecision(protectSnapshot()).show) return;
+  const folder = folderSyncSupported();
+  const dialog = document.createElement("dialog");
+  protectDialog = dialog;
+  dialog.className = "protect-dialog";
+  dialog.setAttribute("aria-labelledby", "protect-title");
+  dialog.setAttribute(
+    "aria-describedby",
+    "protect-desc protect-later protect-persistence",
+  );
+  const folderButton = folder
+    ? `<button class="primary" value="folder" type="submit">Connect a vault folder</button>`
+    : "";
+  const backupClass = folder ? "secondary" : "primary";
+  const how = folder
+    ? "Connect a vault folder to keep an encrypted file in a folder you choose. That works in Chrome and Edge on desktop. Your own drive app can carry the folder; SolveStack does not upload it and does not require an account. Or download a backup file, which imports in any browser, including Firefox and Safari."
+    : "This browser cannot connect a vault folder. That option needs Chrome or Edge on desktop. Download a backup file instead, then import it from Settings. The file round-trips the workspace in Firefox, Safari, and every other browser. SolveStack does not upload it and does not require an account.";
+  dialog.innerHTML = `<form method="dialog"><span class="section-kicker">PROTECT THIS WORKSPACE</span><h2 id="protect-title">Keep a copy outside this browser</h2><p id="protect-desc">This investigation is stored in this browser. Clearing site data can remove it. ${how}</p><p id="protect-persistence" role="status">${escapeHtml(persistenceResultLabel(persistenceGrant))}</p><p id="protect-later">Remind me later, Escape, or clicking outside asks again after ${PROTECT_REPROMPT_AFTER_EDITS} new edits or ${PROTECT_REPROMPT_AFTER_DAYS} days. It does not turn protection off.</p><div class="button-row">${folderButton}<button class="${backupClass}" value="backup" type="submit">Download a backup file</button><button class="secondary" value="settings" type="submit">Import an existing backup</button><button class="secondary" value="later" type="submit">Remind me later</button></div></form>`;
+  document.body.append(dialog);
+  dialog.addEventListener("close", () => {
+    const choice = dialog.returnValue;
+    dialog.remove();
+    if (protectDialog === dialog) protectDialog = null;
+    if (choice === "backup") {
+      void downloadBackup();
+      return;
+    }
+    if (choice === "folder") {
+      void connectFromPrompt();
+      return;
+    }
+    if (choice === "settings") {
+      view = "settings";
+      render();
+      return;
+    }
+    snoozeProtect();
+    refreshProtectLabels();
+    showToast(
+      `We'll ask again after ${PROTECT_REPROMPT_AFTER_EDITS} new edits or ${PROTECT_REPROMPT_AFTER_DAYS} days.`,
+      { durationMs: 7000 },
+    );
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      dialog.returnValue = "later";
+      dialog.close();
+    }
+  });
+  dialog.showModal();
+  dialog.querySelector<HTMLElement>("button")?.focus();
+}
+
+async function connectFromPrompt() {
+  await connectFolder();
+  if (syncPassphrase && !folderSyncError) return;
+  if (folderWaitingEnvelope) return;
+  openProtectDialog({ force: true });
+}
+
 function bind() {
   document.querySelectorAll<HTMLElement>("[data-storage-fill]").forEach((bar) => {
     bar.style.width = `${bar.dataset.storageFill}%`;
   });
   if (view === "settings") void refreshStorageEstimate();
-  const doBackup = async () => {
-    store.lastBackupAt = now();
-    download(
-      "solvestack-backup.json",
-      JSON.stringify({ ...store, exportedAt: now() }, null, 2),
-      "application/json",
-    );
-    await persist();
-    render();
-    showToast(
-      `Backup downloaded — ${backupStatus(store.lastBackupAt).label.toLowerCase()}.`,
-    );
-  };
   document
-    .querySelector("#backup-now")
-    ?.addEventListener("click", () => void doBackup());
+    .querySelector("#protect-open")
+    ?.addEventListener("click", () => openProtectDialog({ force: true }));
   document
     .querySelector("#folder-review-banner")
     ?.addEventListener("click", () => void reviewFolderVault());
@@ -1756,7 +1934,10 @@ function bind() {
       ],
       { confirmLabel: "Start session" },
     );
-    if (!values?.problem.trim()) return;
+    if (!values?.problem.trim()) {
+      maybeOfferProtect();
+      return;
+    }
     const blueprint = blueprintById(values.method);
     const stamp = now();
     const userTags = values.tags
@@ -2296,17 +2477,10 @@ function bind() {
       try { (window as unknown as { glass?: { capture: (event: string) => void } }).glass?.capture("case_resolved"); } catch { /* analytics is best-effort */ }
     }
     render();
-    if (backupStatus(store.lastBackupAt).needsBackup) {
-      showToast("Session resolved — back up your workspace?", {
-        actionLabel: "Back up now",
-        onAction: () => void doBackup(),
-        durationMs: 10000,
-      });
-    }
   });
   document
     .querySelector("#backup")
-    ?.addEventListener("click", () => void doBackup());
+    ?.addEventListener("click", () => void downloadBackup());
   document
     .querySelector("#restore")
     ?.addEventListener("click", () =>
@@ -2344,7 +2518,7 @@ function bind() {
     store.sessions = mergeBackup(store.sessions, sessions);
     store.attachments = mergeBackup(store.attachments, attachments);
     store.lastBackupAt = now();
-    await persist();
+    await persist({ protect: "mark-protected" });
     render();
     showToast(`${kindLabel}. Existing records were preserved.`);
   };
@@ -2399,7 +2573,7 @@ function bind() {
           JSON.stringify(envelope, null, 2),
           "application/json",
         );
-        await persist();
+        await persist({ protect: "mark-protected" });
         render();
         showToast("Encrypted vault downloaded. Keep the passphrase offline.");
       } catch (err) {

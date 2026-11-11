@@ -23,7 +23,8 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 
 ## Product boundaries
 
-- Core data stays in IndexedDB in the current browser profile (large evidence may use OPFS).
+- Core data stays in IndexedDB in the current browser profile (large evidence may use OPFS). Clearing site data can remove that copy.
+- Creating an investigation asks for a backup file or, in Chrome and Edge on desktop, a folder for an encrypted vault. The prompt can be postponed and comes back. SolveStack does not upload the workspace.
 - SolveStack has no account, cloud database, or built-in AI service.
 - Method deep links: `/?method=rca`, `/?method=5-whys`, `/?method=fishbone`, `/?method=incident-report`.
 - Users choose when to export Markdown, HTML, JSON, backups, ZIP knowledge packages, encrypted vaults, or redacted agent packs.

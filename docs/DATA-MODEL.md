@@ -9,12 +9,22 @@ The current persisted format is `schemaVersion: 3`. A workspace contains `sessio
 ## Data safety (P0)
 
 - `lastBackupAt` (ISO string, optional) records the last full backup
-  download on the workspace record. It is set by the Backup button, by a
-  successful restore or vault import, by encrypted vault export, and survives
-  migration (unknown top-level fields are preserved). Absent means "never
-  backed up". The dashboard shows a banner while a backup is due (never, or
-  7+ days old with real sessions) and Settings shows the same status next to
-  the backup controls.
+  download or encrypted vault export on the workspace record. It is set by
+  Backup, by a successful restore or vault import, and by encrypted vault
+  export. It survives migration (unknown top-level fields are preserved).
+  Absent means "never backed up".
+- `localStorage` key `solvestack-protect` stores `{ snoozedAt, editsSinceAnchor }`
+  for the protect prompt. `solvestack-folder-meta.lastWriteAt` is the last
+  successful vault-folder sync. The dashboard, the session header, and
+  Settings show "Last backed up: …", plus a sync time when the folder copy
+  is newer. The prompt opens on the first user-created investigation, and
+  again after 8 meaningful saves (`PROTECT_REPROMPT_AFTER_EDITS`) or 7 days
+  (`PROTECT_REPROMPT_AFTER_DAYS`) while a change is still unbacked-up.
+  "Remind me later" snoozes until one of those limits; it is not a permanent
+  dismiss. Chrome and Edge on desktop can connect a vault folder. Other
+  browsers get a backup file plus Import JSON. `navigator.storage.persist()`
+  runs on load and Settings shows granted, denied, or unavailable. Persistent
+  storage is not a backup.
 - Writes are serialised: `persist()` in `src/main.ts` queues full-workspace
   IndexedDB transactions instead of interleaving them, updates the save
   status in place, and never re-renders. Callers that changed data render
@@ -27,11 +37,9 @@ The current persisted format is `schemaVersion: 3`. A workspace contains `sessio
   via a `solvestack:remove-attachment` event so the in-memory workspace
   is the single IndexedDB owner — a second writer could otherwise
   resurrect a removed attachment on the next save.
-- Storage is requested as persistent (`navigator.storage.persist()`) on
-  load, best-effort. Settings shows the real quota from
-  `navigator.storage.estimate()` when available, falling back to the
-  evidence-only estimate. Large attachments prefer the Origin Private File
-  System when the browser supports it.
+- Settings shows the real quota from `navigator.storage.estimate()` when
+  available, falling back to the evidence-only estimate. Large attachments
+  prefer the Origin Private File System when the browser supports it.
 
 ## Encrypted vault
 
