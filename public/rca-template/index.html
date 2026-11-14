@@ -149,6 +149,154 @@ Systems affected:
 6. FOLLOW-UPS
    - Action — date checked — what showed it worked</pre>
         </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — MARKDOWN</p>
+          <pre># Root Cause Analysis
+
+- **Incident:**
+- **Date (start–end, with timezone):**
+- **Severity:**
+- **Incident commander:**
+- **Systems affected:**
+
+## 1. Problem statement
+
+What failed, what it affected, and when it was detected.
+Measurements you actually have (counts, durations, error rates):
+
+## 2. Incident timeline
+
+- HH:MM TZ — what was observed or done
+- HH:MM TZ —
+- HH:MM TZ — resolution confirmed
+
+## 3. The 5 whys
+
+**Problem:**
+
+1. Why?
+   - Answer:
+   - Evidence:
+2. Why?
+   - Answer:
+   - Evidence:
+3. Why?
+   - Answer:
+   - Evidence:
+4. Why?
+   - Answer:
+   - Evidence:
+5. Why?
+   - Answer:
+   - Evidence:
+
+**Root cause (a cause you can change):**
+
+Add another chain if a second cause does not depend on this one.
+
+## 4. Contributing factors
+
+- Factor — how it made the incident worse or more likely, and why it is not the root cause
+
+## 5. Corrective actions
+
+- [ ] Immediate: action — owner — due date
+- [ ] Systemic: action — owner — due date
+
+## 6. Follow-ups
+
+- Action — date checked — what showed it worked</pre>
+        </div>
+        <div class="copyblock">
+          <p>WORKED EXAMPLE — THE SAME TEMPLATE, FILLED IN (FICTIONAL INCIDENT)</p>
+          <pre>ROOT CAUSE ANALYSIS — WORKED EXAMPLE
+Not a real incident. The company, people, and figures are invented
+to show this template completed end to end.
+=====================================
+Incident: Checkout payment API returning HTTP 500
+Date: 2026-09-17, 14:02–14:47 UTC
+Severity: SEV-2 — customer-facing checkout failures for 45 minutes
+Incident commander: Priya (payments on-call lead)
+Systems affected: payment API (/pay/confirm), checkout database primary
+
+1. PROBLEM STATEMENT
+   The payment API returned HTTP 500 for a slice of checkout requests
+   between 14:02 and 14:47 UTC. Failed checkouts were counted from the
+   checkout log: 1,140 failed attempts in the window. The incident was
+   detected by the checkout-error alert at 14:02, not by a customer
+   report. No payment was double-charged; failed requests were rejected
+   before capture.
+
+2. INCIDENT TIMELINE
+   13:58 UTC — database primary disk usage crosses 90%; the disk alert
+     threshold is set at 95% and does not fire.
+   14:02 UTC — checkout-error alert fires; on-call confirms HTTP 500 on
+     /pay/confirm.
+   14:09 UTC — application logs show the database rejecting writes.
+   14:18 UTC — database primary disk found at 100%; the log directory is
+     the largest consumer.
+   14:24 UTC — oldest logs archived to object storage as a stopgap;
+     errors continue because the disk is still full.
+   14:31 UTC — disk volume expanded; the database accepts writes and
+     new 500s stop.
+   14:47 UTC — error rate back to baseline for 15 minutes; incident closed.
+
+3. THE 5 WHYS
+   Problem: checkout requests failed with HTTP 500 for 45 minutes.
+   1. Why did checkout fail?
+      Answer: the database rejected writes, and the API returned 500
+        instead of queueing the request.
+      Evidence: application log write errors from 14:02; the database
+        error log for the same window.
+   2. Why did the database reject writes?
+      Answer: its disk was at 100%.
+      Evidence: the disk usage graph and the on-call check at 14:18.
+   3. Why was the disk full?
+      Answer: application logs grew without a cap after a debug logging
+        change raised the volume.
+      Evidence: log directory sizes by day; the logging change in the
+        deploy history three days earlier.
+   4. Why did log growth fill the disk instead of being capped?
+      Answer: log retention was never configured on this host, so
+        nothing rotated or deleted old logs.
+      Evidence: the host configuration has no retention policy; the
+        previous host had one.
+   5. Why was retention never configured?
+      Answer: the database migration runbook had no storage-verification
+        step, so retention was never checked after the move.
+      Evidence: the migration runbook's checklist, which covers data and
+        credentials but not storage.
+   Root cause (a cause you can change): the migration runbook omitted a
+   storage-verification step, so log retention was never configured on
+   the new database host.
+
+4. CONTRIBUTING FACTORS
+   - The disk alert threshold (95%) left too little time to act before
+     the disk filled. It made an outage more likely, but the disk would
+     still have filled.
+   - Staging had more disk headroom than production, so load tests never
+     reached a full disk and the growth rate was not visible in testing.
+   - The rollback step in the payments runbook assumed a healthy
+     database, which slowed the first response.
+
+5. CORRECTIVE ACTIONS
+   - [x] Immediate: expand the database disk volume and archive the
+     oldest logs — Priya — 2026-09-17 — done
+   - [ ] Immediate: cap log retention at 14 days on the database
+     host — Priya — 2026-09-24
+   - [ ] Systemic: add a storage-verification step (retention, alert
+     thresholds, headroom) to the migration runbook — Marcus — 2026-10-08
+   - [ ] Systemic: lower the disk alert threshold and page on growth
+     rate, not only on usage — Priya — 2026-10-08
+
+6. FOLLOW-UPS
+   - Retention cap — checked 2026-10-01 — disk growth stayed flat over
+     the two weeks after the cap deployed.
+   - Runbook step — checked 2026-10-08 — the step was added and used on
+     the next migration rehearsal.
+   - Alert threshold — checked 2026-10-15 — the earlier alert fired once
+     on a real growth spike, and the team acted before 80% usage.</pre>
+        </div>
       </section>
 
       <section class="tool" id="tool" aria-labelledby="tool-title">
