@@ -29,6 +29,8 @@ const PRECACHE_URLS = [
   "/corrective-action-plan-template/template.css",
   "/incident-report-template/",
   "/incident-report-template/template.css",
+  "/incident-response-plan-template/",
+  "/incident-response-plan-template/template.css",
   "/vpn-outage-template/",
   "/vpn-outage-template/template.css",
   "/sign-in-failure-template/",
