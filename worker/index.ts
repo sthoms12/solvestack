@@ -8,6 +8,7 @@ interface Env {
 const markdownRoutes = new Set([
   "/",
   "/incident-report-template/",
+  "/incident-response-plan-template/",
   "/5-whys-template/",
   "/fishbone-diagram-template/",
   "/root-cause-analysis-tools/",

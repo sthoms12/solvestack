@@ -352,6 +352,13 @@ const addedPages: Array<{
     descriptionPhrase: "corrective action plan template",
     templateMarker: "CORRECTIVE ACTION PLAN",
   },
+  {
+    path: "incident-response-plan-template/",
+    title: "Incident Response Plan Template",
+    heading: "Incident Response Plan Template",
+    descriptionPhrase: "incident response plan template",
+    templateMarker: "INCIDENT RESPONSE PLAN",
+  },
 ];
 for (const page of addedPages) {
   const html = await Bun.file(`public/${page.path}index.html`).text();

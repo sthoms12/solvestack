@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="An incident response plan template for IT teams: roles, severity levels, escalation path, communication cadence, response phases, and the post-incident review. Free to copy." />
+    <link rel="canonical" href="https://solvestack-ai.app/incident-response-plan-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/incident-response-plan-template/" />
+    <meta property="og:title" content="Incident Response Plan Template for IT Teams" />
+    <meta property="og:description" content="Decide before the incident: roles, severity levels, escalation, and communication cadence. Copy the blank plan, or read the scenario walkthrough." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Incident Response Plan Template for IT Teams" />
+    <meta name="twitter:description" content="A free incident response plan template. Roles, severities, escalation, phases, and a scenario walkthrough. No account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/incident-response-plan-template/template.css" />
+    <title>Incident Response Plan Template for IT Teams | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Incident Response Plan Template for IT Teams",
+        "description": "An incident response plan template with roles, severity levels, an escalation path, communication cadence, response phases, and a post-incident review, plus a blank plan and a scenario walkthrough.",
+        "url": "https://solvestack-ai.app/incident-response-plan-template/",
+        "author": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+        "publisher": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+        "about": ["incident response plan template", "incident response plan", "incident response", "severity levels", "escalation", "IT troubleshooting"]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is an incident response plan template?",
+            "acceptedAnswer": { "@type": "Answer", "text": "An incident response plan template is the fill-in structure for a team's incident response plan: the roles, severity levels, escalation path, communication cadence, and response phases decided before an incident. The plan says who does what. The incident report records what one incident actually did." }
+          },
+          {
+            "@type": "Question",
+            "name": "What should an incident response plan include?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Include named roles with backups, severity levels with a plain-language test for each one, an escalation path with contact order, the channels and cadence for updates, the response phases from detection to recovery, and a post-incident review step that feeds changes back into the plan." }
+          },
+          {
+            "@type": "Question",
+            "name": "How is an incident response plan different from an incident report?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The plan is written before anything breaks and applies to every incident: who leads, who communicates, when to escalate. The incident report is written during and after one incident and records its summary, timeline, impact, and actions. The plan governs; the report remembers." }
+          },
+          {
+            "@type": "Question",
+            "name": "How often should an incident response plan be reviewed?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Review it after every significant incident, while the gaps are still fresh, and whenever the team, the on-call rotation, or the systems it covers change. A plan that names people who left or tools nobody uses fails the first time it is needed." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I keep an incident response plan offline?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. The template on this page is plain text you can copy into any document or wiki. SolveStack, the app linked from this page, also works offline: investigations stay in your browser, with no account and no cloud service, and export as Markdown, HTML, JSON, or ZIP." }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#plan">Plan</a><a href="#template">Template</a><a href="/rca-template/">RCA</a><a href="#faqs">FAQs</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT RESPONSE PLAN</div>
+        <p class="overline">DECIDE IN ADVANCE → RESPOND WITHOUT IMPROVISING</p>
+        <h1>Incident Response <em>Plan</em> Template</h1>
+        <p class="intro">An incident response plan template is the structure for deciding, before anything breaks, who leads an incident, who communicates, how severity is set, and when to escalate. Copy the blank plan, or read the scenario walkthrough. The record of a single incident belongs on the <a href="/incident-report-template/">incident report template</a>. The analysis belongs on the <a href="/rca-template/">root cause analysis template</a>.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="#example">Read the walkthrough</a></div>
+        <aside><strong>Local-first boundary</strong><span>The text on this page stays in your browser until you copy it. SolveStack stores an investigation in IndexedDB. No account, no cloud database, no built-in AI.</span></aside>
+      </section>
+
+      <section class="template" id="plan" aria-labelledby="plan-title">
+        <div class="section-label"><span>01</span><div><p>WHAT THE PLAN DECIDES</p><h2 id="plan-title">Decided in advance, not improvised mid-incident.</h2></div></div>
+        <p class="lede">An incident is the worst time to negotiate who is in charge. The plan settles the standing questions while everyone is calm: which role leads, how severity is declared, who writes the updates, and what happens when the first fix fails. Name a role for every line. A role survives a resignation; a person's phone number does not. The record of one incident goes on the <a href="/incident-report-template/">incident report template</a>. The tracked follow-up actions go on the <a href="/corrective-action-plan-template/">corrective action plan template</a>.</p>
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>Six parts. The plan is done when each one names a role, not a hope.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Part</th>
+                <th scope="col">What to write</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Roles and responsibilities</th>
+                <td>Who leads the incident, who communicates, who keeps the record — each a role, each with a backup.</td>
+              </tr>
+              <tr>
+                <th scope="row">Severity levels</th>
+                <td>A short ladder of levels, each with a plain-language test anyone on call can apply in the first minutes.</td>
+              </tr>
+              <tr>
+                <th scope="row">Escalation path</th>
+                <td>Who is pulled in next, in what order, and who can declare the incident over.</td>
+              </tr>
+              <tr>
+                <th scope="row">Communication cadence and channels</th>
+                <td>Where updates are posted, who they are for, how often they land while an incident is open, and the format each update follows.</td>
+              </tr>
+              <tr>
+                <th scope="row">Response phases</th>
+                <td>The path from detection to recovery, as a checklist the incident lead can walk without inventing the next step.</td>
+              </tr>
+              <tr>
+                <th scope="row">Post-incident review</th>
+                <td>When the review happens, which records it reads, and how the changes it assigns get tracked — including changes to this plan.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="step-list">
+          <article><span class="number">PART 01</span><div><h3>Roles and responsibilities</h3><p>Three roles carry most incidents: the incident lead, who declares severity and directs the work; communications, who writes and posts updates; and the scribe, who keeps the timeline. Give every role a backup, and write down how the lead role passes when an incident crosses a shift or a specialty boundary.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Incident lead: platform on-call. Communications: support lead. Scribe: second on-call. For identity incidents, the lead passes to the platform lead. Not a real incident.</span></div></article>
+          <article><span class="number">PART 02</span><div><h3>Severity levels</h3><p>A severity level is a test, not a feeling. Write each level as a sentence a tired person can check at 3 a.m.: who is affected, and how badly. Pair each level with its response — who is paged and how often updates are posted — so declaring a severity also starts the right machinery.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>SEV-2: a customer-facing service is degraded, or all staff are locked out of internal tools. Response: page the incident lead and communications; updates every 30 minutes. Not a real incident.</span></div></article>
+          <article><span class="number">PART 03</span><div><h3>Escalation path</h3><p>Escalation is a decision made in advance, not an admission of defeat. Name the order: who is pulled in when the first responder is stuck, who joins when the incident crosses teams, and the route for vendor incidents, where the escalation is a support case rather than a person. End the path with who can declare the incident over.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Stuck after 30 minutes: page the service owner. Cross-team impact: the incident lead pulls in the second team's on-call. Vendor fault: open the priority support case and keep the update cadence. Not a real incident.</span></div></article>
+          <article><span class="number">PART 04</span><div><h3>Communication cadence and channels</h3><p>Silence is what turns an incident into a rumor. Name one status channel, the audience for each kind of notice, and a cadence per severity. Give updates a fixed shape — what is broken, what is being done, when the next update lands — so a reader can scan any update in seconds.</p></div></article>
+          <article><span class="number">PART 05</span><div><h3>Response phases</h3><p>Six phases are enough: detect, declare, contain, resolve, recover, review. Contain and resolve are different jobs — stop the impact spreading first, then fix the cause. Recover is its own step: service is normal when the checks say so, not when the fix is deployed. The review phase is part of the response, not an optional extra.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Contain: route traffic away from the failing region. Resolve: fix the bad deploy. Recover: watch the error rate for one full update cycle before closing. Not a real incident.</span></div></article>
+          <article><span class="number">PART 06</span><div><h3>Post-incident review</h3><p>The review reads the incident report and the root cause analysis, assigns the corrective actions, and — the step most plans miss — records what the incident exposed about the plan itself. A severity test that did not fit, a role nobody filled, a channel nobody watched: those are plan defects, and they get actions like any other.</p></div></article>
+        </div>
+        <div class="copyblock" id="example">
+          <p>COPY-PASTE VERSION — SCENARIO WALKTHROUGH</p>
+          <pre>INCIDENT RESPONSE PLAN — SCENARIO WALKTHROUGH
+Not a real incident. The company, people, and times are invented to
+show this plan being followed end to end.
+==============================================
+Scenario: the single sign-on provider the company relies on is down,
+and staff cannot sign in to internal tools.
+
+02:10 — Monitoring flags sign-in errors. The on-call engineer checks
+  the severity tests in the plan: no customer-facing service is
+  affected, but all staff are locked out of internal tools. That is
+  the plan's SEV-2 line. Severity declared: SEV-2.
+02:15 — The lead role passes to the platform lead, as the plan's
+  rotation note says for identity incidents. The support lead takes
+  communications. The second on-call takes the scribe role and opens
+  the incident record.
+02:20 — First update posted to the plan's status channel and the
+  staff notice page, in the plan's update format: what is broken,
+  what is being done, when the next update lands.
+02:45 — The vendor confirms an outage on their side. The plan's
+  escalation path for vendor incidents says: open the vendor's
+  priority support case, and post updates every 30 minutes while a
+  SEV-2 is open. Both happen.
+03:30 — The vendor restores service and sign-ins succeed in testing.
+  The incident lead keeps the incident open for one more update
+  cycle, as the plan's recovery step requires after a vendor fix.
+04:05 — Final update posted; incident closed. The scribe's record
+  becomes the incident report.
+Next day — The post-incident review is held under the plan's review
+  step. One change is made to the plan itself: the severity tests
+  gain a line for "all staff locked out of internal tools", which
+  this incident exposed as missing.</pre>
+        </div>
+        <div class="copyblock" id="template">
+          <p>COPY-PASTE VERSION — BLANK PLAN</p>
+          <pre>INCIDENT RESPONSE PLAN
+======================
+Plan owner (role):
+Last reviewed:
+Scope (systems and services this plan covers):
+
+1. ROLES AND RESPONSIBILITIES
+   Incident lead (role) — declares severity, directs the response:
+   Communications (role) — writes and posts updates:
+   Scribe (role) — keeps the timeline and the record:
+   Backup for each role:
+   How the lead role passes (shift change, specialty boundary):
+
+2. SEVERITY LEVELS
+   SEV-1 — test in plain language (who is affected, how badly):
+     Response (who is paged, update cadence):
+   SEV-2 — test:
+     Response:
+   SEV-3 — test:
+     Response:
+   SEV-4 — test:
+     Response:
+
+3. ESCALATION PATH
+   First escalation (role or team) — when:
+   Second escalation — when:
+   Vendor incidents — support case route and contract contact:
+   Who can declare the incident over:
+
+4. COMMUNICATION
+   Status channel:
+   Audience for staff or customer notices:
+   Update cadence while a SEV-1 or SEV-2 is open:
+   Update format: what is broken — what is being done — when the
+   next update lands.
+
+5. RESPONSE PHASES
+   [ ] Detect — how incidents are noticed and reported
+   [ ] Declare — severity set, roles filled, record opened
+   [ ] Contain — stop the impact spreading
+   [ ] Resolve — fix or work around the cause
+   [ ] Recover — confirm normal service before closing
+   [ ] Review — post-incident review scheduled
+
+6. POST-INCIDENT REVIEW
+   Held within (days) of closing:
+   Records it reads (incident report ID, root cause analysis ID):
+   Plan changes this incident exposed:
+   Actions tracked on the corrective action plan:</pre>
+        </div>
+      </section>
+
+      <section class="tool" id="tool" aria-labelledby="tool-title">
+        <div class="section-label"><span>02</span><div><p>RUN IT LOCALLY</p><h2 id="tool-title">Write the plan from a real incident.</h2></div></div>
+        <div class="tool-grid"><div><p>A plan written from a real incident beats a plan written from imagination. When an investigation closes in SolveStack, convert it into a runbook, keep the plan with your exported knowledge, and let the next incident amend it.</p><div class="tool-actions"><a class="primary" href="/">Open SolveStack</a><a class="secondary" href="/use-your-data/">See export formats</a></div></div>
+          <ol class="seven">
+            <li><strong>The declared severity</strong> — and the test that set it</li>
+            <li><strong>The roles as they were actually filled</strong> — including the handoffs</li>
+            <li><strong>The timeline the scribe kept</strong> — the raw material of the record</li>
+            <li><strong>The decisions</strong> — and when they were made</li>
+            <li><strong>The updates that were sent</strong> — kept with the incident, not lost in chat</li>
+            <li><strong>The confirmed root cause</strong> — or an explicit "not confirmed"</li>
+            <li><strong>The follow-ups the review assigned</strong> — the plan's next amendments</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Incident response plans, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What is an incident response plan template?</h3><p>An incident response plan template is the fill-in structure for a team's incident response plan: the roles, severity levels, escalation path, communication cadence, and response phases decided before an incident. The plan says who does what. The incident report records what one incident actually did.</p></article>
+          <article><h3>What should an incident response plan include?</h3><p>Include named roles with backups, severity levels with a plain-language test for each one, an escalation path with contact order, the channels and cadence for updates, the response phases from detection to recovery, and a post-incident review step that feeds changes back into the plan.</p></article>
+          <article><h3>How is an incident response plan different from an incident report?</h3><p>The plan is written before anything breaks and applies to every incident: who leads, who communicates, when to escalate. The incident report is written during and after one incident and records its summary, timeline, impact, and actions. The plan governs; the report remembers.</p></article>
+          <article><h3>How often should an incident response plan be reviewed?</h3><p>Review it after every significant incident, while the gaps are still fresh, and whenever the team, the on-call rotation, or the systems it covers change. A plan that names people who left or tools nobody uses fails the first time it is needed.</p></article>
+          <article><h3>Can I keep an incident response plan offline?</h3><p>Yes. The template on this page is plain text you can copy into any document or wiki. SolveStack, the app linked from this page, also works offline: investigations stay in your browser, with no account and no cloud service, and export as Markdown, HTML, JSON, or ZIP.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>04</span><div><p>KEEP GOING</p><h2 id="related-title">Before, during, and after.</h2></div></div>
+        <div class="related-cards">
+          <a href="/incident-report-template/"><b>DURING</b><span>IT incident report template</span><p>The record of one incident: summary, timeline, impact, root cause, and owners.</p></a>
+          <a href="/rca-template/"><b>AFTER</b><span>Root cause analysis template</span><p>The analysis the review is built on: problem statement, timeline, 5 whys, and the check that the fix held.</p></a>
+          <a href="/corrective-action-plan-template/"><b>ACTIONS</b><span>Corrective action plan template</span><p>Owners, dates, and the effectiveness check for the changes the review assigns.</p></a>
+          <a href="/5-whys-template/"><b>THE CHAIN</b><span>5 whys template</span><p>The short cause chain for the review's analysis step, with evidence on each why.</p></a>
+          <a href="/"><b>WORKSPACE</b><span>Run the response in SolveStack</span><p>Capture the incident locally as it happens, then convert it into the runbook your plan points to. No account, no cloud.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

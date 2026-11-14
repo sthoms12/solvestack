@@ -20,6 +20,11 @@ const PAGES = [
     path: "/incident-report-template/",
   },
   {
+    source: "public/incident-response-plan-template/index.html",
+    out: "incident-response-plan-template.md",
+    path: "/incident-response-plan-template/",
+  },
+  {
     source: "public/5-whys-template/index.html",
     out: "5-whys-template.md",
     path: "/5-whys-template/",
