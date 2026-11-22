@@ -95,6 +95,27 @@ test("core renderer uses shared search and avoids duplicate search enhancement",
   expect(source).not.toContain('import "./search-enhancements"');
 });
 
+test("search supports 2-char IT acronyms and ignores internal JSON schema keys", () => {
+  const s1 = {
+    ...session("SS-AD", "Sign-in failure", "Entra ID", ["auth"]),
+    schemaVersion: 3,
+    createdAt: "2026-11-01T00:00:00Z",
+    entries: [{ type: "Observation", content: "AD replication lag on DC01 and IP 10.0.0.4" }],
+  };
+  const s2 = {
+    ...session("SS-DB", "Database timeout", "Postgres", ["db"]),
+    schemaVersion: 3,
+    createdAt: "2026-11-01T00:00:00Z",
+    entries: [{ type: "Observation", content: "Connection pool exhausted on VM" }],
+  };
+  expect(searchSessions([s1, s2], "AD").map((r) => r.session.id)).toEqual(["SS-AD"]);
+  expect(searchSessions([s1, s2], "IP").map((r) => r.session.id)).toEqual(["SS-AD"]);
+  expect(searchSessions([s1, s2], "VM").map((r) => r.session.id)).toEqual(["SS-DB"]);
+  expect(searchSessions([s1, s2], "schemaVersion")).toEqual([]);
+  expect(searchSessions([s1, s2], "createdAt")).toEqual([]);
+  expect(searchSessions([s1, s2], "attachmentIds")).toEqual([]);
+});
+
 test("enhancements identify sessions explicitly and reuse uses a modal", async () => {
   const enhancements = await Bun.file("src/enhancements.ts").text();
   const reuse = await Bun.file("src/reuse-enhancement.ts").text();
@@ -105,4 +126,5 @@ test("enhancements identify sessions explicitly and reuse uses a modal", async (
   expect(reuse).toContain("dialog.showModal()");
   expect(reuse).not.toContain("prompt(");
   expect(attachments).toContain("data-remove-attachment");
+  expect(enhancements).toContain("setRangeText");
 });

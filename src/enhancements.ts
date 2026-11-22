@@ -69,7 +69,13 @@ const wire = () => {
       if (classified && tech) {
         event.preventDefault();
         tech.value = classified.technicalType;
-        capture.value = classified.content;
+        if (capture.value) {
+          const start = capture.selectionStart ?? capture.value.length;
+          const end = capture.selectionEnd ?? capture.value.length;
+          capture.setRangeText(classified.content, start, end, "end");
+        } else {
+          capture.value = classified.content;
+        }
         capture.placeholder = `${classified.note} — edit if needed, then Capture`;
         tech.dispatchEvent(new Event("change", { bubbles: true }));
       }

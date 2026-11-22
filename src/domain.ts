@@ -18,43 +18,64 @@ const words = (value: string) =>
     value
       .toLowerCase()
       .split(/[^a-z0-9.-]+/)
-      .filter((word) => word.length > 2),
+      .filter((word) => word.length >= 2),
   );
+const userFacingContent = (session: SearchableSession) =>
+  [
+    session.problem,
+    session.resolution.rootCause,
+    session.resolution.fix,
+    session.resolution.validation,
+    session.resolution.prevention,
+    ...session.entries.map((entry) => entry.content),
+    ...session.hypotheses.flatMap((hyp) => [hyp.text, hyp.reasoning]),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 export function searchSessions(sessions: SearchableSession[], query: string) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return [];
-  const queryWords = words(normalized);
+  const queryWords = [...words(normalized)];
   return sessions
     .map((session) => {
-      const title = words(session.title),
+      const titleLower = session.title.toLowerCase(),
+        systemLower = session.system.toLowerCase(),
+        tagsLower = session.tags.map((tag) => tag.toLowerCase()),
+        title = words(session.title),
         system = words(session.system),
-        tags = new Set(session.tags.map((tag) => tag.toLowerCase())),
-        body = words(JSON.stringify(session));
+        tags = new Set(tagsLower),
+        bodyText = userFacingContent(session),
+        body = words(bodyText);
       let score = 0;
       const reasons = new Set<string>();
-      if (session.title.toLowerCase().includes(normalized)) {
+      if (titleLower.includes(normalized)) {
         score += 12;
         reasons.add("title match");
       }
-      if (session.system.toLowerCase().includes(normalized)) {
+      if (systemLower.includes(normalized)) {
         score += 8;
         reasons.add("system match");
       }
-      if (session.tags.some((tag) => tag.toLowerCase().includes(normalized))) {
+      if (tagsLower.some((tag) => tag.includes(normalized))) {
         score += 7;
         reasons.add("tag match");
       }
+      if (bodyText.includes(normalized)) {
+        score += 4;
+        reasons.add("content match");
+      }
       for (const word of queryWords) {
-        if (title.has(word)) {
+        if (title.has(word) || titleLower.includes(word)) {
           score += 8;
           reasons.add("title match");
-        } else if (system.has(word)) {
+        } else if (system.has(word) || systemLower.includes(word)) {
           score += 6;
           reasons.add("system match");
-        } else if (tags.has(word)) {
+        } else if (tags.has(word) || tagsLower.some((tag) => tag.includes(word))) {
           score += 5;
           reasons.add("tag match");
-        } else if (body.has(word)) {
+        } else if (body.has(word) || bodyText.includes(word)) {
           score += 2;
           reasons.add("content match");
         }

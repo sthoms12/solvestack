@@ -145,6 +145,7 @@ export function showToast(message: string, options: ToastOptions = {}): void {
   if (!region) {
     region = document.createElement("div");
     region.id = "toast-region";
+    region.className = "toast-region";
     region.setAttribute("aria-live", "polite");
     document.body.append(region);
   }
