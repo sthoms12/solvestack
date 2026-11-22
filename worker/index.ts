@@ -23,6 +23,10 @@ const markdownRoutes = new Set([
   "/use-your-data/",
   "/onenote-vs-solvestack/",
   "/agent-adapter/",
+  "/templates/",
+  "/postmortem-template/",
+  "/network-outage-template/",
+  "/backup-restore-failure-template/",
 ]);
 
 function appendVary(headers: Headers, value: string) {

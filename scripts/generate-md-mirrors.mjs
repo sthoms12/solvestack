@@ -94,6 +94,26 @@ const PAGES = [
     out: "agent-adapter.md",
     path: "/agent-adapter/",
   },
+  {
+    source: "public/templates/index.html",
+    out: "templates.md",
+    path: "/templates/",
+  },
+  {
+    source: "public/postmortem-template/index.html",
+    out: "postmortem-template.md",
+    path: "/postmortem-template/",
+  },
+  {
+    source: "public/network-outage-template/index.html",
+    out: "network-outage-template.md",
+    path: "/network-outage-template/",
+  },
+  {
+    source: "public/backup-restore-failure-template/index.html",
+    out: "backup-restore-failure-template.md",
+    path: "/backup-restore-failure-template/",
+  },
 ];
 
 const NAMED_ENTITIES = {

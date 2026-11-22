@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free blameless postmortem template for IT and SRE teams: customer impact, timeline, detection gap, contributing factors, and owned follow-ups. Copy it or run it locally in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/postmortem-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/postmortem-template/" />
+    <meta property="og:title" content="Blameless Postmortem Template" />
+    <meta property="og:description" content="Copy-ready IT post-incident review template covering impact, timeline, contributing factors, and preventive actions." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Blameless Postmortem Template" />
+    <meta name="twitter:description" content="Impact, timeline, detection gap, contributing factors, and owned follow-ups. Free postmortem template, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/vpn-outage-template/template.css" />
+    <title>Blameless Postmortem Template — Post-Incident Review | SolveStack</title>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Blameless Postmortem Template",
+  "description": "A blameless postmortem template for IT and operations teams covering customer impact, timeline, detection gaps, contributing factors, and owned preventive actions.",
+  "url": "https://solvestack-ai.app/postmortem-template/",
+  "author": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+  "publisher": { "@type": "Organization", "name": "SolveStack" },
+  "about": ["postmortem", "blameless postmortem", "post-incident review", "IT operations"]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What makes a postmortem blameless?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A blameless postmortem focuses on system conditions, missing guardrails, unclear runbooks, and detection gaps rather than blaming the individual who ran a command. People act rationally based on the information and tools available at the time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should a postmortem be written after an outage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Draft the timeline and facts within 24 to 48 hours while logs and chat transcripts are fresh, then hold the review meeting within one week so follow-up actions enter normal sprint or ops planning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the worked example on this page a real incident?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each postmortem section reads when completed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this postmortem template free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Copy the plain-text postmortem template below or capture the incident locally in SolveStack for free with no account."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/templates/">All templates</a><a href="/rca-template/">RCA template</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / POST-INCIDENT REVIEW</div>
+        <p class="overline">TIMELINE → SYSTEMS → GUARDRAILS</p>
+        <h1>Blameless <em>Postmortem</em> Template</h1>
+        <p class="intro">A good postmortem turns a painful outage into concrete system guardrails instead of finger-pointing. Use this copy-ready template to document impact, timeline, detection gaps, contributing factors, and owner-assigned follow-ups.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five sections that produce real preventive work.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Incident summary and user impact</h3><p>State what broke, who felt it, how long it lasted, and how service was restored. Keep it plain enough for non-technical stakeholders to understand in 30 seconds.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Internal billing portal returned HTTP 502 for 38 minutes (14:04–14:42 UTC), affecting roughly 85 finance staff. Service restored by rolling back reverse-proxy config change #412. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Factual timeline</h3><p>Record exact timestamps (with timezone) for trigger, first user report, alert fire, mitigation attempt, and verified recovery. Separate observed facts from interpretations.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>14:03 Config deployed; 14:04 502 errors began; 14:11 Help desk ticket opened (monitoring alert missed due to wrong health endpoint); 14:35 Rollback initiated; 14:42 Verified clean. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Detection and response review</h3><p>Capture what went well, what slowed diagnosis, and where monitoring or runbooks failed to give early warning.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Rollback procedure worked cleanly once the bad commit was found; however, synthetic checks hit /healthz instead of /api/status, delaying detection by 7 minutes. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Contributing factors (system focus)</h3><p>List the technical and process conditions that allowed the failure — never "human error." Ask why the system let a single mistake cause an outage.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>1) Proxy config lacked automated syntax/upstream validation in CI. 2) Health check did not verify backend upstream connectivity. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Follow-up actions with owners and due dates</h3><p>Every action item must have one named owner, a concrete deliverable, a due date, and a ticket link. Unowned actions never ship.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Add proxy validation step to CI (Platform team, due Friday); point synthetic monitor at /api/status (SRE team, due Tuesday). Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>BLAMELESS POSTMORTEM
+====================
+Incident ID / Title:
+Date &amp; Duration (UTC):
+Severity:
+Facilitator / Author:
+
+1. SUMMARY &amp; IMPACT
+   What broke, who was affected, and how service was restored:
+
+2. TIMELINE (UTC)
+   - [HH:MM] Trigger / change:
+   - [HH:MM] Impact started:
+   - [HH:MM] Detection / first alert:
+   - [HH:MM] Mitigation applied:
+   - [HH:MM] Full recovery verified:
+
+3. DETECTION &amp; RESPONSE
+   What went well:
+   What slowed us down:
+   Where we got lucky:
+
+4. CONTRIBUTING FACTORS
+   - Technical / guardrail gap:
+   - Monitoring / alerting gap:
+   - Process / runbook gap:
+
+5. PREVENTIVE ACTIONS
+   - [Action] | Owner: | Due: | Ticket:</pre>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>02</span><div><p>QUESTIONS</p><h2 id="faqs-title">Blameless postmortems, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What makes a postmortem blameless?</h3><p>A blameless postmortem focuses on system conditions, missing guardrails, unclear runbooks, and detection gaps rather than blaming the individual who ran a command. People act rationally based on the information and tools available at the time.</p></article>
+          <article><h3>When should a postmortem be written after an outage?</h3><p>Draft the timeline and facts within 24 to 48 hours while logs and chat transcripts are fresh, then hold the review meeting within one week so follow-up actions enter normal sprint or ops planning.</p></article>
+          <article><h3>Is the worked example on this page a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer. It shows how each postmortem section reads when completed.</p></article>
+          <article><h3>Is this postmortem template free?</h3><p>Yes. Copy the plain-text postmortem template below or capture the incident locally in SolveStack for free with no account.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>03</span><div><p>KEEP GOING</p><h2 id="related-title">Related templates.</h2></div></div>
+        <div class="related-cards">
+          <a href="/rca-template/"><b>RCA</b><span>Root cause analysis template</span><p>Deep causal analysis with 5 Whys, contributing factors, and verified corrective actions.</p></a>
+          <a href="/corrective-action-plan-template/"><b>FOLLOW-UP</b><span>Corrective action plan template</span><p>Track preventive follow-up items through completion and verification.</p></a>
+          <a href="/templates/"><b>DIRECTORY</b><span>All IT templates</span><p>Browse every incident checklist and RCA template in SolveStack.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

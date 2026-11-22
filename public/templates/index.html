@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free IT troubleshooting, root cause analysis, postmortem, and outage checklist templates. Copy plain-text templates or run them locally in SolveStack — no account, no cloud." />
+    <link rel="canonical" href="https://solvestack-ai.app/templates/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/templates/" />
+    <meta property="og:title" content="IT Troubleshooting &amp; RCA Templates | SolveStack" />
+    <meta property="og:description" content="Directory of free, copy-ready IT troubleshooting checklists, RCA templates, postmortems, and incident response plans." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="IT Troubleshooting &amp; RCA Templates | SolveStack" />
+    <meta name="twitter:description" content="Free IT outage checklists, RCA templates, 5 Whys, fishbone diagrams, and blameless postmortems." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/vpn-outage-template/template.css" />
+    <title>IT Troubleshooting &amp; RCA Templates | SolveStack</title>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "IT Troubleshooting and RCA Templates",
+  "description": "Free IT troubleshooting checklists, root cause analysis templates, blameless postmortems, and incident response plans.",
+  "url": "https://solvestack-ai.app/templates/",
+  "publisher": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" }
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "SolveStack", "item": "https://solvestack-ai.app/" },
+    { "@type": "ListItem", "position": 2, "name": "Templates", "item": "https://solvestack-ai.app/templates/" }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are all SolveStack templates free to copy?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Every template includes a plain-text copy-paste version you can use in any ticket, wiki, or editor, or you can run the investigation locally in SolveStack with no account."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which template should I pick during a live IT outage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Start with the incident-specific checklist (VPN, DNS, network, sign-in, expired certificate, disk full, email delivery, or backup restore) to isolate the fault quickly, then move to the RCA or blameless postmortem template after service is restored."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#incident-checklists">Incident checklists</a><a href="#rca-methods">RCA &amp; postmortems</a><a href="/use-your-data/">Use your data</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">TEMPLATE LIBRARY / FIELD GUIDES</div>
+        <p class="overline">CAPTURE → ISOLATE → PREVENT</p>
+        <h1>IT Troubleshooting &amp; <em>RCA</em> Templates</h1>
+        <p class="intro">Every SolveStack template is free to copy in plain text or run locally in your browser's IndexedDB workspace — no account, no cloud upload, and portable Markdown, HTML, JSON, or ZIP export when you finish.</p>
+        <div class="hero-actions"><a class="primary" href="#incident-checklists">Browse incident checklists</a><a class="secondary" href="/">Open SolveStack workspace</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="related" id="incident-checklists" aria-labelledby="inc-title">
+        <div class="section-label"><span>01</span><div><p>LIVE INCIDENT CHECKLISTS</p><h2 id="inc-title">Isolate active outages layer by layer.</h2></div></div>
+        <div class="related-cards">
+          <a href="/vpn-outage-template/"><b>REMOTE ACCESS</b><span>VPN outage template</span><p>Separate gateway, ISP, authentication path, and client-spread faults by scope.</p></a>
+          <a href="/network-outage-template/"><b>CONNECTIVITY</b><span>Network &amp; Wi-Fi outage template</span><p>Isolate physical link, DHCP, VLAN/routing, DNS, and ISP circuit failures in order.</p></a>
+          <a href="/dns-failure-template/"><b>NAME RESOLUTION</b><span>DNS failure template</span><p>Compare resolvers, query authoritative servers, and verify TTL before touching records.</p></a>
+          <a href="/sign-in-failure-template/"><b>IDENTITY &amp; SSO</b><span>SSO sign-in failure template</span><p>Trace IdP status, MFA prompts, conditional access policies, and SAML token errors.</p></a>
+          <a href="/expired-certificate-template/"><b>TLS &amp; PKI</b><span>Expired certificate template</span><p>Verify the served chain, locate every host holding the cert, and confirm replacement cleanly.</p></a>
+          <a href="/disk-full-template/"><b>STORAGE</b><span>Disk full template</span><p>Find runaway logs, unlinked open files, and inode exhaustion before rebooting or deleting blindly.</p></a>
+          <a href="/email-delivery-template/"><b>MESSAGING</b><span>Email delivery template</span><p>Check queues, SPF/DKIM/DMARC authentication, relay blocks, and bounce codes systematically.</p></a>
+          <a href="/backup-restore-failure-template/"><b>RECOVERY</b><span>Backup &amp; restore failure template</span><p>Verify snapshot integrity, storage targets, VSS/agent errors, and clean test-restore validation.</p></a>
+        </div>
+      </section>
+
+      <section class="related" id="rca-methods" aria-labelledby="rca-title">
+        <div class="section-label"><span>02</span><div><p>POST-INCIDENT &amp; RCA METHODS</p><h2 id="rca-title">Turn resolved incidents into durable fixes.</h2></div></div>
+        <div class="related-cards">
+          <a href="/rca-template/"><b>METHOD</b><span>Root cause analysis template</span><p>Problem statement, timeline, 5 Whys, contributing factors, and verified corrective actions.</p></a>
+          <a href="/postmortem-template/"><b>POSTMORTEM</b><span>Blameless postmortem template</span><p>Customer impact, detection gap, timeline, contributing factors, and owner-assigned follow-ups.</p></a>
+          <a href="/5-whys-template/"><b>METHOD</b><span>5 Whys template</span><p>Structured causal chain with evidence checks and guidance on when to escalate to full RCA.</p></a>
+          <a href="/fishbone-diagram-template/"><b>METHOD</b><span>Fishbone diagram template (Ishikawa)</span><p>Structured cause-and-effect template plus downloadable CSV for team workshops.</p></a>
+          <a href="/incident-report-template/"><b>REPORTING</b><span>IT incident report template</span><p>Executive summary, impact, timeline, root cause, corrective actions, and owners.</p></a>
+          <a href="/corrective-action-plan-template/"><b>FOLLOW-UP</b><span>Corrective action plan template</span><p>Turn RCA findings into tracked preventive actions with owners, due dates, and verification.</p></a>
+          <a href="/incident-response-plan-template/"><b>PREPAREDNESS</b><span>Incident response plan template</span><p>Roles, severity tiers, escalation paths, communication cadence, and recovery checkpoints.</p></a>
+          <a href="/root-cause-analysis-tools/"><b>GUIDE</b><span>Root cause analysis tools</span><p>Compare 5 Whys, Fishbone diagrams, fault trees, and structured RCA notebooks.</p></a>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>03</span><div><p>QUESTIONS</p><h2 id="faqs-title">Using the template library.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>Are all SolveStack templates free to copy?</h3><p>Yes. Every template includes a plain-text copy-paste version you can use in any ticket, wiki, or editor, or you can run the investigation locally in SolveStack with no account.</p></article>
+          <article><h3>Which template should I pick during a live IT outage?</h3><p>Start with the incident-specific checklist (VPN, DNS, network, sign-in, expired certificate, disk full, email delivery, or backup restore) to isolate the fault quickly, then move to the RCA or blameless postmortem template after service is restored.</p></article>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

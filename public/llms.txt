@@ -20,6 +20,10 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 - https://solvestack-ai.app/dns-failure-template/ — DNS failure troubleshooting template and checklist
 - https://solvestack-ai.app/disk-full-template/ — disk full troubleshooting template and checklist
 - https://solvestack-ai.app/email-delivery-template/ — email delivery failure troubleshooting template and checklist
+- https://solvestack-ai.app/templates/ — central directory of all free IT troubleshooting checklists, RCA methods, and postmortem templates
+- https://solvestack-ai.app/postmortem-template/ — blameless postmortem and post-incident review template with worked IT example
+- https://solvestack-ai.app/network-outage-template/ — LAN, Wi-Fi, and WAN network outage troubleshooting template and checklist
+- https://solvestack-ai.app/backup-restore-failure-template/ — backup and restore failure troubleshooting template and checklist
 - https://solvestack-ai.app/onenote-vs-solvestack/ - honest comparison of OneNote and SolveStack for IT troubleshooting notes, citing Microsoft support pages, with a sample SolveStack export
 
 ## Product boundaries

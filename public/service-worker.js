@@ -1,4 +1,4 @@
-const CACHE = "solvestack-v13";
+const CACHE = "solvestack-v14";
 
 // Every page and static file precached on install, so the whole site works
 // offline on a first visit — not only after a page was visited once.
@@ -17,6 +17,7 @@ const PRECACHE_URLS = [
   "/use-your-data/",
   "/use-your-data/guide.css",
   "/agent-adapter/",
+  "/templates/",
   "/rca-template/",
   "/rca-template/template.css",
   "/5-whys-template/",
@@ -31,6 +32,7 @@ const PRECACHE_URLS = [
   "/incident-report-template/template.css",
   "/incident-response-plan-template/",
   "/incident-response-plan-template/template.css",
+  "/postmortem-template/",
   "/vpn-outage-template/",
   "/vpn-outage-template/template.css",
   "/sign-in-failure-template/",
@@ -43,6 +45,8 @@ const PRECACHE_URLS = [
   "/disk-full-template/template.css",
   "/email-delivery-template/",
   "/email-delivery-template/template.css",
+  "/network-outage-template/",
+  "/backup-restore-failure-template/",
   "/onenote-vs-solvestack/",
   "/onenote-vs-solvestack/template.css",
 ];

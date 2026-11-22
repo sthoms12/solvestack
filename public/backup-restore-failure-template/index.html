@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free backup and restore failure template: a troubleshooting checklist covering job errors, VSS/snapshot faults, repository capacity, immutable locks, and clean restore verification." />
+    <link rel="canonical" href="https://solvestack-ai.app/backup-restore-failure-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/backup-restore-failure-template/" />
+    <meta property="og:title" content="Backup &amp; Restore Failure Template" />
+    <meta property="og:description" content="Troubleshooting checklist for failed backup jobs and broken restores: last good recovery point, snapshot/VSS errors, repository capacity, and restore validation." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Backup &amp; Restore Failure Template" />
+    <meta name="twitter:description" content="Check last good recovery point, snapshot errors, storage capacity, and test-restore proof. Free checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/vpn-outage-template/template.css" />
+    <title>Backup &amp; Restore Failure Template — Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Backup and Restore Failure Template",
+  "description": "A troubleshooting template for diagnosing failed backup jobs and restore errors, verifying the last known good recovery point, and validating recovery.",
+  "url": "https://solvestack-ai.app/backup-restore-failure-template/",
+  "author": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+  "publisher": { "@type": "Organization", "name": "SolveStack" },
+  "about": ["backup failure", "disaster recovery", "restore testing", "IT troubleshooting"]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What should you confirm first when a backup job fails?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Confirm the timestamp and integrity of the last known good recovery point first so you know your current RPO exposure before changing job settings or retargeting repositories."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do backups succeed while restores still fail?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Common causes include corrupt incremental chains, missing encryption keys, changed permissions on the restore target, or application-inconsistent snapshots. Only a verified test restore proves recoverability."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the worked example a real incident?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/templates/">All templates</a><a href="/rca-template/">RCA template</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">VERIFY RPO → ISOLATE → TEST RESTORE</p>
+        <h1>Backup &amp; Restore <em>Failure</em> Template</h1>
+        <p class="intro">A failed backup is a silent continuity risk; a failed restore is an emergency. Walk these five checks to confirm your last good recovery point, isolate agent or repository faults, and verify a clean test restore.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks to protect recoverability.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Confirm the last known good recovery point</h3><p>Before restarting failed jobs, record the exact timestamp of the last verified good backup (on-site and off-site/immutable) so leadership knows current RPO exposure.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Nightly ERP database backup failed at 02:14 UTC; previous verified restore point is 26 hours old on local NAS and immutable S3 bucket. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Check repository capacity, retention, and immutability</h3><p>Verify free disk space on the backup target, object-storage quota, and whether retention/immutability locks prevented old chains from pruning.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Backup repository volume hit full capacity after a one-time 400 GB file migration triggered an oversized incremental chain. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Inspect source snapshot, VSS, or agent errors</h3><p>Check Windows VSS writers, hypervisor snapshot consolidation, database log-truncation errors, and service-account credential or certificate expirations.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>SQL VSS writer entered Failed state due to expired service account password rotated during monthly patching. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Check network path, throttling, and encryption keys</h3><p>Confirm the backup proxy can reach the repository without packet loss or firewall blocks, and verify that encryption passphrases or KMS keys are accessible for restore.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Firewall rule update blocked TCP 443 from backup proxy subnet to off-site object storage endpoint. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Run a clean test restore to prove recovery</h3><p>Do not close the incident on a green backup icon alone. Restore a sample file, database, or VM to an isolated sandbox and record the verification output.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Restored ERP database to isolated staging instance, ran integrity check with zero errors, and documented updated RPO compliance. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>BACKUP &amp; RESTORE FAILURE CHECKLIST
+==================================
+Affected workload / job name:
+Failure time &amp; exact error code:
+Last verified good recovery point (local / off-site):
+
+1. REPOSITORY &amp; CAPACITY
+   Target free space / quota:
+   Retention / immutability lock status:
+
+2. SOURCE AGENT &amp; SNAPSHOTS
+   VSS writer / hypervisor snapshot state:
+   Service account / credential / cert expiry:
+
+3. NETWORK &amp; ENCRYPTION
+   Proxy-to-repository connectivity:
+   Encryption key / KMS access verified:
+
+4. REMEDIATION &amp; TEST RESTORE
+   Fix applied:
+   Isolated test restore result &amp; timestamp:</pre>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>02</span><div><p>QUESTIONS</p><h2 id="faqs-title">Backup and restore failures, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should you confirm first when a backup job fails?</h3><p>Confirm the timestamp and integrity of the last known good recovery point first so you know your current RPO exposure before changing job settings or retargeting repositories.</p></article>
+          <article><h3>Why do backups succeed while restores still fail?</h3><p>Common causes include corrupt incremental chains, missing encryption keys, changed permissions on the restore target, or application-inconsistent snapshots. Only a verified test restore proves recoverability.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>03</span><div><p>KEEP GOING</p><h2 id="related-title">Related templates.</h2></div></div>
+        <div class="related-cards">
+          <a href="/disk-full-template/"><b>STORAGE</b><span>Disk full template</span><p>Isolate runaway logs, unlinked files, and full volumes quickly.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>Root cause analysis template</span><p>Document why the backup failed and lock in monitoring follow-ups.</p></a>
+          <a href="/templates/"><b>DIRECTORY</b><span>All IT templates</span><p>Browse every incident checklist and RCA template in SolveStack.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>
