@@ -91,7 +91,7 @@ self.addEventListener("activate", (event) => {
 });
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(async (cached) => {
+    caches.match(event.request, { ignoreVary: true }).then(async (cached) => {
       if (cached) return cached;
       try {
         const response = await fetch(event.request);
@@ -108,8 +108,8 @@ self.addEventListener("fetch", (event) => {
         // fall back to the app shell; anything else gets an honest 503.
         if (event.request.mode === "navigate") {
           return (
-            (await caches.match("/")) ||
-            (await caches.match("/404.html")) ||
+            (await caches.match("/", { ignoreVary: true })) ||
+            (await caches.match("/404.html", { ignoreVary: true })) ||
             new Response("Offline", { status: 503 })
           );
         }
