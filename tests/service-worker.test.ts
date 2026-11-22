@@ -11,7 +11,7 @@ const activate = source.slice(
 );
 const fetchHandler = source.slice(source.indexOf('addEventListener("fetch"'));
 
-assert.match(source, /const CACHE = "solvestack-v13"/);
+assert.match(source, /const CACHE = "solvestack-v14"/);
 assert.match(install, /event\.waitUntil/);
 assert.match(install, /self\.skipWaiting\(\)/);
 // One missing precache file must not fail the whole install.
@@ -24,8 +24,9 @@ assert.equal(fetchHandler.includes("cache.put"), true);
 assert.match(fetchHandler, /shouldCache\(event\.request, response\)/);
 // Offline with nothing cached: navigations fall back to the app shell,
 // other requests get an honest 503 — never respondWith(undefined).
+assert.match(fetchHandler, /caches\.match\(event\.request, \{ ignoreVary: true \}\)/);
 assert.match(fetchHandler, /mode === "navigate"/);
-assert.match(fetchHandler, /caches\.match\("\/"\)/);
+assert.match(fetchHandler, /caches\.match\("\/", \{ ignoreVary: true \}\)/);
 assert.match(fetchHandler, /status: 503/);
 assert.equal(source.includes("fonts.googleapis.com"), false);
 assert.equal(source.includes("fonts.gstatic.com"), false);

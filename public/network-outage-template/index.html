@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="Free network outage template: a step-by-step LAN, Wi-Fi, and WAN troubleshooting checklist separating physical link, DHCP, routing, DNS, and ISP faults. Copy or run locally in SolveStack." />
+    <link rel="canonical" href="https://solvestack-ai.app/network-outage-template/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/network-outage-template/" />
+    <meta property="og:title" content="Network Outage Template" />
+    <meta property="og:description" content="Copy-ready LAN, Wi-Fi, and WAN outage troubleshooting checklist: blast radius, physical/AP layer, DHCP/gateway, DNS, and ISP escalation." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Network Outage Template" />
+    <meta name="twitter:description" content="Isolate LAN, Wi-Fi, DHCP, routing, DNS, and ISP faults in order. Free network outage checklist, no account." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/vpn-outage-template/template.css" />
+    <title>Network Outage Template — LAN &amp; Wi-Fi Checklist | SolveStack</title>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Network Outage Template",
+  "description": "A network and Wi-Fi outage troubleshooting template that isolates scope, physical/AP links, DHCP/gateway reachability, DNS, and ISP circuits in order.",
+  "url": "https://solvestack-ai.app/network-outage-template/",
+  "author": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" },
+  "publisher": { "@type": "Organization", "name": "SolveStack" },
+  "about": ["network outage", "Wi-Fi outage", "LAN troubleshooting", "IT troubleshooting"]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What should you check first during a network or Wi-Fi outage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Establish the blast radius first: compare wired vs. Wi-Fi, one floor/switch vs. the whole building, and internal apps vs. public internet. That single comparison immediately narrows the fault to APs, a switch/VLAN, DNS, or the WAN circuit."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you separate a DNS issue from a full internet outage?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ping or curl a public IP address directly (such as 1.1.1.1) and then test a hostname lookup. If the IP responds but hostnames fail, the WAN circuit is up and the fault is DNS."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the worked example a real incident?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The example on this page is illustrative — not a real incident from SolveStack or any customer."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Template navigation"><a href="#template">Template</a><a href="/templates/">All templates</a><a href="/rca-template/">RCA template</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">FIELD GUIDE / INCIDENT CHECKLISTS</div>
+        <p class="overline">SCOPE → LAYER 1–3 → RESTORE</p>
+        <h1>Network &amp; Wi-Fi <em>Outage</em> Template</h1>
+        <p class="intro">When users say "the internet is down," the fault could be one access point, an exhausted DHCP scope, a core switch uplink, DNS, or the ISP fiber circuit. Walk these five checks in order to isolate the exact layer.</p>
+        <div class="hero-actions"><a class="primary" href="#template">Use the template</a><a class="secondary" href="/">Open SolveStack</a></div>
+        <aside><strong>Local-first boundary</strong><span>SolveStack stores investigation data in your browser's IndexedDB. No account, no cloud database, no built-in AI. It works offline as a progressive web app.</span></aside>
+      </section>
+
+      <section class="template" id="template" aria-labelledby="template-title">
+        <div class="section-label"><span>01</span><div><p>THE TEMPLATE</p><h2 id="template-title">Five checks from physical link to WAN circuit.</h2></div></div>
+        <p class="worked-note">The worked example below is illustrative — not a real incident. It shows how each section reads when filled in.</p>
+        <div class="step-list">
+          <article><span class="number">SECTION 01</span><div><h3>Map the blast radius (wired vs. Wi-Fi)</h3><p>Test one wired workstation and one Wi-Fi device on the same floor, plus a second floor or site. Confirm whether internal servers fail too or only external internet traffic.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Second-floor Wi-Fi clients lost connectivity at 09:18; wired desks on floor 2 and all of floor 1 unaffected. Fault narrowed to floor-2 AP switch or SSID VLAN. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 02</span><div><h3>Check IP assignment (DHCP) and default gateway</h3><p>Verify whether affected clients receive a valid IP (not 169.254.x.x APIPA) and can ping their default gateway. Exhausted DHCP leases look identical to a dead network.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Wi-Fi clients pulled 169.254.x.x addresses; DHCP server showed the Guest/Staff Wi-Fi scope at full exhaustion after a large all-hands event. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 03</span><div><h3>Test IP routing vs. DNS resolution</h3><p>Ping an external IP address (e.g. 1.1.1.1) and run a DNS query. If IP traffic passes while names fail, switch straight to the DNS checklist.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Ping to 1.1.1.1 succeeded at 9 ms; nslookup timed out against internal resolver 10.10.0.5. WAN link confirmed healthy. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 04</span><div><h3>Check switch uplinks, PoE, and recent changes</h3><p>Inspect core/access switch port errors, PoE power draw on APs, firewall HA failover status, and any ACL or firmware changes deployed in the past 24 hours.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Access switch SW-2B showed spanning-tree port block on uplink Gi1/0/48 after a patch cable swap at 09:15. Not a real incident.</span></div></article>
+          <article><span class="number">SECTION 05</span><div><h3>Verify WAN circuit and ISP escalation bundle</h3><p>Check WAN interface link light, BGP/PPPoE session state, and failover circuit behavior. Escalate to the ISP with circuit ID, firewall WAN logs, and traceroute output.</p><span class="example"><b>ILLUSTRATIVE EXAMPLE</b>Primary fiber WAN down with LOS alarm; SD-WAN failed over to LTE backup within 12 seconds; ISP ticket opened with circuit ID and outage timestamp. Not a real incident.</span></div></article>
+        </div>
+        <div class="copyblock">
+          <p>COPY-PASTE VERSION — PLAIN TEXT</p>
+          <pre>NETWORK OUTAGE CHECKLIST
+========================
+First report (time, site):
+Blast radius (wired / Wi-Fi / floor / whole site):
+Internal vs. external reachability:
+
+1. PHYSICAL &amp; WI-FI
+   AP / switch status &amp; PoE:
+   Recent cabling or firmware changes:
+
+2. DHCP &amp; GATEWAY
+   Client IP (valid vs. 169.254.x.x):
+   Ping default gateway:
+   DHCP pool utilization:
+
+3. ROUTING VS. DNS
+   Ping external IP (1.1.1.1):
+   DNS lookup test:
+
+4. FIREWALL &amp; WAN
+   Primary WAN link &amp; failover status:
+   ISP status page / circuit ID:
+
+5. MITIGATION &amp; ESCALATION
+   Evidence bundle (traceroute, logs, timestamps):</pre>
+        </div>
+      </section>
+
+      <section class="faq" id="faqs" aria-labelledby="faqs-title">
+        <div class="section-label"><span>02</span><div><p>QUESTIONS</p><h2 id="faqs-title">Network outages, answered briefly.</h2></div></div>
+        <div class="faq-list">
+          <article><h3>What should you check first during a network or Wi-Fi outage?</h3><p>Establish the blast radius first: compare wired vs. Wi-Fi, one floor/switch vs. the whole building, and internal apps vs. public internet. That single comparison immediately narrows the fault to APs, a switch/VLAN, DNS, or the WAN circuit.</p></article>
+          <article><h3>How do you separate a DNS issue from a full internet outage?</h3><p>Ping or curl a public IP address directly (such as 1.1.1.1) and then test a hostname lookup. If the IP responds but hostnames fail, the WAN circuit is up and the fault is DNS.</p></article>
+          <article><h3>Is the worked example a real incident?</h3><p>No. The example on this page is illustrative — not a real incident from SolveStack or any customer.</p></article>
+        </div>
+      </section>
+
+      <section class="related" aria-labelledby="related-title">
+        <div class="section-label"><span>03</span><div><p>KEEP GOING</p><h2 id="related-title">Related templates.</h2></div></div>
+        <div class="related-cards">
+          <a href="/dns-failure-template/"><b>DNS</b><span>DNS failure template</span><p>Isolate resolver, authoritative record, and TTL faults.</p></a>
+          <a href="/vpn-outage-template/"><b>VPN</b><span>VPN outage template</span><p>Separate gateway, ISP, authentication, and client faults.</p></a>
+          <a href="/rca-template/"><b>RCA</b><span>Root cause analysis template</span><p>Document the root cause and preventive actions after recovery.</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><a href="/">Back to the application</a></footer>
+  </body>
+</html>

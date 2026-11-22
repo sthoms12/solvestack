@@ -27,7 +27,11 @@
       "/email-delivery-template/*",
       "/use-your-data/*",
       "/onenote-vs-solvestack/*",
-      "/agent-adapter/*"
+      "/agent-adapter/*",
+      "/templates/*",
+      "/postmortem-template/*",
+      "/network-outage-template/*",
+      "/backup-restore-failure-template/*"
     ]
   },
   "observability": {

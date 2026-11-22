@@ -359,6 +359,27 @@ const addedPages: Array<{
     descriptionPhrase: "incident response plan template",
     templateMarker: "INCIDENT RESPONSE PLAN",
   },
+  {
+    path: "postmortem-template/",
+    title: "Blameless Postmortem Template",
+    heading: "Blameless Postmortem Template",
+    descriptionPhrase: "blameless postmortem template",
+    templateMarker: "BLAMELESS POSTMORTEM",
+  },
+  {
+    path: "network-outage-template/",
+    title: "Network Outage Template",
+    heading: "Network &amp; Wi-Fi Outage Template",
+    descriptionPhrase: "network outage template",
+    templateMarker: "NETWORK OUTAGE CHECKLIST",
+  },
+  {
+    path: "backup-restore-failure-template/",
+    title: "Backup &amp; Restore Failure Template",
+    heading: "Backup &amp; Restore Failure Template",
+    descriptionPhrase: "backup and restore failure template",
+    templateMarker: "BACKUP &amp; RESTORE FAILURE CHECKLIST",
+  },
 ];
 for (const page of addedPages) {
   const html = await Bun.file(`public/${page.path}index.html`).text();
@@ -389,6 +410,13 @@ for (const page of addedPages) {
   const built = await Bun.file(`dist/${page.path}index.html`).text();
   assert.equal(built, html, page.path);
 }
+const templatesHub = await Bun.file("public/templates/index.html").text();
+assert.equal(templatesHub.includes('href="/postmortem-template/"'), true);
+assert.equal(templatesHub.includes('href="/network-outage-template/"'), true);
+assert.equal(templatesHub.includes('href="/backup-restore-failure-template/"'), true);
+assert.equal(sitemap.includes(`<loc>${productionOrigin}templates/</loc>`), true);
+assert.equal(llms.includes(`${productionOrigin}templates/`), true);
+assert.equal(await Bun.file("dist/templates/index.html").text(), templatesHub);
 assert.equal(
   (await Bun.file("public/root-cause-analysis-tools/index.html").text()).includes(
     'href="/corrective-action-plan-template/"',
