@@ -531,7 +531,7 @@ function dashboard() {
     realSessions.length === 0 && activeSessions.length
       ? '<p class="example-note">The session below is a worked example — open it to see how a finished investigation reads.</p>'
       : "";
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${protectStatus}${folderBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><input id="search" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. A backup file or a vault folder is what survives clearing site data.</small></div></aside></section>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / OVERVIEW</div><h1>SolveStack</h1><p class="lede">${lede}</p></div><button class="primary" id="new-session">${icon("plus")} New session</button></header>${welcomeDismissed ? "" : welcomePanel()}${protectStatus}${folderBanner}<section class="method-strip" aria-label="Investigation methods"><span class="section-kicker">START WITH A METHOD</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "method" && b.id !== "blank").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}<button class="method-chip quiet" data-method="blank">Blank</button></div></section><section class="method-strip" aria-label="Incident templates"><span class="section-kicker">START FROM AN INCIDENT</span><div class="method-chip-row">${BLUEPRINTS.filter((b) => b.kind === "incident").map((b) => `<button class="method-chip" data-method="${b.id}" title="${escapeHtml(b.description)}">${escapeHtml(b.shortLabel)}</button>`).join("")}</div></section><section class="dashboard-grid"><div class="main-column"><div class="section-heading"><div><span class="section-kicker">IN FLIGHT</span><h2>Active sessions <em>${String(activeSessions.length).padStart(2, "0")}</em></h2></div><span class="quiet">${savedState}</span></div>${exampleNote}<div class="session-list">${activeSessions.length ? activeSessions.map(sessionCard).join("") : '<div class="empty"><span>◎</span><h3>No active investigations</h3><p>Start a session when the next problem appears.</p></div>'}</div><div class="section-heading resolved-heading"><div><span class="section-kicker">THE LIBRARY</span><h2>Recently resolved <em>${String(resolved.length).padStart(2, "0")}</em></h2></div></div><div class="session-list compact">${resolved.length ? resolved.slice(0, 6).map(sessionCard).join("") : '<div class="empty small"><p>Resolved investigations become reusable knowledge here.</p></div>'}</div></div><aside class="dashboard-side"><div class="search-panel"><span class="section-kicker">FIND AN INVESTIGATION</span><div class="search-input"><span>${icon("search")}</span><label class="sr-only" for="search">Search sessions</label><input id="search" aria-label="Search sessions" value="${escapeHtml(search)}" placeholder="Search sessions, evidence, root causes…" /></div><div id="search-results">${search ? searchResults() : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>'}</div></div><div class="principle"><span class="section-kicker">THE SOLVESTACK PRINCIPLE</span><p>Messy work becomes durable knowledge.</p><small>Stored in this browser. A backup file or a vault folder is what survives clearing site data.</small></div></aside></section>`;
 }
 function patternDesk() {
   const patterns = buildPatterns(store.sessions);
@@ -584,7 +584,7 @@ function knowledgeView() {
   const tags = knowledgeTags(store.sessions);
   const controls =
     resolvedCount > 0
-      ? `<div class="knowledge-controls"><div class="search-input"><span>${icon("search")}</span><input id="knowledge-search" value="${escapeHtml(knowledgeSearch)}" placeholder="Search root causes, systems, entries…" /></div><select id="knowledge-system" aria-label="Filter by system"><option value="">All systems</option>${systems.map((system) => `<option value="${escapeHtml(system)}" ${system === knowledgeSystem ? "selected" : ""}>${escapeHtml(system)}</option>`).join("")}</select></div>${tags.length ? `<div class="tag-filter-row"><button class="method-chip ${knowledgeTag ? "quiet" : "selected"}" data-kb-tag="">All tags</button>${tags.map((tag) => `<button class="method-chip ${tag === knowledgeTag ? "selected" : "quiet"}" data-kb-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join("")}</div>` : ""}`
+      ? `<div class="knowledge-controls"><div class="search-input"><span>${icon("search")}</span><label class="sr-only" for="knowledge-search">Search knowledge base</label><input id="knowledge-search" aria-label="Search knowledge base" value="${escapeHtml(knowledgeSearch)}" placeholder="Search root causes, systems, entries…" /></div><select id="knowledge-system" aria-label="Filter by system"><option value="">All systems</option>${systems.map((system) => `<option value="${escapeHtml(system)}" ${system === knowledgeSystem ? "selected" : ""}>${escapeHtml(system)}</option>`).join("")}</select></div>${tags.length ? `<div class="tag-filter-row"><button class="method-chip ${knowledgeTag ? "quiet" : "selected"}" data-kb-tag="">All tags</button>${tags.map((tag) => `<button class="method-chip ${tag === knowledgeTag ? "selected" : "quiet"}" data-kb-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join("")}</div>` : ""}`
       : "";
   const body =
     resolvedCount === 0
@@ -592,7 +592,7 @@ function knowledgeView() {
       : articles.length
         ? `<div class="article-grid">${articles.map((a) => `<button class="session-card" data-article="${escapeHtml(a.id)}"><div class="card-top"><span class="session-id">${escapeHtml(a.id)}</span><span>${dateLabel(a.resolvedAt)}</span></div><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.rootCause || "Root cause not recorded")}</p><div class="card-meta"><span>${escapeHtml(a.system || "Unspecified")}</span><span>${a.entryCount} entries</span></div><div class="tags">${a.tags.map((t) => `<span>#${escapeHtml(t)}</span>`).join("")}</div></button>`).join("")}</div>`
         : `<div class="empty"><span>▤</span><h3>Nothing matches those filters</h3><p>Clear the search or filters to see the whole library.</p></div>`;
-  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / KNOWLEDGE</div><h1>What you've already solved.</h1><p class="lede">Resolved investigations, kept as searchable knowledge — computed on this device. Nothing uploaded.</p></div></header>${controls}<section>${body}</section>`;
+  return `<header class="topbar"><div><div class="eyebrow">WORKSPACE / KNOWLEDGE</div><h1>What you've already solved.</h1><p class="lede">Resolved investigations, kept as searchable knowledge — computed on this device. Nothing uploaded.</p></div></header>${controls}<section id="knowledge-results">${body}</section>`;
 }
 function knowledgeArticleView(s: Session) {
   const para = (label: string, value: string) =>
@@ -2002,19 +2002,50 @@ function bind() {
       (el.onclick = () =>
         void startSession(el.dataset.method as BlueprintId)),
   );
+  const bindOpenButtons = (root: ParentNode = document) => {
+    root.querySelectorAll<HTMLElement>("[data-open]").forEach(
+      (el) =>
+        (el.onclick = () => {
+          activeId = el.dataset.open!;
+          view = "session";
+          history.replaceState(null, "", `#${activeId}`);
+          render();
+        }),
+    );
+    root.querySelectorAll<HTMLElement>("[data-article]").forEach(
+      (el) =>
+        (el.onclick = () => {
+          knowledgeArticleId = el.dataset.article!;
+          view = "knowledge";
+          render();
+        }),
+    );
+  };
   document
     .querySelector<HTMLInputElement>("#search")
     ?.addEventListener("input", (e) => {
       search = (e.target as HTMLInputElement).value;
-      render();
-      document.querySelector<HTMLInputElement>("#search")?.focus();
+      const resultsBox = document.querySelector<HTMLElement>("#search-results");
+      if (resultsBox) {
+        resultsBox.innerHTML = search
+          ? searchResults()
+          : '<p class="search-hint">Search titles, systems, tags, entries, hypotheses, and resolutions.</p>';
+        bindOpenButtons(resultsBox);
+      }
     });
   document
     .querySelector<HTMLInputElement>("#knowledge-search")
     ?.addEventListener("input", (e) => {
-      knowledgeSearch = (e.target as HTMLInputElement).value;
+      const input = e.target as HTMLInputElement;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      knowledgeSearch = input.value;
       render();
-      document.querySelector<HTMLInputElement>("#knowledge-search")?.focus();
+      const next = document.querySelector<HTMLInputElement>("#knowledge-search");
+      if (next) {
+        next.focus();
+        if (start !== null && end !== null) next.setSelectionRange(start, end);
+      }
     });
   document
     .querySelector<HTMLSelectElement>("#knowledge-system")
@@ -2067,7 +2098,11 @@ function bind() {
     (b) =>
       (b.onclick = () => {
         entryType = b.dataset.type as EntryType;
-        render();
+        document.querySelectorAll<HTMLButtonElement>("[data-type]").forEach((chip) => {
+          const isActive = chip.dataset.type === entryType;
+          chip.classList.toggle("active", isActive);
+          chip.setAttribute("aria-pressed", String(isActive));
+        });
         document.querySelector<HTMLTextAreaElement>("#capture")?.focus();
       }),
   );
@@ -2174,7 +2209,6 @@ function bind() {
         ]);
         if (values) {
           e.content = values.content;
-          e.timestamp = now();
           e.updatedAt = now();
           active()!.updatedAt = now();
           await persist();

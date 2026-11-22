@@ -76,5 +76,12 @@ test("no blocking alerts in delete/restore flows; conflict confirm kept", async 
   expect(attachments).not.toContain("location.reload()");
   const style = await Bun.file("src/style.css").text();
   expect(style).toContain(".toast-region");
+  expect(style).toContain("#toast-region");
+  expect(style).toContain("color-scheme: dark");
+  expect(style).toContain("color-scheme: light");
+  expect(style).toContain('[data-theme="light"] .welcome-panel');
+  expect(style).toContain("--primary-ink: #ffffff");
   expect(style).toContain(".backup-banner");
+  const dataSafety = await Bun.file("src/data-safety.ts").text();
+  expect(dataSafety).toContain('region.className = "toast-region"');
 });
