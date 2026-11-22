@@ -47,6 +47,10 @@ assert.match(
   headers,
   /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(\)/,
 );
+assert.match(
+  headers,
+  /Strict-Transport-Security: max-age=31536000; includeSubDomains/,
+);
 assert.equal(policyLine.length <= 2000, true, "Workers _headers lines are limited to 2000 characters");
 // The document policy must allow every external origin index.html actually
 // loads. The Dataflare analytics script was added to index.html without a
