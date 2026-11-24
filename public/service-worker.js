@@ -49,6 +49,8 @@ const PRECACHE_URLS = [
   "/backup-restore-failure-template/",
   "/onenote-vs-solvestack/",
   "/onenote-vs-solvestack/template.css",
+  "/privacy/",
+  "/terms/",
 ];
 
 // Hashed build assets (dist/assets/*), injected by

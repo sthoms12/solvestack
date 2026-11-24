@@ -25,6 +25,8 @@ SolveStack is a free, local-first IT troubleshooting workspace. It helps practit
 - https://solvestack-ai.app/network-outage-template/ — LAN, Wi-Fi, and WAN network outage troubleshooting template and checklist
 - https://solvestack-ai.app/backup-restore-failure-template/ — backup and restore failure troubleshooting template and checklist
 - https://solvestack-ai.app/onenote-vs-solvestack/ - honest comparison of OneNote and SolveStack for IT troubleshooting notes, citing Microsoft support pages, with a sample SolveStack export
+- https://solvestack-ai.app/privacy/ — local-first privacy policy covering IndexedDB, OPFS, encrypted vaults, and cookieless Dataflare analytics
+- https://solvestack-ai.app/terms/ — terms of use, non-commercial as-is positioning, local backup and redaction responsibilities, and limitations of liability
 
 ## Product boundaries
 
