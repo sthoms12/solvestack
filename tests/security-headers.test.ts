@@ -89,11 +89,14 @@ assert.match(
 const readme = await Bun.file("README.md").text();
 const source = await Bun.file("src/main.ts").text();
 for (const text of [readme, source]) {
-  assert.match(text, /Cloudflare Web Analytics/);
+  assert.match(text, /Dataflare/);
   assert.match(text, /cookieless/);
-  assert.match(text, /aggregate page views/);
+  assert.match(text, /90 days/);
   assert.match(text, /does not read locally stored data/);
+  assert.equal(text.includes("Cloudflare Web Analytics"), false);
 }
+assert.equal(source.includes('href="/privacy/"'), true);
+assert.equal(source.includes('href="/terms/"'), true);
 
 assert.deepEqual(forbiddenHits("local troubleshooting notes"), []);
 assert.deepEqual(forbiddenHits("https://zo" + "computer.io/script.js").length > 0, true);

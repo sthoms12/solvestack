@@ -27,6 +27,8 @@ const markdownRoutes = new Set([
   "/postmortem-template/",
   "/network-outage-template/",
   "/backup-restore-failure-template/",
+  "/privacy/",
+  "/terms/",
 ]);
 
 function appendVary(headers: Headers, value: string) {

@@ -114,6 +114,16 @@ const PAGES = [
     out: "backup-restore-failure-template.md",
     path: "/backup-restore-failure-template/",
   },
+  {
+    source: "public/privacy/index.html",
+    out: "privacy.md",
+    path: "/privacy/",
+  },
+  {
+    source: "public/terms/index.html",
+    out: "terms.md",
+    path: "/terms/",
+  },
 ];
 
 const NAMED_ENTITIES = {

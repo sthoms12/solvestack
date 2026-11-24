@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101313" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="description" content="How SolveStack stores IT troubleshooting sessions locally in IndexedDB, OPFS, and optional encrypted vaults, what cookieless Dataflare analytics records, and what never leaves your browser." />
+    <link rel="canonical" href="https://solvestack-ai.app/privacy/" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="SolveStack" />
+    <meta property="og:url" content="https://solvestack-ai.app/privacy/" />
+    <meta property="og:title" content="Privacy Policy | SolveStack" />
+    <meta property="og:description" content="Local-first browser storage, optional encrypted vaults, cookieless Dataflare analytics, and clear data boundaries in SolveStack." />
+    <meta property="og:image" content="https://solvestack-ai.app/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Privacy Policy | SolveStack" />
+    <meta name="twitter:description" content="Local-first browser storage, optional encrypted vaults, and cookieless analytics in SolveStack." />
+    <meta name="twitter:image" content="https://solvestack-ai.app/og-image.png" />
+    <link rel="stylesheet" href="/use-your-data/guide.css" />
+    <title>Privacy Policy | SolveStack</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Privacy Policy",
+        "description": "How SolveStack handles local browser storage, encrypted vaults, cookieless analytics, and user-initiated exports.",
+        "url": "https://solvestack-ai.app/privacy/",
+        "dateModified": "2026-11-23",
+        "publisher": { "@type": "Organization", "name": "SolveStack", "url": "https://solvestack-ai.app/" }
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/"><span>S</span><strong>SolveStack</strong></a>
+      <nav aria-label="Legal navigation"><a href="#local-storage">Local storage</a><a href="#analytics">Analytics</a><a href="/terms/">Terms</a><a class="launch" href="/">Open SolveStack</a></nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="chapter">LEGAL / PRIVACY MODEL</div>
+        <p class="overline">EFFECTIVE NOVEMBER 23, 2026</p>
+        <h1>A local-first<br /><em>privacy</em> model.</h1>
+        <p class="intro">SolveStack is built so your troubleshooting notes, commands, evidence, and resolutions stay on your device in the current browser profile unless you deliberately export or move a file.</p>
+        <div class="hero-actions"><a class="primary" href="/">Open SolveStack</a><a class="secondary" href="/terms/">Read Terms of Use</a></div>
+        <aside><strong>Local-first boundary</strong><span>No account, no cookies, no SolveStack server database, and no hosted AI service. SolveStack never sees your troubleshooting records or vault passphrase.</span></aside>
+      </section>
+
+      <section class="workflows" id="local-storage" aria-labelledby="privacy-details-title">
+        <div class="section-label"><span>01</span><div><p>HOW DATA IS HANDLED</p><h2 id="privacy-details-title">What stays local and what touches the network.</h2></div></div>
+        <div class="workflow-list">
+          <article><span class="number">01</span><div><h3>Browser-local storage (IndexedDB &amp; OPFS)</h3><p>Core troubleshooting sessions, timeline entries, hypotheses, tasks, preferences, and attachments are stored locally in IndexedDB inside your current browser profile. Larger evidence files prefer the Origin Private File System (OPFS) when available. Browser storage is tied to the exact origin and browser profile and does not automatically sync across browsers, devices, or private-browsing windows.</p><small>STAYS ON YOUR DEVICE</small></div></article>
+          <article><span class="number">02</span><div><h3>Encrypted vaults &amp; local sync folders</h3><p>You can optionally export an AES-GCM encrypted vault file protected by a user-held passphrase, or connect a local sync folder in browsers that support the File System Access API (such as Chrome and Edge on desktop). Encryption and decryption happen entirely inside your browser. SolveStack never receives your passphrase, vault files, or folder contents.</p><small>USER-HELD ENCRYPTION</small></div></article>
+          <article><span class="number">03</span><div><h3>No accounts, cookies, or server database</h3><p>SolveStack does not require an account, does not set cookies, does not run ads or third-party trackers, and does not maintain a server database of user investigations. Your troubleshooting notes, evidence files, attachments, and vault data are never uploaded to a SolveStack server.</p><small>ZERO ACCOUNT OVERHEAD</small></div></article>
+          <article id="analytics"><span class="number">04</span><div><h3>Cookieless analytics (Dataflare)</h3><p>This site uses Dataflare, an analytics tool we self-host in our own Cloudflare account. It is cookieless — it sets no cookies and stores nothing on your device. It records pageviews, the referring site, basic device and browser information, and anonymous interaction events (such as <code>case_resolved</code> — never your troubleshooting notes, evidence, attachments, or vault data) so we can understand which content and workflows are useful. Analytics data is kept for 90 days and is never sold or shared.</p><small>COOKIELESS · 90-DAY RETENTION</small></div></article>
+          <article><span class="number">05</span><div><h3>Hosting &amp; infrastructure logs</h3><p>The static site files are delivered through Cloudflare infrastructure, which processes ordinary web request metadata — such as IP address, browser user agent, and requested URL — to serve pages reliably and protect the site from abuse.</p><small>STANDARD WEB DELIVERY</small></div></article>
+          <article><span class="number">06</span><div><h3>Exports, agent packs &amp; external services</h3><p>When you choose to export Markdown, standalone HTML, JSON, ZIP archives, or a redacted agent pack and move or upload that file to an external file share, wiki, or third-party AI tool, that external service's privacy, security, and retention policies apply. Always review exported files and redact credentials, tokens, personal data, and confidential evidence before sharing. Links to external sites are governed by those sites' own policies.</p><small>USER-INITIATED MOVEMENT</small></div></article>
+          <article><span class="number">07</span><div><h3>Deleting local data &amp; security boundaries</h3><p>Export a JSON backup or encrypted vault first if you want to preserve your records. You can delete local workspace data at any time through your browser's site-storage controls; clearing site data removes the local browser copy. Local storage reduces server-side exposure, but it does not protect against unlocked devices, compromised browser profiles, malicious browser extensions, or unsafe handling of exported files.</p><small>YOUR DEVICE BOUNDARY</small></div></article>
+          <article><span class="number">08</span><div><h3>Policy updates &amp; contact</h3><p>This privacy policy may be updated as SolveStack evolves. The effective date above identifies the current version. For privacy questions, email <a href="mailto:hello@solvestack-ai.app">hello@solvestack-ai.app</a>.</p><small>CONTACT · HELLO@SOLVESTACK-AI.APP</small></div></article>
+        </div>
+      </section>
+
+      <section class="privacy" aria-labelledby="privacy-summary-title"><span>02</span><div><p>RELATED LEGAL TERMS</p><h2 id="privacy-summary-title">Review the Terms of Use.</h2><p>SolveStack is operated as a free, independent, non-commercial project provided "as is" and "as available". Review the <a href="/terms/">Terms of Use</a> for permitted use, local backup and passphrase responsibilities, and limitations of liability.</p></div><a href="/terms/">Read Terms of Use →</a></section>
+    </main>
+    <footer><span>SolveStack</span><p>Capture locally. Export deliberately. Reuse responsibly.</p><nav aria-label="Footer navigation"><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/">Back to the application</a></nav></footer>
+  </body>
+</html>

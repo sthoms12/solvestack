@@ -31,7 +31,7 @@ The Worker asset runtime is defined in `wrangler.jsonc`. It uses `not_found_hand
 
 No account, backend, cloud database, hosted AI, or network service is required. The MVP stores sessions and evidence in IndexedDB (large evidence prefers OPFS when available) and provides deterministic Markdown, standalone HTML, JSON, backup, ZIP knowledge-package, encrypted vault, and redacted agent-pack export. Method deep links (`/?method=rca`, `5-whys`, `fishbone`, `incident-report`) seed structured investigations. The Pattern Desk surfaces recurring systems, tags, root causes, and ruled-outs on-device. The service worker precaches every page, the fonts, and the built assets, so the whole site works offline on a first visit; fonts are self-hosted in `public/fonts` and no request goes to Google Fonts. When a new service worker takes over, the app prompts to reload instead of swapping silently.
 
-The site uses Cloudflare Web Analytics, which is cookieless, records aggregate page views, and does not read locally stored data.
+This site uses Dataflare, a cookieless analytics tool self-hosted in our own Cloudflare account. It records pageviews, referrer, basic device and browser info, and anonymous interaction events (such as `case_resolved`) — never your troubleshooting notes, evidence, or vault data — and does not read locally stored data. Analytics data is kept for 90 days and is never sold or shared.
 
 The data format is versioned (`schemaVersion: 3`) with executable migrations from versions 1 and 2. JSON import accepts individual session exports and full backups, reports ID conflicts, and preserves existing investigations. Encrypted vault import uses the same merge policy after local passphrase decrypt.
 

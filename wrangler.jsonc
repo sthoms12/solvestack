@@ -31,7 +31,9 @@
       "/templates/*",
       "/postmortem-template/*",
       "/network-outage-template/*",
-      "/backup-restore-failure-template/*"
+      "/backup-restore-failure-template/*",
+      "/privacy/*",
+      "/terms/*"
     ]
   },
   "observability": {
